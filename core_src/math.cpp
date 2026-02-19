@@ -26,7 +26,7 @@ namespace ademma_core::math
 {
 ademma_uint_t factorial_twos_count(ademma_uint_t aBase);
 bool f2_choose(ademma_uint_t aTop, ademma_uint_t aBottom);
-ClassicalAdemPolynomial admissify_two_term_classical_adem_monomial(SteenrodSquareDegree aLeft, SteenrodSquareDegree aRight);
+ClassicalAdemPolynomial admissify_two_factor_classical_adem_monomial(SteenrodSquareDegree aLeft, SteenrodSquareDegree aRight);
 }
 
 // PUBLIC FUNCTIONS
@@ -48,7 +48,7 @@ ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_classical_adem
         SteenrodSquareDegree term1 = aMonomial[monomial_i - 1];
         SteenrodSquareDegree term2 = aMonomial[monomial_i];
         // TODO: following line needs changed when handling more than 2 factors
-        cap = admissify_two_term_classical_adem_monomial(term1, term2);
+        cap = admissify_two_factor_classical_adem_monomial(term1, term2);
     }
     return cap;
 }
@@ -82,7 +82,7 @@ bool ademma_core::math::f2_choose(ademma_uint_t aTop, ademma_uint_t aBottom)
     return numeratorTwos <= denominatorTwos;
 }
 
-ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_two_term_classical_adem_monomial(SteenrodSquareDegree aLeft, SteenrodSquareDegree aRight)
+ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_two_factor_classical_adem_monomial(SteenrodSquareDegree aLeft, SteenrodSquareDegree aRight)
 {
     ClassicalAdemPolynomial cap {};
     if (aLeft >= 2 * aRight)
