@@ -9,6 +9,7 @@
 namespace ademma_core
 {
 typedef std::vector<ClassicalAdemMonomial> ClassicalAdemPolynomial;
+std::string ClassicalAdemPolynomial_ToString(const ClassicalAdemPolynomial& aValue);
 }
 
 #endif // CORE_INCLUDE_CLASSICAL_ADEM_POLYNOMIAL
