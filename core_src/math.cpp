@@ -87,7 +87,7 @@ ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_two_factor_cla
     ClassicalAdemPolynomial cap {};
     if (aLeft >= 2 * aRight)
     {
-        // already admissable
+        // already admissible
         ClassicalAdemMonomial cam {};
         cam.push_back(aLeft);
         cam.push_back(aRight);
