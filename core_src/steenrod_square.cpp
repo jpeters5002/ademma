@@ -7,3 +7,8 @@ std::string ademma_core::SteenrodSquareDegree_ToString(SteenrodSquareDegree aVal
     return "Sq^" + std::to_string(aValue);
 }
 
+bool ademma_core::SteenrodSquareDegree_IsPairAdmissible(SteenrodSquareDegree aLeft, SteenrodSquareDegree aRight)
+{
+    return aLeft >= 2 * aRight;
+}
+
