@@ -8,23 +8,46 @@
 
 int main (int argc, char** argv)
 {
-    // Sq6Sq7
-    std::cout << "running Sq^6Sq^7 admissify..." << std::endl;
+    //
     ademma_core::ClassicalAdemMonomial cam {};
     cam.push_back(6);
     cam.push_back(7);
     ademma_core::ClassicalAdemPolynomial cap {};
+    std::cout << "running " << ademma_core::ClassicalAdemMonomial_ToString(cam) << " admissify..." << std::endl;
     cap = ademma_core::math::admissify_classical_adem_monomial(cam);
     std::cout << ademma_core::ClassicalAdemPolynomial_ToString(cap) << std::endl;
-    // Sq6Sq7Sq4
-    std::cout << "running Sq^6Sq^7Sq^4 admissify..." << std::endl;
-    ademma_core::ClassicalAdemMonomial cam2 {};
-    cam2.push_back(6);
-    cam2.push_back(7);
-    cam2.push_back(4);
-    ademma_core::ClassicalAdemPolynomial cap2 {};
-    cap2 = ademma_core::math::admissify_classical_adem_monomial(cam2);
-    std::cout << ademma_core::ClassicalAdemPolynomial_ToString(cap2) << std::endl;
+    //
+    cam.clear();
+    cap.clear();
+    cam.push_back(6);
+    cam.push_back(7);
+    cam.push_back(4);
+    std::cout << "running " << ademma_core::ClassicalAdemMonomial_ToString(cam) << " admissify..." << std::endl;
+    cap = ademma_core::math::admissify_classical_adem_monomial(cam);
+    std::cout << ademma_core::ClassicalAdemPolynomial_ToString(cap) << std::endl;
+    //
+    cam.clear();
+    cap.clear();
+    cam.push_back(3);
+    cam.push_back(7);
+    cam.push_back(10);
+    cam.push_back(13);
+    std::cout << "running " << ademma_core::ClassicalAdemMonomial_ToString(cam) << " admissify..." << std::endl;
+    cap = ademma_core::math::admissify_classical_adem_monomial(cam);
+    std::cout << ademma_core::ClassicalAdemPolynomial_ToString(cap) << std::endl;
+    //
+    cam.clear();
+    cap.clear();
+    cam.push_back(6);
+    cam.push_back(19);
+    cam.push_back(14);
+    cam.push_back(10);
+    cam.push_back(13);
+    cam.push_back(14);
+    cam.push_back(22);
+    std::cout << "running " << ademma_core::ClassicalAdemMonomial_ToString(cam) << " admissify..." << std::endl;
+    cap = ademma_core::math::admissify_classical_adem_monomial(cam);
+    std::cout << ademma_core::ClassicalAdemPolynomial_ToString(cap) << std::endl;
     return 0;
 }
 
