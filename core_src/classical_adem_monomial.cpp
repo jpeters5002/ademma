@@ -46,7 +46,7 @@ bool ademma_core::ClassicalAdemMonomial_IsAdmissible_AssumeNoSq0Factors(const Cl
     SteenrodSquareDegree previous_degree = aMonomial[0];
     for (size_t i = 1; i < aMonomial.size(); i++)
     {
-        if (previous_degree < aMonomial[i] * 2)
+        if (!SteenrodSquareDegree_IsPairAdmissible(previous_degree, aMonomial[i]))
         {
             return false;
         }
