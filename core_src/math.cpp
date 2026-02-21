@@ -110,7 +110,7 @@ bool ademma_core::math::f2_choose(ademma_uint_t aTop, ademma_uint_t aBottom)
 ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_two_factor_classical_adem_monomial(SteenrodSquareDegree aLeft, SteenrodSquareDegree aRight)
 {
     ClassicalAdemPolynomial cap {};
-    if (aLeft >= 2 * aRight)
+    if (SteenrodSquareDegree_IsPairAdmissible(aLeft, aRight))
     {
         // already admissible
         ClassicalAdemMonomial cam {};
