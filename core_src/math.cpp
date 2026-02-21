@@ -117,7 +117,6 @@ ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_two_factor_cla
     ClassicalAdemPolynomial cap {};
     if (SteenrodSquareDegree_IsPairAdmissible(aLeft, aRight))
     {
-        // already admissible
         ClassicalAdemMonomial cam {};
         cam.push_back(aLeft);
         cam.push_back(aRight);
