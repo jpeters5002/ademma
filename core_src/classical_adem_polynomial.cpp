@@ -33,7 +33,6 @@ void ademma_core::ClassicalAdemPolynomial_EliminateAllSq0Factors(ClassicalAdemPo
 void ademma_core::ClassicalAdemPolynomial_CombineLikeTerms_AssumeNoSq0Factors(ClassicalAdemPolynomial& aPolynomial)
 {
     // strange reverse iteration with forward sub-iteration madness
-    //for (size_t i = aPolynomial.size() - 1; i > 0; i--)
     for (size_t i = 1; i < aPolynomial.size();)
     {
         for (size_t j = 0; j < i;)
