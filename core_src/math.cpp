@@ -81,24 +81,6 @@ ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_classical_adem
         admissify_classical_adem_polynomial_one_step_AssumeNoSq0Factors(capOut);
     }
     return capOut;
-    // Sq10Sq5Sq6Sq4
-    // (Sq10Sq5)Sq6Sq4
-    // Sq10(Sq5Sq6)Sq4
-    // (monomial)(polynomial)(monomial)
-    // 
-    // P, zoom in on some index of the terms, n, then we need admissify_monomial(P[n]) which can create another polynomial, which inserts itself as part of P at index n
-    // fn admissify_one_step(monomial) -> polynomial
-    // fn admissify_polynomial_one_step_each_term(polynomial) -> polynomial
-
-    //cap = aMonomial;
-    //for (size_t monomial_i = 1; monomial_i < aMonomial.size(); monomial_i++)
-    //{
-        //SteenrodSquareDegree term1 = aMonomial[monomial_i - 1];
-        //SteenrodSquareDegree term2 = aMonomial[monomial_i];
-        //// TODO: following line needs changed when handling more than 2 factors
-        //cap = admissify_two_factor_classical_adem_monomial(term1, term2);
-    //}
-    //return cap;
 }
 
 // PRIVATE FUNCTIONS DEFINITION
