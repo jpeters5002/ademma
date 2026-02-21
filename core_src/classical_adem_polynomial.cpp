@@ -15,6 +15,10 @@ std::string ademma_core::ClassicalAdemPolynomial_ToString(const ClassicalAdemPol
         }
         outStr += ClassicalAdemMonomial_ToString(aValue[i]);
     }
+    if (outStr.empty())
+    {
+        outStr = "0";
+    }
     return outStr;
 }
 
@@ -29,7 +33,8 @@ void ademma_core::ClassicalAdemPolynomial_EliminateAllSq0Factors(ClassicalAdemPo
 void ademma_core::ClassicalAdemPolynomial_CombineLikeTerms_AssumeNoSq0Factors(ClassicalAdemPolynomial& aPolynomial)
 {
     // strange reverse iteration with forward sub-iteration madness
-    for (size_t i = aPolynomial.size() - 1; i > 0; i--)
+    //for (size_t i = aPolynomial.size() - 1; i > 0; i--)
+    for (size_t i = 1; i < aPolynomial.size();)
     {
         for (size_t j = 0; j < i;)
         {
@@ -38,13 +43,16 @@ void ademma_core::ClassicalAdemPolynomial_CombineLikeTerms_AssumeNoSq0Factors(Cl
                 aPolynomial.erase(aPolynomial.begin() + i);
                 aPolynomial.erase(aPolynomial.begin() + j);
                 i--; // because j < i
-                break;
+                goto skip_i_increment;
             }
             else
             {
                 j++;
             }
         }
+        i++;
+skip_i_increment:
+        continue;
     }
 }
 

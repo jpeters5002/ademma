@@ -124,7 +124,7 @@ ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_two_factor_cla
         {
             ademma_uint_t chooseTop = aRight - k - 1;
             ademma_uint_t chooseBottom = aLeft - 2 * k;
-            if (f2_choose(chooseTop, chooseBottom))
+            if (chooseTop >= chooseBottom && f2_choose(chooseTop, chooseBottom))
             {
                 ClassicalAdemMonomial cam {};
                 cam.push_back(aLeft + aRight - k);
