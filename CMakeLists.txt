@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(ademma CXX)
+project(ademma VERSION 0.0.1 LANGUAGES CXX)
 
 set(CORE_SOURCES
 	core_src/steenrod_square.cpp
