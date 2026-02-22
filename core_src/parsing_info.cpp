@@ -12,7 +12,7 @@ std::string ademma_core::ParsingInfo::GetFullErrorString()
     outStr += mErrorInfo.mErrorString;
     if (mErrorInfo.mErrorNearbyIndex != (size_t)-1)
     {
-        outStr += std::string("\n    ") + "Note: This error occurred near index " + std::to_string(mErrorInfo.mErrorNearbyIndex) + "...";
+        outStr += std::string("\n    ") + "Note: This error occurred near index " + std::to_string(mErrorInfo.mErrorNearbyIndex) + " (zero indexed)...";
 
         size_t error_location_string_left_index = (cPADDING_AROUND_ERROR_INDEX < mErrorInfo.mErrorNearbyIndex) ? (mErrorInfo.mErrorNearbyIndex - cPADDING_AROUND_ERROR_INDEX) : 0;
         size_t error_location_string_right_index = (cPADDING_AROUND_ERROR_INDEX + mErrorInfo.mErrorNearbyIndex < mStringToParse.size()) ? (cPADDING_AROUND_ERROR_INDEX + mErrorInfo.mErrorNearbyIndex) : (mStringToParse.size() - 1);

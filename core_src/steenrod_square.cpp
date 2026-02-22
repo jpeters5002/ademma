@@ -33,6 +33,7 @@ ademma_core::SteenrodSquareDegree ademma_core::SteenrodSquareDegree_FromString(P
         if (user_char != expected_str[i])
         {
             aParsingInfo.mErrorInfo.mIsError = true;
+            aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
             aParsingInfo.mErrorInfo.mErrorString = std::string("Unexpected character while parsing steenrod square: ") + user_char + "; expected form: Sq^<num>";
             return cSteenrodSquareDegree_ERROR_VALUE;
         }
