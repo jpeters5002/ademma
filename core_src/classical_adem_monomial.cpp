@@ -10,6 +10,25 @@ std::string ademma_core::ClassicalAdemMonomial_ToString(const ClassicalAdemMonom
     return outStr;
 }
 
+ademma_core::ClassicalAdemMonomial ademma_core::ClassicalAdemMonomial_FromString(ParsingInfo& aParsingInfo)
+{
+    ClassicalAdemMonomial camOut {};
+    for (;;)
+    {
+        if (aParsingInfo.mCurrentIndex >= aParsingInfo.mStringToParse.size())
+        {
+            break;
+        }
+        SteenrodSquareDegree ssd = SteenrodSquareDegree_FromString(aParsingInfo);
+        if (aParsingInfo.mErrorInfo.mIsError)
+        {
+            return {};
+        }
+        camOut.push_back(ssd);
+    }
+    return camOut;
+}
+
 void ademma_core::ClassicalAdemMonomial_EliminateAllSq0Factors(ClassicalAdemMonomial& aMonomial)
 {
     for (size_t i = aMonomial.size(); i > 0; i--)

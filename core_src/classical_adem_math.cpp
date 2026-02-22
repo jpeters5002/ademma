@@ -1,61 +1,14 @@
-#include <iostream>
+#include "classical_adem_math.hpp"
 
-#include "math.hpp"
 #include "classical_adem_polynomial.hpp"
 
 #include <stdexcept>
-
-
-int main (int argc, char** argv)
-{
-    //
-    ademma_core::ClassicalAdemMonomial cam {};
-    cam.push_back(6);
-    cam.push_back(7);
-    ademma_core::ClassicalAdemPolynomial cap {};
-    std::cout << "running " << ademma_core::ClassicalAdemMonomial_ToString(cam) << " admissify..." << std::endl;
-    cap = ademma_core::math::admissify_classical_adem_monomial(cam);
-    std::cout << ademma_core::ClassicalAdemPolynomial_ToString(cap) << std::endl;
-    //
-    cam.clear();
-    cap.clear();
-    cam.push_back(6);
-    cam.push_back(7);
-    cam.push_back(4);
-    std::cout << "running " << ademma_core::ClassicalAdemMonomial_ToString(cam) << " admissify..." << std::endl;
-    cap = ademma_core::math::admissify_classical_adem_monomial(cam);
-    std::cout << ademma_core::ClassicalAdemPolynomial_ToString(cap) << std::endl;
-    //
-    cam.clear();
-    cap.clear();
-    cam.push_back(3);
-    cam.push_back(7);
-    cam.push_back(10);
-    cam.push_back(13);
-    std::cout << "running " << ademma_core::ClassicalAdemMonomial_ToString(cam) << " admissify..." << std::endl;
-    cap = ademma_core::math::admissify_classical_adem_monomial(cam);
-    std::cout << ademma_core::ClassicalAdemPolynomial_ToString(cap) << std::endl;
-    //
-    cam.clear();
-    cap.clear();
-    cam.push_back(6);
-    cam.push_back(19);
-    cam.push_back(14);
-    cam.push_back(10);
-    cam.push_back(13);
-    cam.push_back(14);
-    cam.push_back(22);
-    std::cout << "running " << ademma_core::ClassicalAdemMonomial_ToString(cam) << " admissify..." << std::endl;
-    cap = ademma_core::math::admissify_classical_adem_monomial(cam);
-    std::cout << ademma_core::ClassicalAdemPolynomial_ToString(cap) << std::endl;
-    return 0;
-}
 
 // PRIVATE FUNCTIONS DECLARATION
 
 typedef unsigned int ademma_uint_t;
 
-namespace ademma_core::math
+namespace ademma_core::classical_adem_math
 {
 ademma_uint_t factorial_twos_count(ademma_uint_t aBase);
 bool f2_choose(ademma_uint_t aTop, ademma_uint_t aBottom);
@@ -66,7 +19,7 @@ void admissify_classical_adem_polynomial_one_step_AssumeNoSq0Factors(ClassicalAd
 
 // PUBLIC FUNCTIONS
 
-ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_classical_adem_monomial(const ClassicalAdemMonomial& aMonomial)
+ademma_core::ClassicalAdemPolynomial ademma_core::classical_adem_math::admissify_classical_adem_monomial(const ClassicalAdemMonomial& aMonomial)
 {
     ClassicalAdemPolynomial capOut {};
     capOut.push_back(aMonomial);
@@ -85,7 +38,7 @@ ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_classical_adem
 
 // PRIVATE FUNCTIONS DEFINITION
 
-ademma_uint_t ademma_core::math::factorial_twos_count(ademma_uint_t aBase)
+ademma_uint_t ademma_core::classical_adem_math::factorial_twos_count(ademma_uint_t aBase)
 {
     ademma_uint_t runningCount = 0;
     ademma_uint_t lastCount = aBase;
@@ -101,7 +54,7 @@ ademma_uint_t ademma_core::math::factorial_twos_count(ademma_uint_t aBase)
     return runningCount;
 }
 
-bool ademma_core::math::f2_choose(ademma_uint_t aTop, ademma_uint_t aBottom)
+bool ademma_core::classical_adem_math::f2_choose(ademma_uint_t aTop, ademma_uint_t aBottom)
 {
     if (aTop < aBottom)
     {
@@ -112,7 +65,7 @@ bool ademma_core::math::f2_choose(ademma_uint_t aTop, ademma_uint_t aBottom)
     return numeratorTwos <= denominatorTwos;
 }
 
-ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_two_factor_classical_adem_monomial(SteenrodSquareDegree aLeft, SteenrodSquareDegree aRight)
+ademma_core::ClassicalAdemPolynomial ademma_core::classical_adem_math::admissify_two_factor_classical_adem_monomial(SteenrodSquareDegree aLeft, SteenrodSquareDegree aRight)
 {
     ClassicalAdemPolynomial cap {};
     if (SteenrodSquareDegree_IsPairAdmissible(aLeft, aRight))
@@ -140,7 +93,7 @@ ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_two_factor_cla
     return cap;
 }
 
-ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_classical_adem_monomial_one_step_AssumeNoSq0Factors(const ClassicalAdemMonomial& aMonomial)
+ademma_core::ClassicalAdemPolynomial ademma_core::classical_adem_math::admissify_classical_adem_monomial_one_step_AssumeNoSq0Factors(const ClassicalAdemMonomial& aMonomial)
 {
     ClassicalAdemPolynomial capOut {};
     if (ClassicalAdemMonomial_IsAdmissible_AssumeNoSq0Factors(aMonomial))
@@ -174,7 +127,7 @@ ademma_core::ClassicalAdemPolynomial ademma_core::math::admissify_classical_adem
     throw std::runtime_error("no inadmissible pair found within monomial that was checked to have an inadmissible pair somewhere");
 }
 
-void ademma_core::math::admissify_classical_adem_polynomial_one_step_AssumeNoSq0Factors(ClassicalAdemPolynomial& aPolynomial)
+void ademma_core::classical_adem_math::admissify_classical_adem_polynomial_one_step_AssumeNoSq0Factors(ClassicalAdemPolynomial& aPolynomial)
 {
     for (size_t i = 0; i < aPolynomial.size();)
     {
