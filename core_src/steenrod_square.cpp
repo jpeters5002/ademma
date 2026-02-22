@@ -40,7 +40,7 @@ ademma_core::SteenrodSquareDegree ademma_core::SteenrodSquareDegree_FromString(P
     }
     try
     {
-        degreeOut = std::stoi(aParsingInfo.mStringToParse, &aParsingInfo.mCurrentIndex);
+        degreeOut = std::stoi(aParsingInfo.mStringToParse.substr(aParsingInfo.mCurrentIndex));
     }
     catch (std::invalid_argument& aException)
     {
