@@ -45,6 +45,10 @@ std::string ademma_core::ParsingInfo::GetFullErrorString()
             error_nearby_index_in_padded_string = mErrorInfo.mErrorNearbyIndex;
         }
         error_location_string_padded += mStringToParse.substr(error_location_string_left_index, error_location_string_right_index - error_location_string_left_index + 1);
+        if (error_location_string_right_index < mStringToParse.size() - 1)
+        {
+            error_location_string_padded += "...";
+        }
 
         outStr += "\n    " + error_location_string_padded;
         std::string error_location_indicator {};
@@ -58,3 +62,4 @@ std::string ademma_core::ParsingInfo::GetFullErrorString()
 
     return outStr;
 }
+
