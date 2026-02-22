@@ -5,24 +5,6 @@
 #include "classical_adem_monomial.hpp"
 #include "parsing_info.hpp"
 
-// for now:
-// ./ademma
-// sq^1sq^3
-// -> result
-//
-// later:
-// ./ademma
-// sq^1sq^3
-// -> assume classical
-// -> result
-// OR
-// ./ademma
-// C/cm/rm
-// c
-// enter classical
-// sq^1sq^3
-// -> result
-
 int main (int argc, char** argv)
 {
     using namespace ademma_core;
