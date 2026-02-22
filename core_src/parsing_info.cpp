@@ -14,8 +14,25 @@ std::string ademma_core::ParsingInfo::GetFullErrorString()
     {
         outStr += std::string("\n    ") + "Note: This error occurred near index " + std::to_string(mErrorInfo.mErrorNearbyIndex) + " (zero indexed)...";
 
-        size_t error_location_string_left_index = (cPADDING_AROUND_ERROR_INDEX < mErrorInfo.mErrorNearbyIndex) ? (mErrorInfo.mErrorNearbyIndex - cPADDING_AROUND_ERROR_INDEX) : 0;
-        size_t error_location_string_right_index = (cPADDING_AROUND_ERROR_INDEX + mErrorInfo.mErrorNearbyIndex < mStringToParse.size()) ? (cPADDING_AROUND_ERROR_INDEX + mErrorInfo.mErrorNearbyIndex) : (mStringToParse.size() - 1);
+        size_t error_location_string_left_index;
+        if (cPADDING_AROUND_ERROR_INDEX < mErrorInfo.mErrorNearbyIndex)
+        {
+            error_location_string_left_index = mErrorInfo.mErrorNearbyIndex - cPADDING_AROUND_ERROR_INDEX;
+        }
+        else
+        {
+            error_location_string_left_index = 0;
+        }
+        size_t error_location_string_right_index;
+        if (cPADDING_AROUND_ERROR_INDEX + mErrorInfo.mErrorNearbyIndex < mStringToParse.size())
+        {
+            error_location_string_right_index = cPADDING_AROUND_ERROR_INDEX + mErrorInfo.mErrorNearbyIndex;
+        }
+        else
+        {
+            error_location_string_right_index = mStringToParse.size() - 1;
+        }
+
         std::string error_location_string_padded {};
         size_t error_nearby_index_in_padded_string = 0;
         if (error_location_string_left_index > 0)
@@ -25,13 +42,13 @@ std::string ademma_core::ParsingInfo::GetFullErrorString()
         }
         else
         {
-            error_nearby_index_in_padded_string = error_location_string_left_index;
+            error_nearby_index_in_padded_string = mErrorInfo.mErrorNearbyIndex;
         }
         error_location_string_padded += mStringToParse.substr(error_location_string_left_index, error_location_string_right_index - error_location_string_left_index + 1);
 
         outStr += "\n    " + error_location_string_padded;
         std::string error_location_indicator {};
-        for (size_t i = 0; i + 1 < error_nearby_index_in_padded_string; i++)
+        for (size_t i = 0; i < error_nearby_index_in_padded_string; i++)
         {
             error_location_indicator += ' ';
         }
