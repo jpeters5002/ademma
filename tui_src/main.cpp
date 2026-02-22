@@ -37,7 +37,7 @@ int main (int argc, char** argv)
         std::cout << parsing_info.GetFullErrorString() << std::endl;
         return 1;
     }
-    ClassicalAdemPolynomial cap = math::admissify_classical_adem_monomial(user_input_cam);
+    ClassicalAdemPolynomial cap = classical_adem_math::admissify_classical_adem_monomial(user_input_cam);
     std::cout << ClassicalAdemPolynomial_ToString(cap) << std::endl;
     return 0;
     /*
