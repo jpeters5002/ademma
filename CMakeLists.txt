@@ -6,6 +6,7 @@ set(CORE_SOURCES
 	core_src/classical_adem_math.cpp
 	core_src/classical_adem_monomial.cpp
 	core_src/classical_adem_polynomial.cpp
+	core_src/parsing_info.cpp
 )
 set(TUI_SOURCES
     tui_src/main.cpp
