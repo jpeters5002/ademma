@@ -35,6 +35,8 @@ std::string RMotivicAdemMonomialFactor_ToString(RMotivicAdemMonomialFactor aValu
 
 RMotivicAdemMonomialFactor RMotivicAdemMonomialFactor_FromString(ParsingInfo& aParsingInfo);
 
+int RMotivicAdemMonomialFactor_GetPower_AssumeRhoOrTau(RMotivicAdemMonomialFactor aValue);
+
 bool RMotivicAdemMonomialFactor_IsPairAdmissible(RMotivicAdemMonomialFactor aLeft, RMotivicAdemMonomialFactor aRight);
 
 // MONOMIAL
@@ -45,7 +47,11 @@ std::string RMotivicAdemMonomial_ToString(const RMotivicAdemMonomial& aValue);
 
 RMotivicAdemMonomial RMotivicAdemMonomial_FromString(ParsingInfo& aParsingInfo);
 
+void RMotivicAdemMonomial_EliminateAllPower0Taus(RMotivicAdemMonomial& aMonomial);
+
 void RMotivicAdemMonomial_EliminateAllSq0Factors(RMotivicAdemMonomial& aMonomial);
+
+void RMotivicAdemMonomial_ShoveRhoLeft(RMotivicAdemMonomial& aMonomial);
 
 bool RMotivicAdemMonomial_IsEqualInForm(const RMotivicAdemMonomial& aLeft, const RMotivicAdemMonomial& aRight);
 

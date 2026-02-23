@@ -1,30 +1,31 @@
 #ifndef CORE_INCLUDE_R_MOTIVIC_ADEM_POLYNOMIAL
 #define CORE_INCLUDE_R_MOTIVIC_ADEM_POLYNOMIAL
 
-#include "steenrod_square.hpp"
-#include "classical_adem_monomial.hpp"
+#include "r_motivic_adem_monomial.hpp"
 
 #include <vector>
 
 namespace ademma_core
 {
-typedef std::vector<ClassicalAdemMonomial> ClassicalAdemPolynomial;
+typedef std::vector<RMotivicAdemMonomial> RMotivicAdemPolynomial;
 
-std::string ClassicalAdemPolynomial_ToString(const ClassicalAdemPolynomial& aValue);
+std::string RMotivicAdemPolynomial_ToString(const RMotivicAdemPolynomial& aValue);
 
-void ClassicalAdemPolynomial_EliminateAllSq0Factors(ClassicalAdemPolynomial& aPolynomial);
+void RMotivicAdemPolynomial_EliminateAllSq0Factors(RMotivicAdemPolynomial& aPolynomial);
 
-void ClassicalAdemPolynomial_CombineLikeTerms_AssumeNoSq0Factors(ClassicalAdemPolynomial& aPolynomial);
+void RMotivicAdemPolynomial_ShoveRhoLeft(RMotivicAdemPolynomial& aPolynomial);
 
-bool ClassicalAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(const ClassicalAdemPolynomial& aPolynomial);
+void RMotivicAdemPolynomial_CombineLikeTerms_AssumeNoSq0Factors_AssumeRhoLeft(RMotivicAdemPolynomial& aPolynomial);
 
-ClassicalAdemPolynomial ClassicalAdemPolynomial_MultiplyPolynomial(const ClassicalAdemPolynomial& aLeft, const ClassicalAdemPolynomial& aRight);
+bool RMotivicAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(const RMotivicAdemPolynomial& aPolynomial);
 
-void ClassicalAdemPolynomial_MultiplyLeftMonomial(const ClassicalAdemMonomial& aLeft, ClassicalAdemPolynomial& aRight);
+RMotivicAdemPolynomial RMotivicAdemPolynomial_MultiplyPolynomial(const RMotivicAdemPolynomial& aLeft, const RMotivicAdemPolynomial& aRight);
 
-void ClassicalAdemPolynomial_MultiplyRightMonomial(ClassicalAdemPolynomial& aLeft, const ClassicalAdemMonomial& aRight);
+void RMotivicAdemPolynomial_MultiplyLeftMonomial(const RMotivicAdemMonomial& aLeft, RMotivicAdemPolynomial& aRight);
 
-void ClassicalAdemPolynomial_ReplaceTermWithPolynomial(ClassicalAdemPolynomial& aPolynomial, size_t aTermIndex, const ClassicalAdemPolynomial& aReplacementPolynomial);
+void RMotivicAdemPolynomial_MultiplyRightMonomial(RMotivicAdemPolynomial& aLeft, const RMotivicAdemMonomial& aRight);
+
+void RMotivicAdemPolynomial_ReplaceTermWithPolynomial(RMotivicAdemPolynomial& aPolynomial, size_t aTermIndex, const RMotivicAdemPolynomial& aReplacementPolynomial);
 }
 
 #endif // CORE_INCLUDE_R_MOTIVIC_ADEM_POLYNOMIAL

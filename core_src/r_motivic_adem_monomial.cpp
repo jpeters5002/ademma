@@ -44,7 +44,7 @@ std::string ademma_core::RMotivicAdemMonomialFactor_ToString(RMotivicAdemMonomia
         default:
             throw std::runtime_error("unreachable code reached: RMotivicAdemMonomialFactor_GetType unexpectedly returned cNONE or bad value");
     }
-    RMotivicAdemMonomialFactor power = aValue & ~(cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | cRMotivicAdemMonomialFactor_IS_TAU_BIT);
+    int power = RMotivicAdemMonomialFactor_GetPower_AssumeRhoOrTau(aValue);
     if (power == 1)
     {
         return strOut;
@@ -107,6 +107,11 @@ ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_
     return rmamfOut;
 }
 
+int ademma_core::RMotivicAdemMonomialFactor_GetPower_AssumeRhoOrTau(RMotivicAdemMonomialFactor aValue)
+{
+    return aValue & ~(cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | cRMotivicAdemMonomialFactor_IS_TAU_BIT);
+}
+
 bool ademma_core::RMotivicAdemMonomialFactor_IsPairAdmissible(RMotivicAdemMonomialFactor aLeft, RMotivicAdemMonomialFactor aRight)
 {
     RMotivicAdemMonomialFactor_Type type_left = RMotivicAdemMonomialFactor_GetType(aLeft);
@@ -161,15 +166,54 @@ ademma_core::RMotivicAdemMonomial ademma_core::RMotivicAdemMonomial_FromString(P
     return rmamOut;
 }
 
+void ademma_core::RMotivicAdemMonomial_EliminateAllPower0Taus(RMotivicAdemMonomial& aMonomial)
+{
+    for (size_t i = aMonomial.size(); i > 0; i--)
+    {
+        if (aMonomial[i - 1] = cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT & cRMotivicAdemMonomialFactor_IS_TAU_BIT)
+        {
+            aMonomial.erase(aMonomial.begin() + (i - 1));
+        }
+    }
+}
+
 void ademma_core::RMotivicAdemMonomial_EliminateAllSq0Factors(RMotivicAdemMonomial& aMonomial)
 {
-    // FIXME: this function probably also needs to rm power 0 taus and rhos (change fn name and implement)
     for (size_t i = aMonomial.size(); i > 0; i--)
     {
         if (aMonomial[i - 1] == 0)
         {
             aMonomial.erase(aMonomial.begin() + (i - 1));
         }
+    }
+}
+
+void ademma_core::RMotivicAdemMonomial_ShoveRhoLeft(RMotivicAdemMonomial& aMonomial)
+{
+    int power_count = 0;
+    for (size_t i = aMonomial.size(); i > 0; i--)
+    {
+        RMotivicAdemMonomialFactor rmamf = aMonomial[i - 1];
+        RMotivicAdemMonomialFactor_Type type = RMotivicAdemMonomialFactor_GetType(rmamf);
+        if (type != RMotivicAdemMonomialFactor_Type::cRho)
+        {
+            continue;
+        }
+        if (i - 1 == 0 && power_count == 0)
+        {
+            return;
+        }
+        power_count += RMotivicAdemMonomialFactor_GetPower_AssumeRhoOrTau(rmamf);
+        aMonomial.erase(aMonomial.begin() + (i - 1));
+    }
+    if (power_count > 0)
+    {
+        if (power_count & (cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | cRMotivicAdemMonomialFactor_IS_TAU_BIT))
+        {
+            throw std::runtime_error("too many rho factors on R-motivic monomial (would clobber allocated bits if combined)");
+        }
+        RMotivicAdemMonomialFactor combined_rhos = cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT & power_count;
+        aMonomial.insert(aMonomial.begin(), combined_rhos);
     }
 }
 
@@ -210,7 +254,7 @@ bool ademma_core::RMotivicAdemMonomial_IsAdmissible_AssumeNoSq0Factors(const RMo
 ademma_core::RMotivicAdemMonomial ademma_core::RMotivicAdemMonomial_Multiply(const RMotivicAdemMonomial& aLeft, const RMotivicAdemMonomial& aRight)
 {
     RMotivicAdemMonomial rmamOut = aLeft;
-    rmamOut.insert(std::end(camOut), std::begin(aRight), std::end(aRight));
+    rmamOut.insert(std::end(rmamOut), std::begin(aRight), std::end(aRight));
     return rmamOut;
 }
 

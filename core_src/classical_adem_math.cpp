@@ -1,6 +1,7 @@
 #include "classical_adem_math.hpp"
 
 #include "classical_adem_polynomial.hpp"
+#include "general_adem_math.hpp"
 
 #include <stdexcept>
 
@@ -10,8 +11,6 @@ typedef unsigned int ademma_uint_t;
 
 namespace ademma_core::classical_adem_math
 {
-ademma_uint_t factorial_twos_count(ademma_uint_t aBase);
-bool f2_choose(ademma_uint_t aTop, ademma_uint_t aBottom);
 ClassicalAdemPolynomial admissify_two_factor_classical_adem_monomial(SteenrodSquareDegree aLeft, SteenrodSquareDegree aRight);
 ClassicalAdemPolynomial admissify_classical_adem_monomial_one_step_AssumeNoSq0Factors(const ClassicalAdemMonomial& aMonomial);
 void admissify_classical_adem_polynomial_one_step_AssumeNoSq0Factors(ClassicalAdemPolynomial& aPolynomial);
@@ -38,33 +37,6 @@ ademma_core::ClassicalAdemPolynomial ademma_core::classical_adem_math::admissify
 
 // PRIVATE FUNCTIONS DEFINITION
 
-ademma_uint_t ademma_core::classical_adem_math::factorial_twos_count(ademma_uint_t aBase)
-{
-    ademma_uint_t runningCount = 0;
-    ademma_uint_t lastCount = aBase;
-    for (;;)
-    {
-        lastCount = lastCount / 2;
-        if (lastCount == 0)
-        {
-            break;
-        }
-        runningCount += lastCount;
-    }
-    return runningCount;
-}
-
-bool ademma_core::classical_adem_math::f2_choose(ademma_uint_t aTop, ademma_uint_t aBottom)
-{
-    if (aTop < aBottom)
-    {
-        throw std::runtime_error("f2_choose given aTop is less than given aBottom when it must be >=");
-    }
-    ademma_uint_t numeratorTwos = factorial_twos_count(aTop);
-    ademma_uint_t denominatorTwos = factorial_twos_count(aBottom) + factorial_twos_count(aTop - aBottom);
-    return numeratorTwos <= denominatorTwos;
-}
-
 ademma_core::ClassicalAdemPolynomial ademma_core::classical_adem_math::admissify_two_factor_classical_adem_monomial(SteenrodSquareDegree aLeft, SteenrodSquareDegree aRight)
 {
     ClassicalAdemPolynomial cap {};
@@ -81,7 +53,7 @@ ademma_core::ClassicalAdemPolynomial ademma_core::classical_adem_math::admissify
         {
             ademma_uint_t chooseTop = aRight - k - 1;
             ademma_uint_t chooseBottom = aLeft - 2 * k;
-            if (chooseTop >= chooseBottom && f2_choose(chooseTop, chooseBottom))
+            if (chooseTop >= chooseBottom && ademma_core::general_adem_math::f2_choose(chooseTop, chooseBottom))
             {
                 ClassicalAdemMonomial cam {};
                 cam.push_back(aLeft + aRight - k);

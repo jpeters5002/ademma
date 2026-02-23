@@ -1,10 +1,10 @@
 #include "r_motivic_adem_polynomial.hpp"
 
-#include "classical_adem_monomial.hpp"
+#include "r_motivic_adem_monomial.hpp"
 
 #include <stdexcept>
 
-std::string ademma_core::ClassicalAdemPolynomial_ToString(const ClassicalAdemPolynomial& aValue)
+std::string ademma_core::RMotivicAdemPolynomial_ToString(const RMotivicAdemPolynomial& aValue)
 {
     std::string outStr = "";
     for (size_t i = 0; i < aValue.size(); i++)
@@ -13,7 +13,7 @@ std::string ademma_core::ClassicalAdemPolynomial_ToString(const ClassicalAdemPol
         {
             outStr += " + ";
         }
-        outStr += ClassicalAdemMonomial_ToString(aValue[i]);
+        outStr += RMotivicAdemMonomial_ToString(aValue[i]);
     }
     if (outStr.empty())
     {
@@ -22,22 +22,29 @@ std::string ademma_core::ClassicalAdemPolynomial_ToString(const ClassicalAdemPol
     return outStr;
 }
 
-void ademma_core::ClassicalAdemPolynomial_EliminateAllSq0Factors(ClassicalAdemPolynomial& aPolynomial)
+void ademma_core::RMotivicAdemPolynomial_EliminateAllSq0Factors(RMotivicAdemPolynomial& aPolynomial)
 {
     for (size_t i = 0; i < aPolynomial.size(); i++)
     {
-        ClassicalAdemMonomial_EliminateAllSq0Factors(aPolynomial[i]);
+        RMotivicAdemMonomial_EliminateAllSq0Factors(aPolynomial[i]);
     }
 }
 
-void ademma_core::ClassicalAdemPolynomial_CombineLikeTerms_AssumeNoSq0Factors(ClassicalAdemPolynomial& aPolynomial)
+void ademma_core::RMotivicAdemPolynomial_ShoveRhoLeft(RMotivicAdemPolynomial& aPolynomial)
 {
-    // strange reverse iteration with forward sub-iteration madness
+    for (size_t i = 0; i < aPolynomial.size(); i++)
+    {
+        RMotivicAdemMonomial_ShoveRhoLeft(aPolynomial[i]);
+    }
+}
+
+void ademma_core::RMotivicAdemPolynomial_CombineLikeTerms_AssumeNoSq0Factors_AssumeRhoLeft(RMotivicAdemPolynomial& aPolynomial)
+{
     for (size_t i = 1; i < aPolynomial.size();)
     {
         for (size_t j = 0; j < i;)
         {
-            if (ClassicalAdemMonomial_IsEqualInForm(aPolynomial[i], aPolynomial[j]))
+            if (RMotivicAdemMonomial_IsEqualInForm(aPolynomial[i], aPolynomial[j]))
             {
                 aPolynomial.erase(aPolynomial.begin() + i);
                 aPolynomial.erase(aPolynomial.begin() + j);
@@ -55,11 +62,11 @@ skip_i_increment:
     }
 }
 
-bool ademma_core::ClassicalAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(const ClassicalAdemPolynomial& aPolynomial)
+bool ademma_core::RMotivicAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(const RMotivicAdemPolynomial& aPolynomial)
 {
     for (size_t i = 0; i < aPolynomial.size(); i++)
     {
-        if (!ClassicalAdemMonomial_IsAdmissible_AssumeNoSq0Factors(aPolynomial[i]))
+        if (!RMotivicAdemMonomial_IsAdmissible_AssumeNoSq0Factors(aPolynomial[i]))
         {
             return false;
         }
@@ -67,36 +74,36 @@ bool ademma_core::ClassicalAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeN
     return true;
 }
 
-ademma_core::ClassicalAdemPolynomial ademma_core::ClassicalAdemPolynomial_MultiplyPolynomial(const ClassicalAdemPolynomial& aLeft, const ClassicalAdemPolynomial& aRight)
+ademma_core::RMotivicAdemPolynomial ademma_core::RMotivicAdemPolynomial_MultiplyPolynomial(const RMotivicAdemPolynomial& aLeft, const RMotivicAdemPolynomial& aRight)
 {
-    ClassicalAdemPolynomial capOut {};
+    RMotivicAdemPolynomial capOut {};
     for (size_t left_i = 0; left_i < aLeft.size(); left_i++)
     {
         for (size_t right_i = 0; right_i < aRight.size(); right_i++)
         {
-            capOut.push_back(ClassicalAdemMonomial_Multiply(aLeft[left_i], aRight[right_i]));
+            capOut.push_back(RMotivicAdemMonomial_Multiply(aLeft[left_i], aRight[right_i]));
         }
     }
     return capOut;
 }
 
-void ademma_core::ClassicalAdemPolynomial_MultiplyLeftMonomial(const ClassicalAdemMonomial& aLeft, ClassicalAdemPolynomial& aRight)
+void ademma_core::RMotivicAdemPolynomial_MultiplyLeftMonomial(const RMotivicAdemMonomial& aLeft, RMotivicAdemPolynomial& aRight)
 {
     for (size_t i = 0; i < aRight.size(); i++)
     {
-        aRight[i] = ClassicalAdemMonomial_Multiply(aLeft, aRight[i]);
+        aRight[i] = RMotivicAdemMonomial_Multiply(aLeft, aRight[i]);
     }
 }
 
-void ademma_core::ClassicalAdemPolynomial_MultiplyRightMonomial(ClassicalAdemPolynomial& aLeft, const ClassicalAdemMonomial& aRight)
+void ademma_core::RMotivicAdemPolynomial_MultiplyRightMonomial(RMotivicAdemPolynomial& aLeft, const RMotivicAdemMonomial& aRight)
 {
     for (size_t i = 0; i < aLeft.size(); i++)
     {
-        aLeft[i] = ClassicalAdemMonomial_Multiply(aLeft[i], aRight);
+        aLeft[i] = RMotivicAdemMonomial_Multiply(aLeft[i], aRight);
     }
 }
 
-void ademma_core::ClassicalAdemPolynomial_ReplaceTermWithPolynomial(ClassicalAdemPolynomial& aPolynomial, size_t aTermIndex, const ClassicalAdemPolynomial& aReplacementPolynomial)
+void ademma_core::RMotivicAdemPolynomial_ReplaceTermWithPolynomial(RMotivicAdemPolynomial& aPolynomial, size_t aTermIndex, const RMotivicAdemPolynomial& aReplacementPolynomial)
 {
     if (aTermIndex >= aPolynomial.size())
     {
