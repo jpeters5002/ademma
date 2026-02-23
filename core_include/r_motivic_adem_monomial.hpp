@@ -31,6 +31,12 @@ enum class RMotivicAdemMonomialFactor_Type : RMotivicAdemMonomialFactor
 
 RMotivicAdemMonomialFactor_Type RMotivicAdemMonomialFactor_GetType(RMotivicAdemMonomialFactor aValue);
 
+RMotivicAdemMonomialFactor RMotivicAdemMonomialFactor_CreateSteenrodSquareDegree(SteenrodSquareDegree aValue);
+
+RMotivicAdemMonomialFactor RMotivicAdemMonomialFactor_CreateTau(int aPower);
+
+RMotivicAdemMonomialFactor RMotivicAdemMonomialFactor_CreateRho(int aPower);
+
 std::string RMotivicAdemMonomialFactor_ToString(RMotivicAdemMonomialFactor aValue);
 
 RMotivicAdemMonomialFactor RMotivicAdemMonomialFactor_FromString(ParsingInfo& aParsingInfo);

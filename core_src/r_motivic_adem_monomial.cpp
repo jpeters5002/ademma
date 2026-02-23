@@ -27,6 +27,33 @@ ademma_core::RMotivicAdemMonomialFactor_Type ademma_core::RMotivicAdemMonomialFa
     }
 }
 
+ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_CreateSteenrodSquareDegree(SteenrodSquareDegree aValue)
+{
+    if (aValue & cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT)
+    {
+        throw std::runtime_error("too large steenrod square degree (would clobber allocated bits)");
+    }
+    return (RMotivicAdemMonomialFactor)aValue;
+}
+
+ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_CreateTau(int aPower)
+{
+    if (aPower & (cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | cRMotivicAdemMonomialFactor_IS_TAU_BIT))
+    {
+        throw std::runtime_error("too many tau factors (would clobber allocated bits if combined)");
+    }
+    return (cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | cRMotivicAdemMonomialFactor_IS_TAU_BIT | aPower);
+}
+
+ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_CreateRho(int aPower)
+{
+    if (aPower & (cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | cRMotivicAdemMonomialFactor_IS_TAU_BIT))
+    {
+        throw std::runtime_error("too many rho factors (would clobber allocated bits if combined)");
+    }
+    return (cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | aPower);
+}
+
 std::string ademma_core::RMotivicAdemMonomialFactor_ToString(RMotivicAdemMonomialFactor aValue)
 {
     std::string strOut {};
