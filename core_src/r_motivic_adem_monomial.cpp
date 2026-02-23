@@ -163,6 +163,7 @@ ademma_core::RMotivicAdemMonomial ademma_core::RMotivicAdemMonomial_FromString(P
 
 void ademma_core::RMotivicAdemMonomial_EliminateAllSq0Factors(RMotivicAdemMonomial& aMonomial)
 {
+    // FIXME: this function probably also needs to rm power 0 taus and rhos (change fn name and implement)
     for (size_t i = aMonomial.size(); i > 0; i--)
     {
         if (aMonomial[i - 1] == 0)
@@ -194,22 +195,22 @@ bool ademma_core::RMotivicAdemMonomial_IsAdmissible_AssumeNoSq0Factors(const RMo
     {
         return true;
     }
-    SteenrodSquareDegree previous_degree = aMonomial[0];
+    RMotivicAdemMonomialFactor previous_factor = aMonomial[0];
     for (size_t i = 1; i < aMonomial.size(); i++)
     {
-        if (!SteenrodSquareDegree_IsPairAdmissible(previous_degree, aMonomial[i]))
+        if (!RMotivicAdemMonomialFactor_IsPairAdmissible(previous_factor, aMonomial[i]))
         {
             return false;
         }
-        previous_degree = aMonomial[i];
+        previous_factor = aMonomial[i];
     }
     return true;
 }
 
 ademma_core::RMotivicAdemMonomial ademma_core::RMotivicAdemMonomial_Multiply(const RMotivicAdemMonomial& aLeft, const RMotivicAdemMonomial& aRight)
 {
-    RMotivicAdemMonomial camOut = aLeft;
-    camOut.insert(std::end(camOut), std::begin(aRight), std::end(aRight));
-    return camOut;
+    RMotivicAdemMonomial rmamOut = aLeft;
+    rmamOut.insert(std::end(camOut), std::begin(aRight), std::end(aRight));
+    return rmamOut;
 }
 
