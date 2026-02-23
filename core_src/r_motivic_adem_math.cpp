@@ -274,7 +274,7 @@ ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_
             continue;
         }
         int num_leftover_right_taus;
-        capOut = admissify_two_factor_r_motivic_adem_monomial_AssumeNoSq0Factors(aMonomial[i - 1], aMonomial [i], num_leftover_right_taus);
+        capOut = admissify_two_factor_r_motivic_adem_monomial_AssumeNoSq0Factors(aMonomial[i - 1], aMonomial[i], num_leftover_right_taus);
         if (num_leftover_right_taus > 0)
         {
             right_leftover_monomial.push_back(RMotivicAdemMonomialFactor_CreateTau(num_leftover_right_taus));
