@@ -18,7 +18,6 @@ std::string ademma_core::SteenrodSquareDegree_ToString(SteenrodSquareDegree aVal
 ademma_core::SteenrodSquareDegree ademma_core::SteenrodSquareDegree_FromString(ParsingInfo& aParsingInfo)
 {
     SteenrodSquareDegree degreeOut;
-    size_t chars_handled_here = 0;
     const char* expected_str = "Sq^";
     for (size_t i = 0; i < 3; i++)
     {

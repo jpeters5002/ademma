@@ -3,13 +3,15 @@
 
 #include <string>
 
+#include "limits.h"
+
 #include "parsing_info.hpp"
 
 namespace ademma_core
 {
 typedef int SteenrodSquareDegree;
 
-static constexpr const SteenrodSquareDegree cSteenrodSquareDegree_ERROR_VALUE = -1;
+static constexpr const SteenrodSquareDegree cSteenrodSquareDegree_ERROR_VALUE = INT_MIN;
 
 std::string SteenrodSquareDegree_ToString(SteenrodSquareDegree aValue);
 
