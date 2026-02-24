@@ -90,11 +90,11 @@ ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_
     }
     else if (aParsingInfo.MatchString_IncreaseIndexOnSuccess("\\tau"))
     {
-        rmamfOut = (cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | cRMotivicAdemMonomialFactor_IS_TAU_BIT);
+        rmamfOut = RMotivicAdemMonomialFactor_CreateTau(1);
     }
     else if (aParsingInfo.MatchString_IncreaseIndexOnSuccess("\\rho"))
     {
-        rmamfOut = cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT;
+        rmamfOut = RMotivicAdemMonomialFactor_CreateRho(1);
     }
     else
     {
@@ -197,7 +197,7 @@ void ademma_core::RMotivicAdemMonomial_EliminateAllPower0Taus(RMotivicAdemMonomi
 {
     for (size_t i = aMonomial.size(); i > 0; i--)
     {
-        if (aMonomial[i - 1] = cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT & cRMotivicAdemMonomialFactor_IS_TAU_BIT)
+        if (aMonomial[i - 1] == cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT & cRMotivicAdemMonomialFactor_IS_TAU_BIT)
         {
             aMonomial.erase(aMonomial.begin() + (i - 1));
         }

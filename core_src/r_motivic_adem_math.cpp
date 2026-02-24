@@ -267,9 +267,9 @@ ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_
     RMotivicAdemMonomial right_leftover_monomial {};
     for (size_t i = 1; i < aMonomial.size(); i++)
     {
-        SteenrodSquareDegree left_degree = aMonomial[i - 1];
-        SteenrodSquareDegree right_degree = aMonomial[i];
-        if (SteenrodSquareDegree_IsPairAdmissible(left_degree, right_degree))
+        RMotivicAdemMonomialFactor left_factor = aMonomial[i - 1];
+        RMotivicAdemMonomialFactor right_factor = aMonomial[i];
+        if (RMotivicAdemMonomialFactor_IsPairAdmissible(left_factor, right_factor))
         {
             continue;
         }
@@ -291,7 +291,7 @@ ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_
         RMotivicAdemPolynomial_MultiplyRightMonomial(capOut, right_leftover_monomial);
         return capOut;
     }
-    throw std::runtime_error("no inadmissible pair found within monomial that was checked to have an inadmissible pair somewhere");
+    throw std::runtime_error("no inadmissible pair found within monomial that was checked to have an inadmissible pair somewhere: " + RMotivicAdemMonomial_ToString(aMonomial));
 }
 
 void ademma_core::r_motivic_adem_math::admissify_r_motivic_adem_polynomial_one_step_AssumeNoSq0Factors(RMotivicAdemPolynomial& aPolynomial)
