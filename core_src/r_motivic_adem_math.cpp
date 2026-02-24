@@ -2,6 +2,7 @@
 
 #include "general_adem_math.hpp"
 #include "r_motivic_adem_polynomial.hpp"
+#include "debug_output.hpp"
 
 #include <stdexcept>
 
@@ -41,6 +42,7 @@ ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_
 
 ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_two_factor_r_motivic_adem_monomial_AssumeNoSq0Factors(RMotivicAdemMonomialFactor aLeft, RMotivicAdemMonomialFactor aRight, int& aLeftoverRightTaus)
 {
+    DEBUG_PRINT("r_mot_math::admissify_two_factor... called with: " + RMotivicAdemMonomialFactor_ToString(aLeft) + ", " + RMotivicAdemMonomialFactor_ToString(aRight));
     aLeftoverRightTaus = 0;
     RMotivicAdemPolynomial rmap {};
     if (RMotivicAdemMonomialFactor_IsPairAdmissible(aLeft, aRight))
@@ -252,6 +254,7 @@ ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_
             }
         }
     }
+    DEBUG_PRINT("r_mot_math::admissify_two_factor... done:        " + RMotivicAdemPolynomial_ToString(rmap) + ", " + std::to_string(aLeftoverRightTaus));
     return rmap;
 }
 
@@ -303,9 +306,9 @@ void ademma_core::r_motivic_adem_math::admissify_r_motivic_adem_polynomial_one_s
             i++;
             continue;
         }
-        RMotivicAdemPolynomial cap_term_i = admissify_r_motivic_adem_monomial_one_step_AssumeNoSq0Factors(aPolynomial[i]);
-        RMotivicAdemPolynomial_ReplaceTermWithPolynomial(aPolynomial, i, cap_term_i);
-        i += cap_term_i.size() - 1;
+        RMotivicAdemPolynomial rmap_term_i = admissify_r_motivic_adem_monomial_one_step_AssumeNoSq0Factors(aPolynomial[i]);
+        RMotivicAdemPolynomial_ReplaceTermWithPolynomial(aPolynomial, i, rmap_term_i);
+        i += rmap_term_i.size();
     }
 }
 

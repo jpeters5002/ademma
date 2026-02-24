@@ -110,7 +110,7 @@ void ademma_core::classical_adem_math::admissify_classical_adem_polynomial_one_s
         }
         ClassicalAdemPolynomial cap_term_i = admissify_classical_adem_monomial_one_step_AssumeNoSq0Factors(aPolynomial[i]);
         ClassicalAdemPolynomial_ReplaceTermWithPolynomial(aPolynomial, i, cap_term_i);
-        i += cap_term_i.size() - 1;
+        i += cap_term_i.size();
     }
 }
 
