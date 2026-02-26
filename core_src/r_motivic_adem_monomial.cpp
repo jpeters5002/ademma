@@ -235,11 +235,7 @@ void ademma_core::RMotivicAdemMonomial_ShoveRhoLeft(RMotivicAdemMonomial& aMonom
     }
     if (power_count > 0)
     {
-        if (power_count & (cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | cRMotivicAdemMonomialFactor_IS_TAU_BIT))
-        {
-            throw std::runtime_error("too many rho factors on R-motivic monomial (would clobber allocated bits if combined)");
-        }
-        RMotivicAdemMonomialFactor combined_rhos = cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT & power_count;
+        RMotivicAdemMonomialFactor combined_rhos = RMotivicAdemMonomialFactor_CreateRho(power_count);
         aMonomial.insert(aMonomial.begin(), combined_rhos);
     }
 }
