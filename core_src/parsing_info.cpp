@@ -111,6 +111,7 @@ bool ademma_core::ParsingInfo::ParseInt(int& aIntOut)
 
 void ademma_core::ParsingInfo::IncreaseIndexOverInt()
 {
+    bool first = true;
     for (;;)
     {
         if (mCurrentIndex >= mStringToParse.size())
@@ -118,8 +119,9 @@ void ademma_core::ParsingInfo::IncreaseIndexOverInt()
             break;
         }
         char c = mStringToParse[mCurrentIndex];
-        if (c >= '0' && c <= '9')
+        if ((first && c == '-') || (c >= '0' && c <= '9'))
         {
+            first = false;
             mCurrentIndex++;
         }
         else
