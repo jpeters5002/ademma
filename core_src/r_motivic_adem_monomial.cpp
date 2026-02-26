@@ -84,17 +84,18 @@ std::string ademma_core::RMotivicAdemMonomialFactor_ToString(RMotivicAdemMonomia
 ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_FromString(ParsingInfo& aParsingInfo)
 {
     RMotivicAdemMonomialFactor rmamfOut;
+    bool is_tau;
     if (aParsingInfo.MatchString("Sq^"))
     {
         return (RMotivicAdemMonomialFactor)SteenrodSquareDegree_FromString(aParsingInfo);
     }
     else if (aParsingInfo.MatchString_IncreaseIndexOnSuccess("\\tau"))
     {
-        rmamfOut = RMotivicAdemMonomialFactor_CreateTau(1);
+        is_tau = true;
     }
     else if (aParsingInfo.MatchString_IncreaseIndexOnSuccess("\\rho"))
     {
-        rmamfOut = RMotivicAdemMonomialFactor_CreateRho(1);
+        is_tau = false;
     }
     else
     {
@@ -104,7 +105,7 @@ ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_
         return cRMotivicAdemMonomialFactor_ERROR_VALUE;
     }
 
-    RMotivicAdemMonomialFactor power = 1;
+    int power = 1;
     if (aParsingInfo.MatchString_IncreaseIndexOnSuccess("^"))
     {
         if (!aParsingInfo.ParseInt(power))
@@ -114,7 +115,6 @@ ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_
             aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
             return cRMotivicAdemMonomialFactor_ERROR_VALUE;
         }
-        aParsingInfo.IncreaseIndexOverInt();
         if (power < 0)
         {
             aParsingInfo.mErrorInfo.mIsError = true;
@@ -129,7 +129,15 @@ ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_
             aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
             return cRMotivicAdemMonomialFactor_ERROR_VALUE;
         }
-        rmamfOut |= power;
+        aParsingInfo.IncreaseIndexOverInt();
+    }
+    if (is_tau)
+    {
+        rmamfOut = RMotivicAdemMonomialFactor_CreateTau(power);
+    }
+    else
+    {
+        rmamfOut = RMotivicAdemMonomialFactor_CreateRho(power);
     }
     return rmamfOut;
 }

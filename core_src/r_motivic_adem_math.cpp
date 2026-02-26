@@ -63,12 +63,7 @@ ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_
                 // rho^a * rho^b
                 int left_power = RMotivicAdemMonomialFactor_GetPower_AssumeRhoOrTau(aLeft);
                 int right_power = RMotivicAdemMonomialFactor_GetPower_AssumeRhoOrTau(aRight);
-                int sum_power = left_power + right_power;
-                if (sum_power & (cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | cRMotivicAdemMonomialFactor_IS_TAU_BIT))
-                {
-                    throw std::runtime_error("too many rho factors on R-motivic monomial (would clobber allocated bits if combined)");
-                }
-                RMotivicAdemMonomialFactor combined = (cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | sum_power);
+                RMotivicAdemMonomialFactor combined = RMotivicAdemMonomialFactor_CreateRho(left_power + right_power);
                 RMotivicAdemMonomial rmam {};
                 rmam.push_back(combined);
                 rmap.push_back(rmam);
@@ -89,8 +84,7 @@ ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_
                 // tau^a * tau^b
                 int left_power = RMotivicAdemMonomialFactor_GetPower_AssumeRhoOrTau(aLeft);
                 int right_power = RMotivicAdemMonomialFactor_GetPower_AssumeRhoOrTau(aRight);
-                int sum_power = left_power + right_power;
-                RMotivicAdemMonomialFactor combined = RMotivicAdemMonomialFactor_CreateTau(sum_power);
+                RMotivicAdemMonomialFactor combined = RMotivicAdemMonomialFactor_CreateTau(left_power + right_power);
                 RMotivicAdemMonomial rmam {};
                 rmam.push_back(combined);
                 rmap.push_back(rmam);
@@ -147,7 +141,7 @@ ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_
             else
             {
                 // rho^a * tau^b but we're not admissible...?
-                throw std::runtime_error("unreachable code: logically impossible to reach this code due to inadmissible R-motivic pair");
+                throw std::runtime_error("unreachable code: logically impossible to reach this code (rho^a * tau^b somehow considered inadmissible)");
             }
         } // r != rho and r != tau => r = steenrod_square_degree
         else
@@ -250,7 +244,7 @@ ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_
             else
             {
                 // rho^a * Sq^b or tau^a * Sq^b but we're not admissible...?
-                throw std::runtime_error("unreachable code: logically impossible to reach this code due to inadmissible R-motivic pair");
+                throw std::runtime_error("unreachable code: logically impossible to reach this code (rho^a * Sq^b or tau^a * Sq^b somehow considered inadmissible)");
             }
         }
     }
@@ -280,7 +274,7 @@ ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_
         capOut = admissify_two_factor_r_motivic_adem_monomial_AssumeNoSq0Factors(aMonomial[i - 1], aMonomial[i], num_leftover_right_taus);
         if (num_leftover_right_taus > 0)
         {
-            right_leftover_monomial.push_back(RMotivicAdemMonomialFactor_CreateTau(num_leftover_right_taus));
+            right_leftover_monomial.insert(right_leftover_monomial.begin(), RMotivicAdemMonomialFactor_CreateTau(num_leftover_right_taus));
         }
         for (size_t left_j = 0; left_j < i - 1; left_j++)
         {
