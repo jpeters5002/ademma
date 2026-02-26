@@ -1,5 +1,7 @@
 #include "parsing_info.hpp"
 
+#include <stdexcept>
+
 std::string ademma_core::ParsingInfo::GetFullErrorString()
 {
     const size_t cPADDING_AROUND_ERROR_INDEX = 6;
@@ -61,5 +63,71 @@ std::string ademma_core::ParsingInfo::GetFullErrorString()
     }
 
     return outStr;
+}
+
+bool ademma_core::ParsingInfo::MatchString(const std::string& aString)
+{
+    for (size_t i = 0; i < aString.size(); i++)
+    {
+        if (mCurrentIndex + i >= mStringToParse.size())
+        {
+            return false;
+        }
+        char user_char = mStringToParse[mCurrentIndex + i];
+        if (user_char != aString[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool ademma_core::ParsingInfo::MatchString_IncreaseIndexOnSuccess(const std::string& aString)
+{
+    if (MatchString(aString))
+    {
+        mCurrentIndex += aString.size();
+        return true;
+    }
+    return false;
+}
+
+bool ademma_core::ParsingInfo::ParseInt(int& aIntOut)
+{
+    try
+    {
+        aIntOut = std::stoi(mStringToParse.substr(mCurrentIndex));
+    }
+    catch (std::invalid_argument& aException)
+    {
+        return false;
+    }
+    catch (std::out_of_range& aException)
+    {
+        return false;
+    }
+    return true;
+}
+
+void ademma_core::ParsingInfo::IncreaseIndexOverInt()
+{
+    bool first = true;
+    for (;;)
+    {
+        if (mCurrentIndex >= mStringToParse.size())
+        {
+            break;
+        }
+        char c = mStringToParse[mCurrentIndex];
+        if ((first && c == '-') || (c >= '0' && c <= '9'))
+        {
+            first = false;
+            mCurrentIndex++;
+        }
+        else
+        {
+            break;
+        }
+    }
 }
 
