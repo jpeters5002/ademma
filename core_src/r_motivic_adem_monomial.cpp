@@ -76,8 +76,9 @@ std::string ademma_core::RMotivicAdemMonomialFactor_ToString(RMotivicAdemMonomia
     {
         return strOut;
     }
-    strOut += '^';
+    strOut += "^{";
     strOut += std::to_string(power);
+    strOut += "}";
     return strOut;
 }
 

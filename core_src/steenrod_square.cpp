@@ -12,7 +12,7 @@ std::string ademma_core::SteenrodSquareDegree_ToString(SteenrodSquareDegree aVal
     {
         throw std::runtime_error("error value SteenrodSquareDegree given to SteenrodSquareDegree_ToString");
     }
-    return "Sq^" + std::to_string(aValue);
+    return "Sq^{" + std::to_string(aValue) + "}";
 }
 
 ademma_core::SteenrodSquareDegree ademma_core::SteenrodSquareDegree_FromString(ParsingInfo& aParsingInfo)
