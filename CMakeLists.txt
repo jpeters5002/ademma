@@ -20,3 +20,19 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	core_include
 )
 
+option(BUILD_TESTING "Build the project's tests" ON)
+
+if (BUILD_TESTING)
+    set(TEST_PROJECT_NAME test_${PROJECT_NAME})
+    set(TEST_SOURCES
+        test_src/main.cpp
+        test_src/testing_helper_functions.cpp
+        test_src/test_cl_prod_binary_degrees_1_to_n.cpp
+    )
+    add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCES} ${CORE_SOURCES})
+    target_include_directories(${TEST_PROJECT_NAME} PUBLIC
+        test_include
+        core_include
+    )
+endif()
+
