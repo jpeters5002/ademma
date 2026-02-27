@@ -76,8 +76,9 @@ std::string ademma_core::RMotivicAdemMonomialFactor_ToString(RMotivicAdemMonomia
     {
         return strOut;
     }
-    strOut += '^';
+    strOut += "^{";
     strOut += std::to_string(power);
+    strOut += "}";
     return strOut;
 }
 
@@ -108,6 +109,11 @@ ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_
     int power = 1;
     if (aParsingInfo.MatchString_IncreaseIndexOnSuccess("^"))
     {
+        bool is_bracketed_power = false;
+        if (aParsingInfo.MatchString_IncreaseIndexOnSuccess("{"))
+        {
+            is_bracketed_power = true;
+        }
         if (!aParsingInfo.ParseInt(power))
         {
             aParsingInfo.mErrorInfo.mIsError = true;
@@ -125,11 +131,18 @@ ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_
         if (power & (cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT | cRMotivicAdemMonomialFactor_IS_TAU_BIT))
         {
             aParsingInfo.mErrorInfo.mIsError = true;
-            aParsingInfo.mErrorInfo.mErrorString = "Too large value for power of rho or tau would clobber allocated info bits (", std::to_string(sizeof(RMotivicAdemMonomialFactor) * 8 - 2), " bits available for the power)";
+            aParsingInfo.mErrorInfo.mErrorString = "Too large value for power of rho or tau would clobber allocated info bits (" + std::to_string(sizeof(RMotivicAdemMonomialFactor) * 8 - 2) + " bits available for the power)";
             aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
             return cRMotivicAdemMonomialFactor_ERROR_VALUE;
         }
         aParsingInfo.IncreaseIndexOverInt();
+        if (is_bracketed_power && !aParsingInfo.MatchString_IncreaseIndexOnSuccess("}"))
+        {
+            aParsingInfo.mErrorInfo.mIsError = true;
+            aParsingInfo.mErrorInfo.mErrorString = "When parsing power " + std::to_string(power) + ", a start bracket '{' was found, but no end bracket '}'";
+            aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
+            return cRMotivicAdemMonomialFactor_ERROR_VALUE;
+        }
     }
     if (is_tau)
     {
