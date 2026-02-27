@@ -48,7 +48,24 @@ int handle_r_motivic()
 
 int main (int argc, char** argv)
 {
-    return handle_r_motivic();
-    //return handle_classical();
+    std::cout << "Enter Steenrod Algebra type";
+    std::cout << "Options:\n"
+        "\tcl - Classical\n"
+        "\trm - R-Motivic" << std::endl;
+    std::string option;
+    std::cin >> option;
+    if (option == "cl")
+    {
+        return handle_classical();
+    }
+    else if (option == "rm")
+    {
+        return handle_r_motivic();
+    }
+    else
+    {
+        std::cout << "bad option: " << option << std::endl;
+        return 1;
+    }
 }
 
