@@ -38,6 +38,11 @@ ademma_core::SteenrodSquareDegree ademma_core::SteenrodSquareDegree_FromString(P
         }
         aParsingInfo.mCurrentIndex++;
     }
+    bool is_bracketed_superscript = false;
+    if (aParsingInfo.MatchString_IncreaseIndexOnSuccess("{"))
+    {
+        is_bracketed_superscript = true;
+    }
     try
     {
         degreeOut = std::stoi(aParsingInfo.mStringToParse.substr(aParsingInfo.mCurrentIndex));
@@ -78,6 +83,13 @@ ademma_core::SteenrodSquareDegree ademma_core::SteenrodSquareDegree_FromString(P
         {
             break;
         }
+    }
+    if (is_bracketed_superscript && !aParsingInfo.MatchString_IncreaseIndexOnSuccess("}"))
+    {
+        aParsingInfo.mErrorInfo.mIsError = true;
+        aParsingInfo.mErrorInfo.mErrorString = "When parsing Sq degree " + std::to_string(degreeOut) + ", a start bracket '{' was found, but no end bracket '}'";
+        aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
+        return cSteenrodSquareDegree_ERROR_VALUE;
     }
     return degreeOut;
 }
