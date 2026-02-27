@@ -28,6 +28,7 @@ if (BUILD_TESTING)
         test_src/main.cpp
         test_src/testing_helper_functions.cpp
         test_src/test_cl_prod_binary_degrees_1_to_n.cpp
+        test_src/test_sq1_sq2n.cpp
     )
     add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCES} ${CORE_SOURCES})
     target_include_directories(${TEST_PROJECT_NAME} PUBLIC
