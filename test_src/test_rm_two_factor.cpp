@@ -49,7 +49,7 @@ int test_rm_two_factor()
             ClassicalAdemPolynomial cap_from_rmap = testing::classical_polynomial_from_r_motivic_polynomial(rmap, &tau_terms, &rho_terms);
             if (rho_terms != 0)
             {
-                std::cerr << "Running R-Motivic admissify on " << RMotivicAdemMonomial_ToString(rmam) << " yielded " << RMotivicAdemPolynomial_ToString(rmap) << " which unexpectedly contains at least one term with rho (there are supposed to be 0 when both Sq degrees are odd)" << std::endl;
+                std::cerr << "Running R-Motivic admissify on " << RMotivicAdemMonomial_ToString(rmam) << " yielded " << RMotivicAdemPolynomial_ToString(rmap) << " which unexpectedly contains at least one term with rho (there are supposed to be 0 when Sq degrees are both odd or both even)" << std::endl;
                 success = false;
             }
             bool odd = (i % 2);
