@@ -1,8 +1,8 @@
 #ifndef TEST_INCLUDE_TEST_SQ2MINUS1_SQN_HPP
 #define TEST_INCLUDE_TEST_SQ2MINUS1_SQN_HPP
 
-// for cl, Sq^{2n-1}Sq^{n} = 0
-// for rm, Sq^{2n-1}Sq^{n} = 0 if n is odd; Sq^{2n-1}Sq^{n} = \rhoSq^{2n-1}Sq^{n-1} if n is even
+// in cl, Sq^{2n-1}Sq^{n} = 0
+// in rm, Sq^{2n-1}Sq^{n} = 0 if n is odd; Sq^{2n-1}Sq^{n} = \rhoSq^{2n-1}Sq^{n-1} if n is even
 
 int test_sq2nminus1_sqn();
 

@@ -30,6 +30,7 @@ if (BUILD_TESTING)
         test_src/test_cl_prod_binary_degrees_1_to_n.cpp
         test_src/test_sq1_sq2n.cpp
         test_src/test_sq2nminus1_sqn.cpp
+        test_src/test_sq2tothen_tothe2nplus2.cpp
     )
     add_executable(${TEST_PROJECT_NAME} ${TEST_SOURCES} ${CORE_SOURCES})
     target_include_directories(${TEST_PROJECT_NAME} PUBLIC
