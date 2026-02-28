@@ -6,7 +6,7 @@
 
 namespace testing
 {
-ademma_core::ClassicalAdemPolynomial classical_polynomial_from_r_motivic_polynomial(const ademma_core::RMotivicAdemPolynomial& aRMPolynomial);
+ademma_core::ClassicalAdemPolynomial classical_polynomial_from_r_motivic_polynomial(const ademma_core::RMotivicAdemPolynomial& aRMPolynomial, int* aNumTermsWithTau = nullptr, int* aNumTermsWithRho = nullptr);
 int two_to_power(int n);
 }
 

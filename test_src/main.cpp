@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "test_cl_prod_binary_degrees_1_to_n.hpp"
+#include "test_rm_two_factor.hpp"
 #include "test_sq1_sq2n.hpp"
 #include "test_sq2nminus1_sqn.hpp"
 #include "test_sq2tothen_tothe2nplus2.hpp"
@@ -17,6 +18,7 @@ struct test_function_t
 
 static test_function_t test_functions[] = {
     TEST_FUNCTION(test_cl_prod_binary_degrees_1_to_n),
+    TEST_FUNCTION(test_rm_two_factor),
     TEST_FUNCTION(test_sq1_sq2n),
     TEST_FUNCTION(test_sq2nminus1_sqn),
     TEST_FUNCTION(test_sq2tothen_tothe2nplus2),

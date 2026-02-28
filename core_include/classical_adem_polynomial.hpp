@@ -16,6 +16,8 @@ void ClassicalAdemPolynomial_EliminateAllSq0Factors(ClassicalAdemPolynomial& aPo
 
 void ClassicalAdemPolynomial_CombineLikeTerms_AssumeNoSq0Factors(ClassicalAdemPolynomial& aPolynomial);
 
+bool ClassicalAdemPolynomial_IsEqualInForm(const ClassicalAdemPolynomial& aLeft, const ClassicalAdemPolynomial& aRight);
+
 bool ClassicalAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(const ClassicalAdemPolynomial& aPolynomial);
 
 ClassicalAdemPolynomial ClassicalAdemPolynomial_MultiplyPolynomial(const ClassicalAdemPolynomial& aLeft, const ClassicalAdemPolynomial& aRight);

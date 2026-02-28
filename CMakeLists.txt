@@ -28,6 +28,7 @@ if (BUILD_TESTING)
         test_src/main.cpp
         test_src/testing_helper_functions.cpp
         test_src/test_cl_prod_binary_degrees_1_to_n.cpp
+        test_src/test_rm_two_factor.cpp
         test_src/test_sq1_sq2n.cpp
         test_src/test_sq2nminus1_sqn.cpp
         test_src/test_sq2tothen_tothe2nplus2.cpp
