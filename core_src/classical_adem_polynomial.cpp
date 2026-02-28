@@ -54,6 +54,22 @@ skip_i_increment:
     }
 }
 
+bool ademma_core::ClassicalAdemPolynomial_IsEqualInForm(const ClassicalAdemPolynomial& aLeft, const ClassicalAdemPolynomial& aRight)
+{
+    if (aLeft.size() != aRight.size())
+    {
+        return false;
+    }
+    for (size_t i = 0; i < aLeft.size(); i++)
+    {
+        if (!ClassicalAdemMonomial_IsEqualInForm(aLeft[i], aRight[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool ademma_core::ClassicalAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(const ClassicalAdemPolynomial& aPolynomial)
 {
     for (size_t i = 0; i < aPolynomial.size(); i++)
