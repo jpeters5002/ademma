@@ -29,16 +29,21 @@ int main(int argc, char** argv)
     {
         if (test_functions[i].fn() != 0)
         {
+            std::cout << "\tFAIL - " << test_functions[i].name << std::endl;
             out_val = 1;
+        }
+        else
+        {
+            std::cout << "\tPASS - " << test_functions[i].name << std::endl;
         }
     }
     if (out_val != 0)
     {
-        std::cout << "TESTS FAILED" << std::endl;
+        std::cout << std::endl << "TESTS FAILED" << std::endl;
     }
     else
     {
-        std::cout << "TESTS PASSED" << std::endl;
+        std::cout << std::endl << "TESTS PASSED" << std::endl;
     }
     return out_val;
 }
