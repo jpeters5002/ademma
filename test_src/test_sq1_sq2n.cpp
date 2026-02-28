@@ -9,6 +9,7 @@
 #include "steenrod_square.hpp"
 
 #include <iostream>
+#include <assert.h>
 
 #define LAST_N_CASE_TO_TEST 50
 

@@ -2,6 +2,7 @@
 
 #include "test_cl_prod_binary_degrees_1_to_n.hpp"
 #include "test_sq1_sq2n.hpp"
+#include "test_sq2nminus1_sqn.hpp"
 
 #define SIZEOF_LUT(lut) (sizeof(lut) / sizeof(lut[0]))
 
@@ -16,6 +17,7 @@ struct test_function_t
 static test_function_t test_functions[] = {
     TEST_FUNCTION(test_cl_prod_binary_degrees_1_to_n),
     TEST_FUNCTION(test_sq1_sq2n),
+    TEST_FUNCTION(test_sq2nminus1_sqn),
 };
 
 int main(int argc, char** argv)

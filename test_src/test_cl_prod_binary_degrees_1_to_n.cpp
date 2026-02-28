@@ -11,6 +11,7 @@
 #include "steenrod_square.hpp"
 
 #include <iostream>
+#include <assert.h>
 
 #define LAST_N_CASE_TO_TEST_CL 15
 #define LAST_N_CASE_TO_TEST_RM 6
@@ -19,6 +20,7 @@ int test_cl_prod_binary_degrees_1_to_n()
 {
     using namespace ademma_core;
     bool success = true;
+    assert(LAST_N_CASE_TO_TEST_CL >= LAST_N_CASE_TO_TEST_RM);
     for (size_t n = 1; n <= LAST_N_CASE_TO_TEST_CL; n++)
     {
         const int expected_degree = testing::two_to_power(n + 1) - 1;
