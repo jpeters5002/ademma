@@ -68,12 +68,20 @@ jobs:
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Test Linux
+    - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      if: runner.os == "Linux"
-      run: ${{ github.workspace }}/build/test_ademma
+      run: |
+        if [ "${{ runner.os }}" == "Linux" ]; then
+          ${{ github.workspace }}/build/test_ademma
+        elif [ "${{ runner.os }}" == "Windows" ]; then
+          ${{ github.workspace }}/build/${{ matrix.build_type }}/test_ademma.exe
+        fi
+#    - name: Test Linux
+#      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+#      if: runner.os == "Linux"
+#      run: ${{ github.workspace }}/build/test_ademma
 
-    - name: Test Windows
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      if: runner.os == "Windows"
-      run: ${{ github.workspace }}/build/${{ matrix.build_type }}/test_ademma.exe
+#    - name: Test Windows
+#      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+#      if: runner.os == "Windows"
+#      run: ${{ github.workspace }}/build/${{ matrix.build_type }}/test_ademma.exe
