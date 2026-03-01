@@ -22,7 +22,7 @@ ademma_core::SteenrodSquareDegree ademma_core::SteenrodSquareDegree_FromString(P
     {
         aParsingInfo.mErrorInfo.mIsError = true;
         aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
-        aParsingInfo.mErrorInfo.mErrorString = "Unrecognized character combination while parsing Steenrod square degree; expected form: Sq^<num>";
+        aParsingInfo.mErrorInfo.mErrorString = "Unrecognized character combination while parsing Steenrod square degree; expected form: Sq^<num> (optional curly brackets around <num>)";
         return cSteenrodSquareDegree_ERROR_VALUE;
     }
     bool is_bracketed_superscript = false;
