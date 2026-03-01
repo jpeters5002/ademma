@@ -70,6 +70,7 @@ jobs:
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      shell: bash
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
           ${{ github.workspace }}/build/test_ademma
