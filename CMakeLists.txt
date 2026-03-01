@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(ademma VERSION 0.0.1 LANGUAGES CXX)
+project(ademma VERSION 0.0.2 LANGUAGES CXX)
 
 set(CORE_SOURCES
 	core_src/classical_adem_math.cpp
