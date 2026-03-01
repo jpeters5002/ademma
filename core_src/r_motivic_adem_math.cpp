@@ -10,12 +10,12 @@
 
 // PRIVATE FUNCTIONS DECLARATION
 
-namespace ademma_core::r_motivic_adem_math
+namespace ademma_core { namespace r_motivic_adem_math
 {
 RMotivicAdemPolynomial admissify_two_factor_r_motivic_adem_monomial_AssumeNoSq0Factors(RMotivicAdemMonomialFactor aLeft, RMotivicAdemMonomialFactor aRight, int& aLeftoverRightTaus);
 RMotivicAdemPolynomial admissify_r_motivic_adem_monomial_one_step_AssumeNoSq0Factors(const RMotivicAdemMonomial& aMonomial);
 void admissify_r_motivic_adem_polynomial_one_step_AssumeNoSq0Factors(RMotivicAdemPolynomial& aPolynomial);
-}
+}}
 
 // PUBLIC FUNCTIONS
 

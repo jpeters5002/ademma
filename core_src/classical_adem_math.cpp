@@ -9,12 +9,12 @@
 
 typedef unsigned int ademma_uint_t;
 
-namespace ademma_core::classical_adem_math
+namespace ademma_core { namespace classical_adem_math
 {
 ClassicalAdemPolynomial admissify_two_factor_classical_adem_monomial(SteenrodSquareDegree aLeft, SteenrodSquareDegree aRight);
 ClassicalAdemPolynomial admissify_classical_adem_monomial_one_step_AssumeNoSq0Factors(const ClassicalAdemMonomial& aMonomial);
 void admissify_classical_adem_polynomial_one_step_AssumeNoSq0Factors(ClassicalAdemPolynomial& aPolynomial);
-}
+}}
 
 // PUBLIC FUNCTIONS
 
