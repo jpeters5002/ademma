@@ -18,76 +18,37 @@ std::string ademma_core::SteenrodSquareDegree_ToString(SteenrodSquareDegree aVal
 ademma_core::SteenrodSquareDegree ademma_core::SteenrodSquareDegree_FromString(ParsingInfo& aParsingInfo)
 {
     SteenrodSquareDegree degreeOut;
-    const char* expected_str = "Sq^";
-    for (size_t i = 0; i < 3; i++)
+    if (!aParsingInfo.MatchString_IncreaseIndexOnSuccess("Sq^"))
     {
-        assert(i < strlen(expected_str));
-        if (aParsingInfo.mCurrentIndex >= aParsingInfo.mStringToParse.size())
-        {
-            aParsingInfo.mErrorInfo.mIsError = true;
-            aParsingInfo.mErrorInfo.mErrorString = "Unexpected end of data while parsing a steenrod square; expected form: Sq^<num>";
-            return cSteenrodSquareDegree_ERROR_VALUE;
-        }
-        char user_char = aParsingInfo.mStringToParse[aParsingInfo.mCurrentIndex];
-        if (user_char != expected_str[i])
-        {
-            aParsingInfo.mErrorInfo.mIsError = true;
-            aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
-            aParsingInfo.mErrorInfo.mErrorString = std::string("Unexpected character while parsing steenrod square: ") + user_char + "; expected form: Sq^<num>";
-            return cSteenrodSquareDegree_ERROR_VALUE;
-        }
-        aParsingInfo.mCurrentIndex++;
+        aParsingInfo.mErrorInfo.mIsError = true;
+        aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
+        aParsingInfo.mErrorInfo.mErrorString = "Unrecognized character combination while parsing Steenrod square degree; expected form: Sq^<num>";
+        return cSteenrodSquareDegree_ERROR_VALUE;
     }
     bool is_bracketed_superscript = false;
     if (aParsingInfo.MatchString_IncreaseIndexOnSuccess("{"))
     {
         is_bracketed_superscript = true;
     }
-    try
-    {
-        degreeOut = std::stoi(aParsingInfo.mStringToParse.substr(aParsingInfo.mCurrentIndex));
-    }
-    catch (std::invalid_argument& aException)
+    if (!aParsingInfo.ParseInt(degreeOut))
     {
         aParsingInfo.mErrorInfo.mIsError = true;
         aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
-        aParsingInfo.mErrorInfo.mErrorString = "Unable to determine steenrod square degree value; expected form: Sq^<num>";
-        return cSteenrodSquareDegree_ERROR_VALUE;
-    }
-    catch (std::out_of_range& aException)
-    {
-        aParsingInfo.mErrorInfo.mIsError = true;
-        aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
-        aParsingInfo.mErrorInfo.mErrorString = "Unable to determine steenrod square degree value: value out of range of int";
+        aParsingInfo.mErrorInfo.mErrorString = "Failed to parse int while parsing Steenrod square degree";
         return cSteenrodSquareDegree_ERROR_VALUE;
     }
     if (degreeOut < 0)
     {
         aParsingInfo.mErrorInfo.mIsError = true;
         aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
-        aParsingInfo.mErrorInfo.mErrorString = "Given steenrod square degree value is negative, which is meaningless: " + std::to_string(degreeOut);
+        aParsingInfo.mErrorInfo.mErrorString = "Given Steenrod square degree value is negative, which is meaningless: " + std::to_string(degreeOut);
         return cSteenrodSquareDegree_ERROR_VALUE;
     }
-    for (;;)
-    {
-        if (aParsingInfo.mCurrentIndex >= aParsingInfo.mStringToParse.size())
-        {
-            break;
-        }
-        char c = aParsingInfo.mStringToParse[aParsingInfo.mCurrentIndex];
-        if (c >= '0' && c <= '9')
-        {
-            aParsingInfo.mCurrentIndex++;
-        }
-        else
-        {
-            break;
-        }
-    }
+    aParsingInfo.IncreaseIndexOverInt();
     if (is_bracketed_superscript && !aParsingInfo.MatchString_IncreaseIndexOnSuccess("}"))
     {
         aParsingInfo.mErrorInfo.mIsError = true;
-        aParsingInfo.mErrorInfo.mErrorString = "When parsing Sq degree " + std::to_string(degreeOut) + ", a start bracket '{' was found, but no end bracket '}'";
+        aParsingInfo.mErrorInfo.mErrorString = "When parsing Steenrod square degree " + std::to_string(degreeOut) + ", a start bracket '{' was found, but no end bracket '}'";
         aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
         return cSteenrodSquareDegree_ERROR_VALUE;
     }
