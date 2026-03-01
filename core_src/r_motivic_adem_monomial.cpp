@@ -218,7 +218,7 @@ void ademma_core::RMotivicAdemMonomial_EliminateAllPower0Taus(RMotivicAdemMonomi
 {
     for (size_t i = aMonomial.size(); i > 0; i--)
     {
-        if (aMonomial[i - 1] == cRMotivicAdemMonomialFactor_IS_RHO_OR_TAU_BIT & cRMotivicAdemMonomialFactor_IS_TAU_BIT)
+        if (RMotivicAdemMonomialFactor_GetType(aMonomial[i - 1]) == RMotivicAdemMonomialFactor_Type::cTau && RMotivicAdemMonomialFactor_GetPower_AssumeRhoOrTau(aMonomial[i - 1]) == 0)
         {
             aMonomial.erase(aMonomial.begin() + (i - 1));
         }

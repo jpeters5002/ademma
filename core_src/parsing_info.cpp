@@ -98,11 +98,11 @@ bool ademma_core::ParsingInfo::ParseInt(int& aIntOut)
     {
         aIntOut = std::stoi(mStringToParse.substr(mCurrentIndex));
     }
-    catch (std::invalid_argument& aException)
+    catch (std::invalid_argument&)
     {
         return false;
     }
-    catch (std::out_of_range& aException)
+    catch (std::out_of_range&)
     {
         return false;
     }
