@@ -77,7 +77,8 @@ jobs:
           ./test_ademma
         elif [ "${{ runner.os }}" == "Windows" ]; then
           #${{ github.workspace }}/build/${{ matrix.build_type }}/test_ademma.exe
-          ./test_ademma.exe
+          echo %CD%
+          ./${{ matrix.build_type }}/test_ademma.exe
         fi
 #    - name: Test Linux
 #      working-directory: ${{ steps.strings.outputs.build-output-dir }}
