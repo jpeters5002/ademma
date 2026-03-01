@@ -101,7 +101,7 @@ ademma_core::RMotivicAdemMonomialFactor ademma_core::RMotivicAdemMonomialFactor_
     else
     {
         aParsingInfo.mErrorInfo.mIsError = true;
-        aParsingInfo.mErrorInfo.mErrorString = "Unrecognized character combination while parsing R-motivic adem monomial factor; expected form: 'Sq^<num>' OR '\\tau' OR '\\tau^<num>' OR '\\rho' OR '\\rho^<num>'";
+        aParsingInfo.mErrorInfo.mErrorString = "Unrecognized character combination while parsing R-motivic adem monomial factor; expected form: 'Sq^<num>' OR '\\tau' OR '\\tau^<num>' OR '\\rho' OR '\\rho^<num>' (optional curly brackets around <num>)";
         aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
         return cRMotivicAdemMonomialFactor_ERROR_VALUE;
     }
