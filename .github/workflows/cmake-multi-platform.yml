@@ -68,9 +68,12 @@ jobs:
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Test
+    - name: Test Linux
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      # run: ctest --build-config ${{ matrix.build_type }}
+      if: runner.os == "Linux"
       run: ${{ github.workspace }}/build/test_ademma
+
+    - name: Test Windows
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      if: runner.os == "Windows"
+      run: ${{ github.workspace }}/build/${{ matrix.build_type }}/test_ademma.exe
