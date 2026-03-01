@@ -73,19 +73,7 @@ jobs:
       shell: bash
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
-          #${{ github.workspace }}/build/test_ademma
           ./test_ademma
         elif [ "${{ runner.os }}" == "Windows" ]; then
-          #${{ github.workspace }}/build/${{ matrix.build_type }}/test_ademma.exe
-          echo %CD%
           ./${{ matrix.build_type }}/test_ademma.exe
         fi
-#    - name: Test Linux
-#      working-directory: ${{ steps.strings.outputs.build-output-dir }}
-#      if: runner.os == "Linux"
-#      run: ${{ github.workspace }}/build/test_ademma
-
-#    - name: Test Windows
-#      working-directory: ${{ steps.strings.outputs.build-output-dir }}
-#      if: runner.os == "Windows"
-#      run: ${{ github.workspace }}/build/${{ matrix.build_type }}/test_ademma.exe
