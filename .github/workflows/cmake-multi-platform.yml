@@ -76,9 +76,10 @@ jobs:
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
     - uses: actions/upload-artifact@v4
+      if: ${{ matrix.cpp_compiler != 'clang' }}
       with:
-        name: ${{ matrix.exe_name }}
-        path: ${{ steps.strings.outputs.build-output-dir }}
+        name: ademma-${{ runner.os }}
+        path: ${{ steps.strings.outputs.build-output-dir }}/${{ matrix.exe_name }}
         retention-days: 7
 
     - name: Test
