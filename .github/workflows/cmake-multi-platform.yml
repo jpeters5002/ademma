@@ -26,29 +26,23 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         build_type: [Release]
         c_compiler: [gcc, clang, cl]
-        exe_name:   [ademma, ademma.exe]
         include:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
-            exe_name: ademma.exe
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
-            exe_name: ademma
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
-            exe_name: ademma
         exclude:
           - os: windows-latest
             c_compiler: gcc
-            exe_name: ademma
           - os: windows-latest
             c_compiler: clang
           - os: ubuntu-latest
             c_compiler: cl
-            exe_name: ademma.exe
 
     steps:
     - uses: actions/checkout@v4
@@ -79,7 +73,7 @@ jobs:
       if: ${{ matrix.cpp_compiler != 'clang' }}
       with:
         name: ademma-${{ runner.os }}
-        path: ${{ steps.strings.outputs.build-output-dir }}/${{ matrix.exe_name }}
+        path: ${{ steps.strings.outputs.build-output-dir }}/${{ runner.os == 'Windows' && format('{0}/{1}', matrix.build_type, 'ademma.exe') || 'ademma' }}
         retention-days: 7
 
     - name: Test
