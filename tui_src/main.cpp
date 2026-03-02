@@ -17,11 +17,13 @@ struct option_type_details_t
 {
     const char* mName;
     const char* mDescription;
+    bool mExpectValue;
     const char* mValidValues;
 };
 enum option_type_specifier_e
 {
     cOPTION_TYPE_SPECIFIER_HELP = 0,
+    cOPTION_TYPE_SPECIFIER_ONLY_CLI,
     cOPTION_TYPE_SPECIFIER_SETTING,
 
     cOPTION_TYPE_SPECIFIER_COUNT,
@@ -47,6 +49,7 @@ option_value_setting_e option_value_setting_from_str(const char* aStr);
 
 struct option_values_t
 {
+    bool mOnlyCLI {false};
     option_value_setting_e mSetting {cOPTION_VALUE_SETTING_NONE};
 };
 
@@ -56,8 +59,8 @@ enum argv_handle_return_e { cARGV_HANDLE_RETURN_SUCCESS, cARGV_HANDLE_RETURN_SUC
 argv_handle_return_e argv_handle(option_values_t& aOptionValues, std::string& aCalculationInput, int argc, char** argv);
 bool is_token_option_specifier(const char* aToken);
 void print_help();
-int handle_classical();
-int handle_r_motivic();
+int handle_classical(const option_values_t& aOptionValues, const std::string& aCalculationInput);
+int handle_r_motivic(const option_values_t& aOptionValues, const std::string& aCalculationInput);
 
 // MAIN
 
@@ -74,25 +77,47 @@ int main (int argc, char** argv)
         case cARGV_HANDLE_RETURN_FAIL_EXIT:
             return 1;
     }
-    std::cout << "Enter Steenrod Algebra type";
-    std::cout << "Options:\n"
-        "\tcl - Classical\n"
-        "\trm - R-Motivic" << std::endl;
-    std::string option;
-    std::cin >> option;
-    if (option == "cl")
+    if (option_values.mSetting == cOPTION_VALUE_SETTING_NONE)
     {
-        return handle_classical();
+        if (option_values.mOnlyCLI)
+        {
+            std::cerr << "CLI input error: Option '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_ONLY_CLI).mName << "' was given but specifying '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_SETTING).mName << "' is required (and was not given)" << std::endl;
+            return 1;
+        }
+        else
+        {
+            std::cout << "Enter Setting" << std::endl;
+            std::cout << "Options:\n"
+                "\tcl - Classical\n"
+                "\trm - R-Motivic" << std::endl;
+            std::string option;
+            std::cin >> option;
+            if (option == "cl")
+            {
+                option_values.mSetting = cOPTION_VALUE_SETTING_CLASSICAL;
+            }
+            else if (option == "rm")
+            {
+                option_values.mSetting = cOPTION_VALUE_SETTING_R_MOTIVIC;
+            }
+            else
+            {
+                std::cerr << "bad setting: " << option << std::endl;
+                return 1;
+            }
+        }
     }
-    else if (option == "rm")
+    switch (option_values.mSetting)
     {
-        return handle_r_motivic();
+        case cOPTION_VALUE_SETTING_CLASSICAL:
+            return handle_classical(option_values, calculation_input);
+        case cOPTION_VALUE_SETTING_R_MOTIVIC:
+            return handle_r_motivic(option_values, calculation_input);
+        case cOPTION_VALUE_SETTING_NONE:
+            break;
     }
-    else
-    {
-        std::cout << "bad option: " << option << std::endl;
-        return 1;
-    }
+    std::cerr << "[INTERNAL ERROR]: Unexpectedly reached theoretically unreachable code regarding setting type" << std::endl;
+    return 1;
 }
 
 // PRIVATE ENUMS (helper functions definition)
@@ -102,13 +127,15 @@ option_type_details_t option_type_details_from_option_type_specifier(option_type
     switch (aValue)
     {
         case cOPTION_TYPE_SPECIFIER_HELP:
-            return {"help", "Prints this help info", ""};
+            return {"help", "Print this help info", false, ""};
+        case cOPTION_TYPE_SPECIFIER_ONLY_CLI:
+            return {"only-cli", "Expect all input to be specified through CLI arugments", false, ""};
         case cOPTION_TYPE_SPECIFIER_SETTING:
-            return {"setting", "Which Steenrod algebra setting we are working with", "classical, cl; r-motivic, rm"};
+            return {"setting", "Which Steenrod algebra setting we are working with", true, "classical, cl; r-motivic, rm"};
         case cOPTION_TYPE_SPECIFIER_NONE:
             break;
     }
-    return {"INVALID", "INVALID", "INVALID"};
+    return {"INVALID", "INVALID", false, "INVALID"};
 }
 
 option_type_specifier_e option_type_specifier_from_str(const char* aStr)
@@ -168,11 +195,10 @@ argv_handle_return_e argv_handle(option_values_t& aOptionValues, std::string& aC
         argv_i = argv[i];
         if (await_option_value)
         {
+            await_option_value = false;
+            // option_type_specifier will have been set from the previous iteration of the loop (for option types that expect values)
             switch (option_type_specifier)
             {
-                case cOPTION_TYPE_SPECIFIER_HELP:
-                    print_help();
-                    return cARGV_HANDLE_RETURN_SUCCESS_EXIT;
                 case cOPTION_TYPE_SPECIFIER_SETTING:
                     aOptionValues.mSetting = option_value_setting_from_str(argv_i);
                     if (aOptionValues.mSetting == cOPTION_VALUE_SETTING_NONE)
@@ -182,12 +208,11 @@ argv_handle_return_e argv_handle(option_values_t& aOptionValues, std::string& aC
                         return cARGV_HANDLE_RETURN_FAIL_EXIT;
                     }
                     break;
-                case cOPTION_TYPE_SPECIFIER_NONE:
-                    assert(!"unreachable"); // should have been handled in the last iteration of the loop
+                default:
+                    assert(!"unreachable"); // we only get here with a value required for the option, which should be handled by the previous cases
                     std::cerr << "[INTERNAL ERROR]: Unexpectedly reached theoretically unreachable code while handling CLI arguments" << std::endl;
                     return cARGV_HANDLE_RETURN_FAIL_EXIT;
             }
-            await_option_value = false;
         }
         else
         {
@@ -197,10 +222,27 @@ argv_handle_return_e argv_handle(option_values_t& aOptionValues, std::string& aC
                 option_type_specifier = option_type_specifier_from_str(argv_i);
                 if (option_type_specifier == cOPTION_TYPE_SPECIFIER_NONE)
                 {
-                    std::cerr << "CLI input error: Unrecognized option given at index " << i << " (0 indexed): '" << argv[i] << "'; run '" << argv[0] << " --help' for syntax" << std::endl;
+                    std::cerr << "CLI input error: Unrecognized option given at index " << i << " (0 indexed): '--" << argv_i << "'; run '" << argv[0] << " --help' for syntax" << std::endl;
                     return cARGV_HANDLE_RETURN_FAIL_EXIT;
                 }
-                await_option_value = true;
+                await_option_value = option_type_details_from_option_type_specifier(option_type_specifier).mExpectValue;
+                if (!await_option_value)
+                {
+                    // no value required
+                    switch (option_type_specifier)
+                    {
+                        case cOPTION_TYPE_SPECIFIER_HELP:
+                            print_help();
+                            return cARGV_HANDLE_RETURN_SUCCESS_EXIT;
+                        case cOPTION_TYPE_SPECIFIER_ONLY_CLI:
+                            aOptionValues.mOnlyCLI = true;
+                            break;
+                        default:
+                            assert(!"unreachable"); // we only get here with no value required for the option, which should be handled by the next iteration of the loop
+                            std::cerr << "[INTERNAL ERROR]: Unexpectedly reached theoretically unreachable code while handling CLI arguments" << std::endl;
+                            return cARGV_HANDLE_RETURN_FAIL_EXIT;
+                    }
+                }
             }
             else
             {
@@ -218,12 +260,12 @@ argv_handle_return_e argv_handle(option_values_t& aOptionValues, std::string& aC
         // argv_i must have been set to a valid value if await_option_value is true
         if (argc > 0)
         {
-            std::cerr << "CLI input error: Unexpected end of arguments; value needed for option '" << argv_i << "'; run '" << argv[0] << " --help' for syntax" << std::endl;
+            std::cerr << "CLI input error: Unexpected end of arguments; value needed for option '--" << argv_i << "'; run '" << argv[0] << " --help' for syntax" << std::endl;
         }
         else
         {
             // while this case is not possible, I hate indexing into an array without knowing for certain that it's a valid index
-            std::cerr << "CLI input error: Unexpected end of arguments; value needed for option '" << argv_i << "'; run with '--help' for syntax" << std::endl;
+            std::cerr << "CLI input error: Unexpected end of arguments; value needed for option '--" << argv_i << "'; run with '--help' for syntax" << std::endl;
         }
         return cARGV_HANDLE_RETURN_FAIL_EXIT;
     }
@@ -240,18 +282,26 @@ void print_help()
     std::cout << "TODO" << std::endl;
 }
 
-int handle_classical()
+int handle_classical(const option_values_t& aOptionValues, const std::string& aCalculationInput)
 {
     using namespace ademma_core;
-    std::string user_input_classical_adem_monomial {};
-    std::cout << "Enter classical adem monomial (form Sq^<num1>Sq^<num2>[Sq^<num3>]...)" << std::endl;
     ParsingInfo parsing_info;
-    std::cin >> parsing_info.mStringToParse;
+    parsing_info.mStringToParse = aCalculationInput;
+    if (aCalculationInput.empty())
+    {
+        if (aOptionValues.mOnlyCLI)
+        {
+            std::cerr << "CLI input error: Option '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_ONLY_CLI).mName << "' was given but specifying the calculation input (as the last argument) is required (and was not given); run with '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_HELP).mName << "' for syntax" << std::endl;
+            return 1;
+        }
+        std::cout << "Enter classical adem monomial (form Sq^<num1>Sq^<num2>[Sq^<num3>]...)" << std::endl;
+        std::cin >> parsing_info.mStringToParse;
+    }
 
     ClassicalAdemMonomial user_input_cam = ClassicalAdemMonomial_FromString(parsing_info);
     if (parsing_info.mErrorInfo.mIsError)
     {
-        std::cout << parsing_info.GetFullErrorString() << std::endl;
+        std::cerr << parsing_info.GetFullErrorString() << std::endl;
         return 1;
     }
     ClassicalAdemPolynomial cap = classical_adem_math::admissify_classical_adem_monomial(user_input_cam);
@@ -259,21 +309,30 @@ int handle_classical()
     return 0;
 }
 
-int handle_r_motivic()
+int handle_r_motivic(const option_values_t& aOptionValues, const std::string& aCalculationInput)
 {
     using namespace ademma_core;
-    std::string user_input_r_motivic_adem_monomial {};
-    std::cout << "Enter R-motivic adem monomial (form eg: Sq^1\\tau\\rho^2Sq^2)" << std::endl;
     ParsingInfo parsing_info;
-    std::cin >> parsing_info.mStringToParse;
+    parsing_info.mStringToParse = aCalculationInput;
+    if (aCalculationInput.empty())
+    {
+        if (aOptionValues.mOnlyCLI)
+        {
+            std::cerr << "CLI input error: Option '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_ONLY_CLI).mName << "' was given but specifying the calculation input (as the last argument) is required (and was not given); run with '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_HELP).mName << "' for syntax" << std::endl;
+            return 1;
+        }
+        std::cout << "Enter R-motivic adem monomial (form eg: Sq^1\\tau\\rho^2Sq^2)" << std::endl;
+        std::cin >> parsing_info.mStringToParse;
+    }
 
     RMotivicAdemMonomial user_input_rmam = RMotivicAdemMonomial_FromString(parsing_info);
     if (parsing_info.mErrorInfo.mIsError)
     {
-        std::cout << parsing_info.GetFullErrorString() << std::endl;
+        std::cerr << parsing_info.GetFullErrorString() << std::endl;
         return 1;
     }
     RMotivicAdemPolynomial rmap = r_motivic_adem_math::admissify_r_motivic_adem_monomial(user_input_rmam);
     std::cout << RMotivicAdemPolynomial_ToString(rmap) << std::endl;
     return 0;
 }
+
