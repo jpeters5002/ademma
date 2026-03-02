@@ -74,7 +74,7 @@ and on Linux run
 ```
 ./ademma --help
 ```
-for usage or run without `--help` for a Terminal User Interface (TUI) experience.
+or run without `--help` for a Terminal User Interface (TUI) experience.
 
 ## Planned Future Work
 - Supporting C-Motivic.
