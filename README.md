@@ -82,3 +82,11 @@ for usage or run without `--help` for a Terminal User Interface (TUI) experience
 - And more!
 - Request your own features to be added to ademma [here](https://github.com/jpeters5002/ademma/issues).
 
+## Credits
+
+Lead Designer and Programmer
+  * Brian Billman
+
+Math Wizard
+  * Joshua Peterson
+
