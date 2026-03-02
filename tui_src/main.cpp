@@ -279,7 +279,33 @@ bool is_token_option_specifier(const char* aToken)
 
 void print_help()
 {
-    std::cout << "TODO" << std::endl;
+    std::cout << "usage: ademma";
+    std::string options_str {};
+    for (int ots_index = 0; ots_index < (int)cOPTION_TYPE_SPECIFIER_COUNT; ots_index++)
+    {
+        option_type_specifier_e ots_casted = (option_type_specifier_e)ots_index;
+        option_type_details_t ot_details = option_type_details_from_option_type_specifier(ots_casted);
+        options_str += std::string(" [--") + ot_details.mName + ((ot_details.mExpectValue) ? " <value>" : "") + "]";
+    }
+    options_str += " <calculation-input>\n";
+    std::cout << options_str << std::endl;
+
+    std::string descriptions_str = "descriptions:";
+    for (int ots_index = 0; ots_index < (int)cOPTION_TYPE_SPECIFIER_COUNT; ots_index++)
+    {
+        descriptions_str += "\n\t";
+        option_type_specifier_e ots_casted = (option_type_specifier_e)ots_index;
+        option_type_details_t ot_details = option_type_details_from_option_type_specifier(ots_casted);
+        descriptions_str += std::string(ot_details.mName) + " - " + ot_details.mDescription;
+        if (!ot_details.mExpectValue)
+        {
+            continue;
+        }
+        descriptions_str += std::string("\n\t\tacceptable values: ") + ot_details.mValidValues;
+    }
+    std::cout << descriptions_str << "\n" << std::endl;
+
+    std::cout << "calculation-input depends on the given '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_SETTING).mName << "' option, but most generally, Steenrod square degree factors can be specified as 'Sq^<num>' (with optional curly brackets '{' and '}' around '<num>'), tau factors can be specified as '\\tau' or '\\tau^<num>' (with optional curly brackets around '<num>'), and rho factors can be specified as '\\rho' or '\\rho^<num>' (with optional curly brackets around '<num>'). Classical setting only allows Steenrod square degrees; R-Motivic setting allows Steenrod square degrees, taus, and rhos. Multiplying the elements together is done by placing one element immediately after another without any characters between. Addition of user-input elements is currently not supported." << std::endl;
 }
 
 int handle_classical(const option_values_t& aOptionValues, const std::string& aCalculationInput)
