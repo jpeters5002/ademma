@@ -2,13 +2,12 @@
 ADEM Mathematical Analyzer (ademma) is a computational tool to write arbitrary Steenrod monomials in admissible form. Ademma currently supports Classical and R-Motivic algebras.
 
 ## Binaries
-Find latest Windows and Linux release binaries at [Latest Release](https://github.com/jpeters5002/ademma/releases/latest).
+Find the latest Windows and Linux release binaries at [Latest Release](https://github.com/jpeters5002/ademma/releases/latest).
 
 ## Dependencies
 Ademma has no library dependencies other than the c++ standard library.
 
 ## Compiling
-
 Ademma is around 100 times faster in Release mode than it is in Debug mode (mainly due to std::vector), so the default build type is set to Release.
 
 If the test binary is desired, include the option `-DBUILD_TESTING=True` when running cmake.
@@ -37,7 +36,7 @@ Click 'Configure'. Leave any popup options default or blank. Click 'Generate'.
 
 If Visual Studio has not been set up for building c++ projects before, use the Visual Studio Installer to add the 'Desktop development with C++' workload.
 
-The CMake step (either option) should have created a `.vxproj` file within the `ademma/build` folder. Open this with Visual Studio.
+The CMake step (either option) should have created a `.vcxproj` file within the `ademma/build` folder. Open this with Visual Studio by selecting 'File' then 'Open Project'.
 
 Within the 'Solution Explorer' window of Visual Studio there should be an entry titled 'ademma'. Right click that and select 'Set as startup project'. Right click it again and select 'Build'.
 
@@ -81,4 +80,5 @@ for usage or run without `--help` for a Terminal User Interface (TUI) experience
 - Supporting C-Motivic.
 - LaTeX integration with the option to show each step.
 - And more!
+- Request your own features to be added to ademma [here](https://github.com/jpeters5002/ademma/issues).
 
