@@ -10,7 +10,7 @@ std::string ademma_core::ParsingInfo::GetFullErrorString()
     {
         return outStr;
     }
-    outStr += "Error: ";
+    outStr += "Parsing error: ";
     outStr += mErrorInfo.mErrorString;
     if (mErrorInfo.mErrorNearbyIndex != (size_t)-1)
     {
