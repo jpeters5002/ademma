@@ -6,6 +6,7 @@
 #include "classical_adem_math.hpp"
 #include "classical_adem_polynomial.hpp"
 #include "classical_adem_monomial.hpp"
+#include "cmake_generated_version_info.hpp"
 #include "parsing_info.hpp"
 #include "r_motivic_adem_math.hpp"
 #include "r_motivic_adem_polynomial.hpp"
@@ -22,7 +23,8 @@ struct option_type_details_t
 };
 enum option_type_specifier_e
 {
-    cOPTION_TYPE_SPECIFIER_HELP = 0,
+    cOPTION_TYPE_SPECIFIER_VERSION = 0,
+    cOPTION_TYPE_SPECIFIER_HELP,
     cOPTION_TYPE_SPECIFIER_ONLY_CLI,
     cOPTION_TYPE_SPECIFIER_SETTING,
 
@@ -126,8 +128,10 @@ option_type_details_t option_type_details_from_option_type_specifier(option_type
 {
     switch (aValue)
     {
+        case cOPTION_TYPE_SPECIFIER_VERSION:
+            return {"version", "Print the version number and exit", false, ""};
         case cOPTION_TYPE_SPECIFIER_HELP:
-            return {"help", "Print this help info", false, ""};
+            return {"help", "Print this help info and exit", false, ""};
         case cOPTION_TYPE_SPECIFIER_ONLY_CLI:
             return {"only-cli", "Expect all input to be specified through CLI arugments", false, ""};
         case cOPTION_TYPE_SPECIFIER_SETTING:
@@ -231,6 +235,9 @@ argv_handle_return_e argv_handle(option_values_t& aOptionValues, std::string& aC
                     // no value required
                     switch (option_type_specifier)
                     {
+                        case cOPTION_TYPE_SPECIFIER_VERSION:
+                            std::cout << ADEMMA_VERSION_FULL << std::endl;
+                            return cARGV_HANDLE_RETURN_SUCCESS_EXIT;
                         case cOPTION_TYPE_SPECIFIER_HELP:
                             print_help();
                             return cARGV_HANDLE_RETURN_SUCCESS_EXIT;
