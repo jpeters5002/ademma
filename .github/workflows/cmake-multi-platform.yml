@@ -62,11 +62,19 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DBUILD_TESTING=True
         -S ${{ github.workspace }}
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ matrix.c_compiler != 'clang' }}
+      with:
+        name: ademma-${{ runner.os }}
+        path: ${{ steps.strings.outputs.build-output-dir }}/${{ runner.os == 'Windows' && format('{0}/{1}', matrix.build_type, 'ademma.exe') || 'ademma' }}
+        retention-days: 7
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
