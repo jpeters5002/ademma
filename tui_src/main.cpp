@@ -133,7 +133,7 @@ option_type_details_t option_type_details_from_option_type_specifier(option_type
         case cOPTION_TYPE_SPECIFIER_HELP:
             return {"help", "Print this help info and exit", false, ""};
         case cOPTION_TYPE_SPECIFIER_ONLY_CLI:
-            return {"only-cli", "Expect all input to be specified through CLI arugments", false, ""};
+            return {"only-cli", "Expect all input to be specified through CLI arugments (makes option 'setting' and argument 'calculation-input' required)", false, ""};
         case cOPTION_TYPE_SPECIFIER_SETTING:
             return {"setting", "Which Steenrod algebra setting we are working with", true, "classical, cl; r-motivic, rm"};
         case cOPTION_TYPE_SPECIFIER_NONE:
@@ -294,7 +294,7 @@ void print_help()
         option_type_details_t ot_details = option_type_details_from_option_type_specifier(ots_casted);
         options_str += std::string(" [--") + ot_details.mName + ((ot_details.mExpectValue) ? " <value>" : "") + "]";
     }
-    options_str += " <calculation-input>\n";
+    options_str += " [calculation-input]\n";
     std::cout << options_str << std::endl;
 
     std::string descriptions_str = "descriptions:";
