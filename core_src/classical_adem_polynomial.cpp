@@ -37,7 +37,9 @@ ademma_core::ClassicalAdemPolynomial ademma_core::ClassicalAdemPolynomial_FromSt
         ClassicalAdemMonomial cam = ClassicalAdemMonomial_FromString(monomial_subinfo);
         if (monomial_subinfo.mErrorInfo.mIsError)
         {
+            std::string full_parse_string = aParsingInfo.mStringToParse;
             aParsingInfo = monomial_subinfo;
+            aParsingInfo.mStringToParse = full_parse_string;
             return {};
         }
         aParsingInfo.mCurrentIndex = monomial_subinfo.mCurrentIndex;
