@@ -22,7 +22,7 @@ ademma_core::ClassicalAdemMonomial ademma_core::ClassicalAdemMonomial_FromString
         SteenrodSquareDegree ssd = SteenrodSquareDegree_FromString(aParsingInfo);
         if (aParsingInfo.mErrorInfo.mIsError)
         {
-            return {};
+            break;
         }
         camOut.push_back(ssd);
     }

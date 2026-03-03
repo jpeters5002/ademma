@@ -18,10 +18,9 @@ void admissify_classical_adem_polynomial_one_step_AssumeNoSq0Factors(ClassicalAd
 
 // PUBLIC FUNCTIONS
 
-ademma_core::ClassicalAdemPolynomial ademma_core::classical_adem_math::admissify_classical_adem_monomial(const ClassicalAdemMonomial& aMonomial)
+ademma_core::ClassicalAdemPolynomial ademma_core::classical_adem_math::admissify_classical_adem_polynomial(const ClassicalAdemPolynomial& aPolynomial)
 {
-    ClassicalAdemPolynomial capOut {};
-    capOut.push_back(aMonomial);
+    ClassicalAdemPolynomial capOut = aPolynomial;
     for (;;)
     {
         ClassicalAdemPolynomial_EliminateAllSq0Factors(capOut);
@@ -33,6 +32,13 @@ ademma_core::ClassicalAdemPolynomial ademma_core::classical_adem_math::admissify
         admissify_classical_adem_polynomial_one_step_AssumeNoSq0Factors(capOut);
     }
     return capOut;
+}
+
+ademma_core::ClassicalAdemPolynomial ademma_core::classical_adem_math::admissify_classical_adem_monomial(const ClassicalAdemMonomial& aMonomial)
+{
+    ClassicalAdemPolynomial cap {};
+    cap.push_back(aMonomial);
+    return admissify_classical_adem_polynomial(cap);
 }
 
 // PRIVATE FUNCTIONS DEFINITION

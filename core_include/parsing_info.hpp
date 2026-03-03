@@ -23,6 +23,7 @@ struct ParsingInfo
     bool MatchString_IncreaseIndexOnSuccess(const std::string& aString);
     bool ParseInt(int& aIntOut);
     void IncreaseIndexOverInt();
+    void IncreaseIndexOverWhitespace();
 };
 }
 

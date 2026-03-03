@@ -378,14 +378,14 @@ control_return_e handle_classical(const option_values_t& aOptionValues, const st
         }
     }
 
-    ClassicalAdemMonomial user_input_cam = ClassicalAdemMonomial_FromString(parsing_info);
+    ClassicalAdemPolynomial user_input_cap = ClassicalAdemPolynomial_FromString(parsing_info);
     if (parsing_info.mErrorInfo.mIsError)
     {
         std::cerr << parsing_info.GetFullErrorString() << std::endl;
         return cCONTROL_RETURN_FAIL;
     }
-    ClassicalAdemPolynomial cap = classical_adem_math::admissify_classical_adem_monomial(user_input_cam);
-    std::cout << ClassicalAdemPolynomial_ToString(cap) << std::endl;
+    ClassicalAdemPolynomial cap_return = classical_adem_math::admissify_classical_adem_polynomial(user_input_cap);
+    std::cout << ClassicalAdemPolynomial_ToString(cap_return) << std::endl;
     return cCONTROL_RETURN_SUCCESS;
 }
 

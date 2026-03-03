@@ -131,3 +131,23 @@ void ademma_core::ParsingInfo::IncreaseIndexOverInt()
     }
 }
 
+void ademma_core::ParsingInfo::IncreaseIndexOverWhitespace()
+{
+    for (;;)
+    {
+        if (mCurrentIndex >= mStringToParse.size())
+        {
+            break;
+        }
+        char c = mStringToParse[mCurrentIndex];
+        if (c == ' ' || c == '\t' || c == '\n')
+        {
+            mCurrentIndex++;
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
