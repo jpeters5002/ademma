@@ -26,6 +26,7 @@ enum option_type_specifier_e
     cOPTION_TYPE_SPECIFIER_VERSION = 0,
     cOPTION_TYPE_SPECIFIER_HELP,
     cOPTION_TYPE_SPECIFIER_ONLY_CLI,
+    cOPTION_TYPE_SPECIFIER_NO_LOOP_TUI,
     cOPTION_TYPE_SPECIFIER_SETTING,
 
     cOPTION_TYPE_SPECIFIER_COUNT,
@@ -52,6 +53,7 @@ option_value_setting_e option_value_setting_from_str(const char* aStr);
 struct option_values_t
 {
     bool mOnlyCLI {false};
+    bool mNoLoopTUI {false};
     option_value_setting_e mSetting {cOPTION_VALUE_SETTING_NONE};
 };
 
@@ -88,24 +90,33 @@ int main (int argc, char** argv)
         }
         else
         {
-            std::cout << "Enter Setting" << std::endl;
-            std::cout << "Options:\n"
-                "\tcl - Classical\n"
-                "\trm - R-Motivic" << std::endl;
-            std::string option;
-            std::cin >> option;
-            if (option == "cl")
+            for (;;)
             {
-                option_values.mSetting = cOPTION_VALUE_SETTING_CLASSICAL;
-            }
-            else if (option == "rm")
-            {
-                option_values.mSetting = cOPTION_VALUE_SETTING_R_MOTIVIC;
-            }
-            else
-            {
-                std::cerr << "bad setting: " << option << std::endl;
-                return 1;
+                std::cout << "Enter Setting" << std::endl;
+                std::cout << "Options:\n"
+                    "\tq  - Quit Program\n"
+                    "\tcl - Classical\n"
+                    "\trm - R-Motivic" << std::endl;
+                std::string option;
+                std::cin >> option;
+                if (option == "cl")
+                {
+                    option_values.mSetting = cOPTION_VALUE_SETTING_CLASSICAL;
+                    break;
+                }
+                else if (option == "rm")
+                {
+                    option_values.mSetting = cOPTION_VALUE_SETTING_R_MOTIVIC;
+                    break;
+                }
+                else if (option == "q")
+                {
+                    return 0;
+                }
+                else
+                {
+                    std::cerr << "bad setting: " << option << std::endl;
+                }
             }
         }
     }
@@ -134,6 +145,8 @@ option_type_details_t option_type_details_from_option_type_specifier(option_type
             return {"help", "Print this help info and exit", false, ""};
         case cOPTION_TYPE_SPECIFIER_ONLY_CLI:
             return {"only-cli", "Expect all input to be specified through CLI arugments (makes option 'setting' and argument 'calculation-input' required)", false, ""};
+        case cOPTION_TYPE_SPECIFIER_NO_LOOP_TUI:
+            return {"no-loop-tui", "Exit after first calculation when using the TUI instead of looping", false, ""};
         case cOPTION_TYPE_SPECIFIER_SETTING:
             return {"setting", "Which Steenrod algebra setting we are working with", true, "classical, cl; r-motivic, rm"};
         case cOPTION_TYPE_SPECIFIER_NONE:
@@ -243,6 +256,9 @@ argv_handle_return_e argv_handle(option_values_t& aOptionValues, std::string& aC
                             return cARGV_HANDLE_RETURN_SUCCESS_EXIT;
                         case cOPTION_TYPE_SPECIFIER_ONLY_CLI:
                             aOptionValues.mOnlyCLI = true;
+                            break;
+                        case cOPTION_TYPE_SPECIFIER_NO_LOOP_TUI:
+                            aOptionValues.mNoLoopTUI = true;
                             break;
                         default:
                             assert(!"unreachable"); // we only get here with no value required for the option, which should be handled by the next iteration of the loop
