@@ -65,7 +65,7 @@ std::string ademma_core::ParsingInfo::GetFullErrorString()
     return outStr;
 }
 
-bool ademma_core::ParsingInfo::MatchString(const std::string& aString)
+bool ademma_core::ParsingInfo::MatchString(const std::string& aString) const
 {
     for (size_t i = 0; i < aString.size(); i++)
     {
