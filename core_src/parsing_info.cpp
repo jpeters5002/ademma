@@ -65,7 +65,7 @@ std::string ademma_core::ParsingInfo::GetFullErrorString()
     return outStr;
 }
 
-bool ademma_core::ParsingInfo::MatchString(const std::string& aString)
+bool ademma_core::ParsingInfo::MatchString(const std::string& aString) const
 {
     for (size_t i = 0; i < aString.size(); i++)
     {
@@ -122,6 +122,26 @@ void ademma_core::ParsingInfo::IncreaseIndexOverInt()
         if ((first && c == '-') || (c >= '0' && c <= '9'))
         {
             first = false;
+            mCurrentIndex++;
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
+void ademma_core::ParsingInfo::IncreaseIndexOverWhitespace()
+{
+    for (;;)
+    {
+        if (mCurrentIndex >= mStringToParse.size())
+        {
+            break;
+        }
+        char c = mStringToParse[mCurrentIndex];
+        if (c == ' ' || c == '\t' || c == '\n')
+        {
             mCurrentIndex++;
         }
         else

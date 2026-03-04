@@ -6,6 +6,8 @@
 
 namespace ademma_core { namespace r_motivic_adem_math
 {
+RMotivicAdemPolynomial admissify_r_motivic_adem_polynomial(const RMotivicAdemPolynomial& aPolynomial);
+
 RMotivicAdemPolynomial admissify_r_motivic_adem_monomial(const RMotivicAdemMonomial& aMonomial);
 }}
 

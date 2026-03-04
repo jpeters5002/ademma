@@ -12,6 +12,8 @@ typedef std::vector<ClassicalAdemMonomial> ClassicalAdemPolynomial;
 
 std::string ClassicalAdemPolynomial_ToString(const ClassicalAdemPolynomial& aValue);
 
+ClassicalAdemPolynomial ClassicalAdemPolynomial_FromString(ParsingInfo& aParsingInfo);
+
 void ClassicalAdemPolynomial_EliminateAllSq0Factors(ClassicalAdemPolynomial& aPolynomial);
 
 void ClassicalAdemPolynomial_CombineLikeTerms_AssumeNoSq0Factors(ClassicalAdemPolynomial& aPolynomial);

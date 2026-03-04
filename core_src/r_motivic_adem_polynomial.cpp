@@ -23,6 +23,55 @@ std::string ademma_core::RMotivicAdemPolynomial_ToString(const RMotivicAdemPolyn
     return outStr;
 }
 
+ademma_core::RMotivicAdemPolynomial ademma_core::RMotivicAdemPolynomial_FromString(ParsingInfo& aParsingInfo)
+{
+    RMotivicAdemPolynomial rmapOut {};
+    bool looped_at_least_once = false;
+    for (;;)
+    {
+        ParsingInfo monomial_subinfo = aParsingInfo;
+        std::string::size_type plus_pos = monomial_subinfo.mStringToParse.find('+', monomial_subinfo.mCurrentIndex);
+        if (std::string::npos != plus_pos)
+        {
+            monomial_subinfo.mStringToParse = monomial_subinfo.mStringToParse.substr(0, plus_pos);
+        }
+        RMotivicAdemMonomial rmam = RMotivicAdemMonomial_FromString(monomial_subinfo);
+        if (monomial_subinfo.mErrorInfo.mIsError)
+        {
+            std::string full_parse_string = aParsingInfo.mStringToParse;
+            aParsingInfo = monomial_subinfo;
+            aParsingInfo.mStringToParse = full_parse_string;
+            return {};
+        }
+        aParsingInfo.mCurrentIndex = monomial_subinfo.mCurrentIndex;
+        if (rmam.size() == 0)
+        {
+            aParsingInfo.mErrorInfo.mIsError = true;
+            aParsingInfo.mErrorInfo.mErrorString = "No monomial term";
+            if (looped_at_least_once)
+            {
+                aParsingInfo.mErrorInfo.mErrorString += " after '+'";
+            }
+            aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
+            return {};
+        }
+        rmapOut.push_back(rmam);
+        if (aParsingInfo.mCurrentIndex >= aParsingInfo.mStringToParse.size())
+        {
+            break;
+        }
+        if (!aParsingInfo.MatchString_IncreaseIndexOnSuccess("+"))
+        {
+            aParsingInfo.mErrorInfo.mIsError = true;
+            aParsingInfo.mErrorInfo.mErrorString = "Expected '+' or end of data after parsing monomial, but found '" + std::to_string(aParsingInfo.mStringToParse[aParsingInfo.mCurrentIndex]) + "'";
+            aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
+            return {};
+        }
+        looped_at_least_once = true;
+    }
+    return rmapOut;
+}
+
 void ademma_core::RMotivicAdemPolynomial_EliminateAllSq0Factors(RMotivicAdemPolynomial& aPolynomial)
 {
     DEBUG_PRINT("RMotPoly_EliminateAllSq0Factors called on: " + RMotivicAdemPolynomial_ToString(aPolynomial));

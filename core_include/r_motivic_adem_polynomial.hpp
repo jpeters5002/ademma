@@ -11,6 +11,8 @@ typedef std::vector<RMotivicAdemMonomial> RMotivicAdemPolynomial;
 
 std::string RMotivicAdemPolynomial_ToString(const RMotivicAdemPolynomial& aValue);
 
+RMotivicAdemPolynomial RMotivicAdemPolynomial_FromString(ParsingInfo& aParsingInfo);
+
 void RMotivicAdemPolynomial_EliminateAllSq0Factors(RMotivicAdemPolynomial& aPolynomial);
 
 void RMotivicAdemPolynomial_ShoveRhoLeft(RMotivicAdemPolynomial& aPolynomial);

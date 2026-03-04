@@ -355,7 +355,9 @@ void print_help()
     }
     std::cout << descriptions_str << "\n" << std::endl;
 
-    std::cout << "calculation-input depends on the given '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_SETTING).mName << "' option, but most generally, Steenrod square degree factors can be specified as 'Sq^<num>' (with optional curly brackets '{' and '}' around '<num>'), tau factors can be specified as '\\tau' or '\\tau^<num>' (with optional curly brackets around '<num>'), and rho factors can be specified as '\\rho' or '\\rho^<num>' (with optional curly brackets around '<num>'). Classical setting only allows Steenrod square degrees; R-Motivic setting allows Steenrod square degrees, taus, and rhos. Multiplying the elements together is done by placing one element immediately after another without any characters between. Addition of user-input elements is currently not supported." << std::endl;
+    std::cout << "calculation-input depends on the given '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_SETTING).mName << "' option, but most generally, Steenrod square degree factors can be specified as 'Sq^<num>' (with optional curly brackets '{' and '}' around '<num>'), tau factors can be specified as '\\tau' or '\\tau^<num>' (with optional curly brackets around '<num>'), and rho factors can be specified as '\\rho' or '\\rho^<num>' (with optional curly brackets around '<num>'). Classical setting only allows Steenrod square degrees; R-Motivic setting allows Steenrod square degrees, taus, and rhos. Multiplying the elements together is done by placing one element immediately after another without any characters between. Polynomial inputs are supported, so use the '+' character between monomials for your input. Currently no whitespace is allowed. Currently no parentheses are allowed.\n" << std::endl;
+
+    std::cout << "NOTE: If calculation-input is passed via CLI then, depending on the shell being used, a double backslash might be necessary for the shell to pass a backslash into the program argument. Usually shells allow arguments to be contained within double quotes, and when this is done, usually the shell will pass in a single backslash within those quotes as part of the argument instead of being treated as an escape character." << std::endl;
 }
 
 control_return_e handle_classical(const option_values_t& aOptionValues, const std::string& aCalculationInput)
@@ -378,14 +380,14 @@ control_return_e handle_classical(const option_values_t& aOptionValues, const st
         }
     }
 
-    ClassicalAdemMonomial user_input_cam = ClassicalAdemMonomial_FromString(parsing_info);
+    ClassicalAdemPolynomial user_input_cap = ClassicalAdemPolynomial_FromString(parsing_info);
     if (parsing_info.mErrorInfo.mIsError)
     {
         std::cerr << parsing_info.GetFullErrorString() << std::endl;
         return cCONTROL_RETURN_FAIL;
     }
-    ClassicalAdemPolynomial cap = classical_adem_math::admissify_classical_adem_monomial(user_input_cam);
-    std::cout << ClassicalAdemPolynomial_ToString(cap) << std::endl;
+    ClassicalAdemPolynomial cap_return = classical_adem_math::admissify_classical_adem_polynomial(user_input_cap);
+    std::cout << ClassicalAdemPolynomial_ToString(cap_return) << std::endl;
     return cCONTROL_RETURN_SUCCESS;
 }
 
@@ -409,14 +411,14 @@ control_return_e handle_r_motivic(const option_values_t& aOptionValues, const st
         }
     }
 
-    RMotivicAdemMonomial user_input_rmam = RMotivicAdemMonomial_FromString(parsing_info);
+    RMotivicAdemPolynomial user_input_rmap = RMotivicAdemPolynomial_FromString(parsing_info);
     if (parsing_info.mErrorInfo.mIsError)
     {
         std::cerr << parsing_info.GetFullErrorString() << std::endl;
         return cCONTROL_RETURN_FAIL;
     }
-    RMotivicAdemPolynomial rmap = r_motivic_adem_math::admissify_r_motivic_adem_monomial(user_input_rmam);
-    std::cout << RMotivicAdemPolynomial_ToString(rmap) << std::endl;
+    RMotivicAdemPolynomial rmap_return = r_motivic_adem_math::admissify_r_motivic_adem_polynomial(user_input_rmap);
+    std::cout << RMotivicAdemPolynomial_ToString(rmap_return) << std::endl;
     return cCONTROL_RETURN_SUCCESS;
 }
 

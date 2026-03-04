@@ -19,10 +19,11 @@ struct ParsingInfo
     ParsingErrorInfo mErrorInfo {};
 
     std::string GetFullErrorString();
-    bool MatchString(const std::string& aString);
+    bool MatchString(const std::string& aString) const;
     bool MatchString_IncreaseIndexOnSuccess(const std::string& aString);
     bool ParseInt(int& aIntOut);
     void IncreaseIndexOverInt();
+    void IncreaseIndexOverWhitespace();
 };
 }
 
