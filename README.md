@@ -79,7 +79,6 @@ or run without `--help` for a Terminal User Interface (TUI) experience.
 ## Planned Future Work
 - Supporting C-Motivic.
 - LaTeX integration with the option to show each step.
-- Support for polynomial inputs
 - And more!
 - Request your own features to be added to ademma [here](https://github.com/jpeters5002/ademma/issues).
 
