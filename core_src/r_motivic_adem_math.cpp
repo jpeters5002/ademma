@@ -19,10 +19,9 @@ void admissify_r_motivic_adem_polynomial_one_step_AssumeNoSq0Factors(RMotivicAde
 
 // PUBLIC FUNCTIONS
 
-ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_r_motivic_adem_monomial(const RMotivicAdemMonomial& aMonomial)
+ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_r_motivic_adem_polynomial(const RMotivicAdemPolynomial& aPolynomial)
 {
-    RMotivicAdemPolynomial rmapOut {};
-    rmapOut.push_back(aMonomial);
+    RMotivicAdemPolynomial rmapOut = aPolynomial;
     RMotivicAdemMonomial_EliminateAllPower0Taus(rmapOut[0]);
     for (;;)
     {
@@ -36,6 +35,13 @@ ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_
         admissify_r_motivic_adem_polynomial_one_step_AssumeNoSq0Factors(rmapOut);
     }
     return rmapOut;
+}
+
+ademma_core::RMotivicAdemPolynomial ademma_core::r_motivic_adem_math::admissify_r_motivic_adem_monomial(const RMotivicAdemMonomial& aMonomial)
+{
+    RMotivicAdemPolynomial rmap {};
+    rmap.push_back(aMonomial);
+    return admissify_r_motivic_adem_polynomial(rmap);
 }
 
 // PRIVATE FUNCTIONS DEFINITION

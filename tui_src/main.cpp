@@ -409,14 +409,14 @@ control_return_e handle_r_motivic(const option_values_t& aOptionValues, const st
         }
     }
 
-    RMotivicAdemMonomial user_input_rmam = RMotivicAdemMonomial_FromString(parsing_info);
+    RMotivicAdemPolynomial user_input_rmap = RMotivicAdemPolynomial_FromString(parsing_info);
     if (parsing_info.mErrorInfo.mIsError)
     {
         std::cerr << parsing_info.GetFullErrorString() << std::endl;
         return cCONTROL_RETURN_FAIL;
     }
-    RMotivicAdemPolynomial rmap = r_motivic_adem_math::admissify_r_motivic_adem_monomial(user_input_rmam);
-    std::cout << RMotivicAdemPolynomial_ToString(rmap) << std::endl;
+    RMotivicAdemPolynomial rmap_return = r_motivic_adem_math::admissify_r_motivic_adem_polynomial(user_input_rmap);
+    std::cout << RMotivicAdemPolynomial_ToString(rmap_return) << std::endl;
     return cCONTROL_RETURN_SUCCESS;
 }
 
