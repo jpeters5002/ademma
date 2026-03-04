@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for polynomials as calculation-input.
+- Support for polynomials as calculation-input with whitespace allowed between factors and between terms and '+'.
 - `--no-loop-tui` CLI option.
 
 ### Changed
