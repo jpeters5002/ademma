@@ -15,6 +15,7 @@ ademma_core::ClassicalAdemMonomial ademma_core::ClassicalAdemMonomial_FromString
     ClassicalAdemMonomial camOut {};
     for (;;)
     {
+        aParsingInfo.IncreaseIndexOverWhitespace();
         if (aParsingInfo.mCurrentIndex >= aParsingInfo.mStringToParse.size())
         {
             break;

@@ -200,6 +200,7 @@ ademma_core::RMotivicAdemMonomial ademma_core::RMotivicAdemMonomial_FromString(P
     RMotivicAdemMonomial rmamOut {};
     for (;;)
     {
+        aParsingInfo.IncreaseIndexOverWhitespace();
         if (aParsingInfo.mCurrentIndex >= aParsingInfo.mStringToParse.size())
         {
             break;

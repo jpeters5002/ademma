@@ -28,6 +28,7 @@ ademma_core::ClassicalAdemPolynomial ademma_core::ClassicalAdemPolynomial_FromSt
     bool looped_at_least_once = false;
     for (;;)
     {
+        aParsingInfo.IncreaseIndexOverWhitespace();
         ParsingInfo monomial_subinfo = aParsingInfo;
         std::string::size_type plus_pos = monomial_subinfo.mStringToParse.find('+', monomial_subinfo.mCurrentIndex);
         if (std::string::npos != plus_pos)
