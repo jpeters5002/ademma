@@ -72,13 +72,12 @@ std::string ademma_core::RMotivicAdemMonomialFactor_ToString(RMotivicAdemMonomia
             throw std::runtime_error("unreachable code reached: RMotivicAdemMonomialFactor_GetType unexpectedly returned cNONE or bad value");
     }
     int power = RMotivicAdemMonomialFactor_GetPower_AssumeRhoOrTau(aValue);
-    if (power == 1)
+    if (power != 1)
     {
-        return strOut;
+        strOut += "^{";
+        strOut += std::to_string(power);
+        strOut += "}";
     }
-    strOut += "^{";
-    strOut += std::to_string(power);
-    strOut += "}";
     return strOut;
 }
 
@@ -188,9 +187,23 @@ bool ademma_core::RMotivicAdemMonomialFactor_IsPairAdmissible(RMotivicAdemMonomi
 std::string ademma_core::RMotivicAdemMonomial_ToString(const RMotivicAdemMonomial& aValue)
 {
     std::string outStr = "";
+    bool previous_factor_rho_or_tau = false;
     for (size_t i = 0; i < aValue.size(); i++)
     {
+        if (previous_factor_rho_or_tau)
+        {
+            outStr += ' ';
+        }
         outStr += RMotivicAdemMonomialFactor_ToString(aValue[i]);
+        switch (RMotivicAdemMonomialFactor_GetType(aValue[i]))
+        {
+            case RMotivicAdemMonomialFactor_Type::cRho:
+            case RMotivicAdemMonomialFactor_Type::cTau:
+                previous_factor_rho_or_tau = true;
+                break;
+            default:
+                previous_factor_rho_or_tau = false;
+        }
     }
     return outStr;
 }

@@ -12,7 +12,11 @@ std::string ademma_core::RMotivicAdemPolynomial_ToString(const RMotivicAdemPolyn
     {
         if (i != 0)
         {
-            outStr += " + ";
+            if (outStr.size() > 0 && outStr[outStr.size() - 1] != ' ')
+            {
+                outStr += ' ';
+            }
+            outStr += "+ ";
         }
         outStr += RMotivicAdemMonomial_ToString(aValue[i]);
     }

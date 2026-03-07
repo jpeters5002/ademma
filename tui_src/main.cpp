@@ -111,7 +111,7 @@ int main (int argc, char** argv)
                         "\tcl - Classical\n"
                         "\trm - R-Motivic" << std::endl;
                     std::string option;
-                    std::cin >> option;
+                    std::getline(std::cin, option);
                     if (option == "cl")
                     {
                         option_values_using.mSetting = cOPTION_VALUE_SETTING_CLASSICAL;
@@ -380,7 +380,7 @@ control_return_e handle_classical(const option_values_t& aOptionValues, const st
             return cCONTROL_RETURN_FAIL;
         }
         std::cout << "Enter classical adem monomial (form Sq^<num1>Sq^<num2>[Sq^<num3>]...) or 'q' to quit" << std::endl;
-        std::cin >> parsing_info.mStringToParse;
+        std::getline(std::cin, parsing_info.mStringToParse);
         if (parsing_info.mStringToParse == "q")
         {
             return cCONTROL_RETURN_SUCCESS_EXIT;
@@ -411,7 +411,7 @@ control_return_e handle_r_motivic(const option_values_t& aOptionValues, const st
             return cCONTROL_RETURN_FAIL;
         }
         std::cout << "Enter R-motivic adem monomial (form eg: Sq^1\\tau\\rho^2Sq^2) or 'q' to quit" << std::endl;
-        std::cin >> parsing_info.mStringToParse;
+        std::getline(std::cin, parsing_info.mStringToParse);
         if (parsing_info.mStringToParse == "q")
         {
             return cCONTROL_RETURN_SUCCESS_EXIT;
