@@ -1,9 +1,7 @@
-\documentclass{article}
-
 \usepackage{xstring}
 
 \makeatletter
-\newcommand{\replacebackslashwithcolon}[2]{{\escapechar=`: 
+\newcommand{\replacebackslashwithsemicolon}[2]{{\escapechar=`; 
   \xdef#2{\expandafter\zap@space\detokenize\expandafter{#1} \@empty}}}
 \makeatother
 
@@ -29,34 +27,16 @@
 
 \newcommand{\ademmaclassical}[1]
 {
-	\StrDel{#1}{^}[\ademmafilenametemp]
-	\ademmaimpl{#1}{cl}{\ademmafilenametemp.cl.tex}
+	\StrDel{#1}{ }[\ademmafilenametemp1]
+	\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
+	\ademmaimpl{#1}{cl}{\ademmafilenametemp2.cl.tex}
 }
 
 \newcommand{\ademmarmotivic}[1]
 {
-	%\saveexpandmode\noexpandarg
-	\StrSubstitute{#1}{\\}{:}[\ademmasanitizedbackslashtemp]
-	\StrDel{#1}{^}[\ademmafilenametemp1]
-	\StrDel{\ademmafilenametemp1}{\\}[\ademmafilenametemp2]
-	%\restoreexpandmode
+    \replacebackslashwithsemicolon{#1}{\ademmasanitizedbackslashtemp}
+	\StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametemp1]
+	\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
 	\ademmaimpl{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametemp2.rm.tex}
 }
 
-\newcommand{\testthing}[1]
-{
-	\replacebackslashwithcolon{#1}{\testthingtemp}
-	\testthingtemp
-}
-
-\begin{document}
-
-This is a test
-
-%$\ademmaclassical{Sq^16Sq^16Sq^16Sq^16Sq^16Sq^16}$
-
-%$\ademmarmotivic{Sq^3\tau}$
-
-\testthing{\tau}
-
-\end{document}
