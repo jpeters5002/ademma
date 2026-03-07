@@ -27,8 +27,14 @@
             \errmessage{Error running ademma with calculation-input '#1': see file '#4' for more information}
 		}
 		{
-            {\immediate\write18{rm -f #4}}
-		    \input{#3}
+            \IfFileExists{#3}
+            {
+                {\immediate\write18{rm -f #4}}
+		        \input{#3}
+            }
+            {
+                \errmessage{Error running ademma: '-shell-escape' option required}
+            }
 		}
     }
 }
