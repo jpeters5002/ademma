@@ -51,17 +51,29 @@
 
 %user-friendly macros
 
-\newcommand{\ademmaclassical}[1]
+% #1                                                       , #2
+% (optional) print-calculation-input-equals [default: true], calculation-input
+\newcommand{\ademmaclassical}[2][true]
 {
-    \replacebackslashwithB{#1}{\ademmasanitizedbackslashtemp}
+    \IfStrEq{#1}{true}
+    {
+        #2 =
+    }{}
+    \replacebackslashwithB{#2}{\ademmasanitizedbackslashtemp}
 	\StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
 	\StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
 	\ademmaimplproxy{\ademmasanitizedbackslashtemp}{cl}{\ademmafilenametempB.cl.tex}
 }
 
-\newcommand{\ademmarmotivic}[1]
+% #1                                                       , #2
+% (optional) print-calculation-input-equals [default: true], calculation-input
+\newcommand{\ademmarmotivic}[2][true]
 {
-    \replacebackslashwithB{#1}{\ademmasanitizedbackslashtemp}
+    \IfStrEq{#1}{true}
+    {
+        #2 =
+    }{}
+    \replacebackslashwithB{#2}{\ademmasanitizedbackslashtemp}
 	\StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
 	\StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
     \ademmaimplproxy{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametempB.rm.tex}

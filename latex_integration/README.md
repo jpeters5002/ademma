@@ -27,6 +27,8 @@ The ademma LaTeX package defines a few macros, the following of which are useful
 
 The calculation-input should adhere exactly to the calculation-input specifications when running `ademma --help`.
 
+NOTE: Each of the listed LaTeX commands have an optional argument, default 'true', that controls whether or not the calculation-input is printed followed by '=' before the result. To only show the result, run the command like this, for example: `\ademmaclassical[false]{Sq^3Sq^3}`.
+
 ## Additional Info
 
 All calculations are cached on your machine. For Linux and MacOS/OSX these are stored in the directory `~/.ademma`, which is created if it doesn't exist. The cached files contain the LaTeX compliant result that the ademma process produced. If the cached file exists for a calculation, ademma is not run and the cached file is used. The purpose of this is that some calculations can take a long time and the LaTeX compilation process will be held up if ademma is taking awhile on a calculation.
