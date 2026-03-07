@@ -13,29 +13,29 @@
 % calculation-input, setting, fullpathcachefile, fullpatherroutfile, fullpatherrindicatorfile, dir
 \newcommand{\ademmaimpl}[6]
 {
-	\IfFileExists{#3}
-	{
-		\input{#3}
-	}
+    \IfFileExists{#3}
+    {
+        \input{#3}
+    }
     {
         {\immediate\write18{mkdir -p #6}}
         {\immediate\write18{ademma --only-cli --setting #2 #1 > #3 2> #4 \detokenize{||} touch #5}}
         \IfFileExists{#5}
-		{
+        {
             {\immediate\write18{rm -f #5}}
             {\immediate\write18{rm -f #3}}
             \errmessage{Error running ademma with calculation-input '#1': see file '#4' for more information}
-		}
-		{
+        }
+        {
             \IfFileExists{#3}
             {
                 {\immediate\write18{rm -f #4}}
-		        \input{#3}
+                \input{#3}
             }
             {
                 \errmessage{Error running ademma: '-shell-escape' option required}
             }
-		}
+        }
     }
 }
 
@@ -60,9 +60,9 @@
         #2 =
     }{}
     \replacebackslashwithB{#2}{\ademmasanitizedbackslashtemp}
-	\StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
-	\StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
-	\ademmaimplproxy{\ademmasanitizedbackslashtemp}{cl}{\ademmafilenametempB.cl.tex}
+    \StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
+    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
+    \ademmaimplproxy{\ademmasanitizedbackslashtemp}{cl}{\ademmafilenametempB.cl.tex}
 }
 
 % #1                                                       , #2
@@ -74,8 +74,8 @@
         #2 =
     }{}
     \replacebackslashwithB{#2}{\ademmasanitizedbackslashtemp}
-	\StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
-	\StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
+    \StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
+    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
     \ademmaimplproxy{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametempB.rm.tex}
 }
 
