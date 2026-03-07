@@ -76,9 +76,10 @@ and on Linux run
 ```
 or run without `--help` for a Terminal User Interface (TUI) experience.
 
+See `ademma/latex_integration/README.md` for details on LaTeX integration (currently only Linux supported but MacOS/OSX may work too).
+
 ## Planned Future Work
 - Supporting C-Motivic.
-- LaTeX integration with the option to show each step.
 - And more!
 - Request your own features to be added to ademma [here](https://github.com/jpeters5002/ademma/issues).
 
