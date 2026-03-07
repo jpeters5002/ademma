@@ -25,7 +25,7 @@ The ademma LaTeX package defines a few macros, the following of which are useful
 \ademmarmotivic{...} % returns the admissible form of the given calculation-input in the rmotivic setting
 ```
 
-The calculation-input should adhere exactly to the calculation-input specifications when running `ademma --help`.
+The calculation-input should have equivalent requirements to the calculation-input specifications found when running `ademma --help`.
 
 NOTE: Each of the listed LaTeX commands have an optional argument, default 'true', that controls whether or not the calculation-input is printed followed by '=' before the result. To only show the result, run the command like this, for example: `\ademmaclassical[false]{Sq^3Sq^3}`.
 
