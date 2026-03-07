@@ -1,9 +1,13 @@
 \usepackage{xstring}
 
+%helper macros
+
 \makeatletter
 \newcommand{\replacebackslashwithB}[2]{{\escapechar=`B 
   \xdef#2{\expandafter\zap@space\detokenize\expandafter{#1} \@empty}}}
 \makeatother
+
+%main implementation
 
 % calculation-input, setting, filename
 \newcommand\ademmaimpl[3]
@@ -13,30 +17,28 @@
 		\input{#3}
 	}
     {
-	    \IfFileExists{/home/brian/latex/ademma}
-	    {
-		    %{\immediate\write18{/home/brian/latex/ademma --only-cli --setting #2 #1 > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt ; $? && touch /home/brian/latex/ademmastatuserr}}
-		    {\immediate\write18{/home/brian/latex/ademma --only-cli --setting #2 '#1' > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt}}
-		    %/home/brian/latex/ademma --only-cli --setting #2 '#1' > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt
-            \IfFileExists{#3}
-		    {
-			    \input{#3}
-		    }
-		    {
-			    \errmessage{Error running ademma with calculation-input '#1': see file /home/brian/latex/ademmastatuserrmsg.txt for more information}
-		    }
-	    }
-	    {
-		    \errmessage{No executable file for 'ademma' found}
-	    }
+        %{\immediate\write18{mkdir -p \string~/.ademma}}
+        {\immediate{mkdir -p \string~/.ademma}}
+        {\immediate\write18{ademma --only-cli --setting #2 '#1' > #3 2> /home/brian/latex/ademmastatuserrmsg.txt}}
+        \IfFileExists{#3}
+		{
+		    \input{#3}
+		}
+		{
+		    \errmessage{Error running ademma with calculation-input '#1': see file /home/brian/latex/ademmastatuserrmsg.txt for more information}
+		}
     }
 }
 
+%user-friendly macros
+
 \newcommand{\ademmaclassical}[1]
 {
-	\StrDel{#1}{ }[\ademmafilenametemp1]
+    \replacebackslashwithB{#1}{\ademmasanitizedbackslashtemp}
+	\StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametemp1]
 	\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
-	\ademmaimpl{#1}{cl}{\ademmafilenametemp2.cl.tex}
+    \newcommand{\ademmafullpathtemp}{\string~/.ademma/\ademmafilenametemp2.cl.tex}
+	\ademmaimpl{\ademmasanitizedbackslashtemp}{cl}{\ademmafullpathtemp}
 }
 
 \newcommand{\ademmarmotivic}[1]
@@ -44,6 +46,7 @@
     \replacebackslashwithB{#1}{\ademmasanitizedbackslashtemp}
 	\StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametemp1]
 	\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
-	\ademmaimpl{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametemp2.rm.tex}
+    \newcommand{\ademmafullpathtemp}{\string~/.ademma/\ademmafilenametemp2.rm.tex}
+    \ademmaimpl{\ademmasanitizedbackslashtemp}{rm}{\ademmafullpathtemp}
 }
 
