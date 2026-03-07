@@ -8,36 +8,42 @@
 % calculation-input, setting, filename
 \newcommand\ademmaimpl[3]
 {
-	\IfFileExists{/home/brian/latex/ademma}
+	\IfFileExists{#3}
 	{
-		%{\immediate\write18{/home/brian/latex/ademma --only-cli --setting #2 #1 > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt ; $? && touch /home/brian/latex/ademmastatuserr}}
-		{\immediate\write18{/home/brian/latex/ademma --only-cli --setting #2 '#1' > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt}}
-		%/home/brian/latex/ademma --only-cli --setting #2 '#1' > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt
-		\IfFileExists{#3}
-		{
-			\input{#3}
-		}
-		{
-			\errmessage{Error running ademma with calculation-input '#1': see file /home/brian/latex/ademmastatuserrmsg.txt for more information}
-		}
+		\input{#3}
 	}
-	{
-		\errmessage{No executable file for 'ademma' found}
-	}
+    {
+	    \IfFileExists{/home/brian/latex/ademma}
+	    {
+		    %{\immediate\write18{/home/brian/latex/ademma --only-cli --setting #2 #1 > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt ; $? && touch /home/brian/latex/ademmastatuserr}}
+		    {\immediate\write18{/home/brian/latex/ademma --only-cli --setting #2 '#1' > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt}}
+		    %/home/brian/latex/ademma --only-cli --setting #2 '#1' > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt
+            \IfFileExists{#3}
+		    {
+			    \input{#3}
+		    }
+		    {
+			    \errmessage{Error running ademma with calculation-input '#1': see file /home/brian/latex/ademmastatuserrmsg.txt for more information}
+		    }
+	    }
+	    {
+		    \errmessage{No executable file for 'ademma' found}
+	    }
+    }
 }
 
 \newcommand{\ademmaclassical}[1]
 {
 	\StrDel{#1}{ }[\ademmafilenametemp1]
-	%\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
-	\ademmaimpl{#1}{cl}{\ademmafilenametemp1.cl.tex}
+	\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
+	\ademmaimpl{#1}{cl}{\ademmafilenametemp2.cl.tex}
 }
 
 \newcommand{\ademmarmotivic}[1]
 {
     \replacebackslashwithB{#1}{\ademmasanitizedbackslashtemp}
 	\StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametemp1]
-	%\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
-	\ademmaimpl{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametemp1.rm.tex}
+	\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
+	\ademmaimpl{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametemp2.rm.tex}
 }
 
