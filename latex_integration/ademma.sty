@@ -26,6 +26,7 @@
             \errmessage{Error running ademma with calculation-input '#1': see file '#4' for more information}
 		}
 		{
+            {\immediate\write18{rm #4}}
 		    \input{#3}
 		}
     }
