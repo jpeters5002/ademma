@@ -49,7 +49,7 @@
     \replacebackslashwithB{#1}{\ademmasanitizedbackslashtemp}
 	\StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
 	\StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
-	\ademmaimplproxy{\ademmasanitizedbackslashtemp}{cl}{\ademmafilenametempB}
+	\ademmaimplproxy{\ademmasanitizedbackslashtemp}{cl}{\ademmafilenametempB.cl.tex}
 }
 
 \newcommand{\ademmarmotivic}[1]
@@ -57,6 +57,6 @@
     \replacebackslashwithB{#1}{\ademmasanitizedbackslashtemp}
 	\StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
 	\StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
-    \ademmaimplproxy{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametempB}
+    \ademmaimplproxy{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametempB.rm.tex}
 }
 
