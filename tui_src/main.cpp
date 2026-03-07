@@ -77,14 +77,21 @@ int main (int argc, char** argv)
     switch (argv_handle(option_values_argv_chosen, calculation_input_argv_chosen, argc, argv))
     {
         case cCONTROL_RETURN_SUCCESS:
-            option_values_using = option_values_argv_chosen;
-            calculation_input_using = calculation_input_argv_chosen;
             break;
         case cCONTROL_RETURN_SUCCESS_EXIT:
             return 0;
         case cCONTROL_RETURN_FAIL:
             return 1;
     }
+    for (size_t i = 0; i < calculation_input_argv_chosen.size(); i++)
+    {
+        if (calculation_input_argv_chosen[i] == 'B')
+        {
+            calculation_input_argv_chosen[i] = '\\';
+        }
+    }
+    option_values_using = option_values_argv_chosen;
+    calculation_input_using = calculation_input_argv_chosen;
     for (;;)
     {
         if (option_values_using.mSetting == cOPTION_VALUE_SETTING_NONE)
@@ -104,7 +111,7 @@ int main (int argc, char** argv)
                         "\tcl - Classical\n"
                         "\trm - R-Motivic" << std::endl;
                     std::string option;
-                    std::cin >> option;
+                    std::getline(std::cin, option);
                     if (option == "cl")
                     {
                         option_values_using.mSetting = cOPTION_VALUE_SETTING_CLASSICAL;
@@ -355,7 +362,7 @@ void print_help()
     }
     std::cout << descriptions_str << "\n" << std::endl;
 
-    std::cout << "calculation-input depends on the given '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_SETTING).mName << "' option, but most generally, Steenrod square degree factors can be specified as 'Sq^<num>' (with optional curly brackets '{' and '}' around '<num>'), tau factors can be specified as '\\tau' or '\\tau^<num>' (with optional curly brackets around '<num>'), and rho factors can be specified as '\\rho' or '\\rho^<num>' (with optional curly brackets around '<num>'). Classical setting only allows Steenrod square degrees; R-Motivic setting allows Steenrod square degrees, taus, and rhos. Multiplying the elements together is done by placing one element immediately after another without any characters between. Polynomial inputs are supported, so use the '+' character between monomials for your input. Whitespace is allowed between factors and between terms and '+'. Currently no parentheses are allowed.\n" << std::endl;
+    std::cout << "calculation-input depends on the given '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_SETTING).mName << "' option, but most generally, Steenrod square degree factors can be specified as 'Sq^<num>' (with optional curly brackets '{' and '}' around '<num>'), tau factors can be specified as '\\tau' or '\\tau^<num>' (with optional curly brackets around '<num>'), and rho factors can be specified as '\\rho' or '\\rho^<num>' (with optional curly brackets around '<num>'). Classical setting only allows Steenrod square degrees; R-Motivic setting allows Steenrod square degrees, taus, and rhos. Multiplying the elements together is done by placing one element immediately after another without any characters between. Polynomial inputs are supported, so use the '+' character between monomials for your input. Whitespace is allowed between factors and between terms and '+'. Currently no parentheses are allowed. When passed via CLI, it is acceptable to use 'B' in place of backslashes '\\' but they will be converted before passing to parsing and calculations so error messages will show backslashes.\n" << std::endl;
 
     std::cout << "NOTE: If calculation-input is passed via CLI then, depending on the shell being used, a double backslash might be necessary for the shell to pass a backslash into the program argument. Usually shells allow arguments to be contained within double quotes, and when this is done, usually the shell will pass in a single backslash within those quotes as part of the argument instead of being treated as an escape character." << std::endl;
 }
@@ -373,7 +380,7 @@ control_return_e handle_classical(const option_values_t& aOptionValues, const st
             return cCONTROL_RETURN_FAIL;
         }
         std::cout << "Enter classical adem monomial (form Sq^<num1>Sq^<num2>[Sq^<num3>]...) or 'q' to quit" << std::endl;
-        std::cin >> parsing_info.mStringToParse;
+        std::getline(std::cin, parsing_info.mStringToParse);
         if (parsing_info.mStringToParse == "q")
         {
             return cCONTROL_RETURN_SUCCESS_EXIT;
@@ -404,7 +411,7 @@ control_return_e handle_r_motivic(const option_values_t& aOptionValues, const st
             return cCONTROL_RETURN_FAIL;
         }
         std::cout << "Enter R-motivic adem monomial (form eg: Sq^1\\tau\\rho^2Sq^2) or 'q' to quit" << std::endl;
-        std::cin >> parsing_info.mStringToParse;
+        std::getline(std::cin, parsing_info.mStringToParse);
         if (parsing_info.mStringToParse == "q")
         {
             return cCONTROL_RETURN_SUCCESS_EXIT;

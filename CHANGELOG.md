@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- LaTeX integration (Linux only; maybe MacOS/OSX works too).
+
+### Fixed
+
+- Output `\rho` and `\tau` factors are now LaTeX compliant with their neighbors and have spaces after them if there is a factor following them (for readability).
+- The TUI properly handles whitespace in inputs (previously whitespace would delimit TUI input, which was bad news).
+
 ## [0.1.1] - 2026-03-03
 
 ### Added
