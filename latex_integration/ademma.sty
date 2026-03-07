@@ -17,8 +17,7 @@
 		\input{#3}
 	}
     {
-        %{\immediate\write18{mkdir -p \string~/.ademma}}
-        {\immediate{mkdir -p \string~/.ademma}}
+        {\immediate\write18{mkdir -p \string~/.ademma}}
         {\immediate\write18{ademma --only-cli --setting #2 '#1' > #3 2> /home/brian/latex/ademmastatuserrmsg.txt}}
         \IfFileExists{#3}
 		{
