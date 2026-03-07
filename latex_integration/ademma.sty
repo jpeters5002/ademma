@@ -1,0 +1,62 @@
+\documentclass{article}
+
+\usepackage{xstring}
+
+\makeatletter
+\newcommand{\replacebackslashwithcolon}[2]{{\escapechar=`: 
+  \xdef#2{\expandafter\zap@space\detokenize\expandafter{#1} \@empty}}}
+\makeatother
+
+% calculation-input, setting, filename
+\newcommand\ademmaimpl[3]
+{
+	\IfFileExists{/home/brian/latex/ademma}
+	{
+		%{\immediate\write18{/home/brian/latex/ademma --only-cli --setting #2 #1 > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt ; $? && touch /home/brian/latex/ademmastatuserr}}
+		{\immediate\write18{/home/brian/latex/ademma --only-cli --setting #2 #1 > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt}}
+		\IfFileExists{#3}
+		{
+			\input{#3}
+		}
+		{
+			\errmessage{Error running ademma with calculation-input '#1': see file /home/brian/latex/ademmastatuserrmsg.txt for more information}
+		}
+	}
+	{
+		\errmessage{No executable file for 'ademma' found}
+	}
+}
+
+\newcommand{\ademmaclassical}[1]
+{
+	\StrDel{#1}{^}[\ademmafilenametemp]
+	\ademmaimpl{#1}{cl}{\ademmafilenametemp.cl.tex}
+}
+
+\newcommand{\ademmarmotivic}[1]
+{
+	%\saveexpandmode\noexpandarg
+	\StrSubstitute{#1}{\\}{:}[\ademmasanitizedbackslashtemp]
+	\StrDel{#1}{^}[\ademmafilenametemp1]
+	\StrDel{\ademmafilenametemp1}{\\}[\ademmafilenametemp2]
+	%\restoreexpandmode
+	\ademmaimpl{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametemp2.rm.tex}
+}
+
+\newcommand{\testthing}[1]
+{
+	\replacebackslashwithcolon{#1}{\testthingtemp}
+	\testthingtemp
+}
+
+\begin{document}
+
+This is a test
+
+%$\ademmaclassical{Sq^16Sq^16Sq^16Sq^16Sq^16Sq^16}$
+
+%$\ademmarmotivic{Sq^3\tau}$
+
+\testthing{\tau}
+
+\end{document}
