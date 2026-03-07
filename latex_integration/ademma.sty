@@ -1,7 +1,7 @@
 \usepackage{xstring}
 
 \makeatletter
-\newcommand{\replacebackslashwithsemicolon}[2]{{\escapechar=`; 
+\newcommand{\replacebackslashwithB}[2]{{\escapechar=`B 
   \xdef#2{\expandafter\zap@space\detokenize\expandafter{#1} \@empty}}}
 \makeatother
 
@@ -11,7 +11,8 @@
 	\IfFileExists{/home/brian/latex/ademma}
 	{
 		%{\immediate\write18{/home/brian/latex/ademma --only-cli --setting #2 #1 > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt ; $? && touch /home/brian/latex/ademmastatuserr}}
-		{\immediate\write18{/home/brian/latex/ademma --only-cli --setting #2 #1 > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt}}
+		{\immediate\write18{/home/brian/latex/ademma --only-cli --setting #2 '#1' > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt}}
+		%/home/brian/latex/ademma --only-cli --setting #2 '#1' > /home/brian/latex/#3 2> /home/brian/latex/ademmastatuserrmsg.txt
 		\IfFileExists{#3}
 		{
 			\input{#3}
@@ -28,15 +29,15 @@
 \newcommand{\ademmaclassical}[1]
 {
 	\StrDel{#1}{ }[\ademmafilenametemp1]
-	\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
-	\ademmaimpl{#1}{cl}{\ademmafilenametemp2.cl.tex}
+	%\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
+	\ademmaimpl{#1}{cl}{\ademmafilenametemp1.cl.tex}
 }
 
 \newcommand{\ademmarmotivic}[1]
 {
-    \replacebackslashwithsemicolon{#1}{\ademmasanitizedbackslashtemp}
+    \replacebackslashwithB{#1}{\ademmasanitizedbackslashtemp}
 	\StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametemp1]
-	\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
-	\ademmaimpl{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametemp2.rm.tex}
+	%\StrDel{\ademmafilenametemp1}{\\\\}[\ademmafilenametemp2]
+	\ademmaimpl{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametemp1.rm.tex}
 }
 

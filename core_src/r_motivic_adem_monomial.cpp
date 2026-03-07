@@ -63,10 +63,10 @@ std::string ademma_core::RMotivicAdemMonomialFactor_ToString(RMotivicAdemMonomia
         case RMotivicAdemMonomialFactor_Type::cSteenrodSquareDegree:
             return SteenrodSquareDegree_ToString((SteenrodSquareDegree)aValue);
         case RMotivicAdemMonomialFactor_Type::cTau:
-            strOut = "\\tau";
+            strOut = "{\\tau}";
             break;
         case RMotivicAdemMonomialFactor_Type::cRho:
-            strOut = "\\rho";
+            strOut = "{\\rho}";
             break;
         default:
             throw std::runtime_error("unreachable code reached: RMotivicAdemMonomialFactor_GetType unexpectedly returned cNONE or bad value");
