@@ -196,7 +196,7 @@ option_type_details_t option_type_details_from_option_type_specifier(option_type
         case cOPTION_TYPE_SPECIFIER_NO_LOOP_TUI:
             return {"no-loop-tui", "Exit after first calculation when using the TUI instead of looping", false, ""};
         case cOPTION_TYPE_SPECIFIER_SETTING:
-            return {"setting", "Which Steenrod algebra setting we are working with", true, "classical, cl; r-motivic, rm"};
+            return {"setting", "Which Steenrod algebra setting we are working with", true, "classical, cl; r-motivic, rm; c-motivic, cm"};
         case cOPTION_TYPE_SPECIFIER_NONE:
             break;
     }
@@ -227,7 +227,7 @@ option_value_details_t option_value_details_from_option_value_setting(option_val
         case cOPTION_VALUE_SETTING_R_MOTIVIC:
             return {"r-motivic", "rm"};
         case cOPTION_VALUE_SETTING_C_MOTIVIC:
-            return {"r-motivic", "rm"};
+            return {"c-motivic", "cm"};
         case cOPTION_VALUE_SETTING_NONE:
             break;
     }
