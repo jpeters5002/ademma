@@ -12,7 +12,7 @@
 
 namespace ademma_core { namespace c_motivic_adem_math
 {
-CMotivicAdemPolynomial admissify_two_factor_c_motivic_adem_monomial_AssumeNoSq0Factors(CMotivicAdemMonomialFactor aLeft, CMotivicAdemMonomialFactor aRight, int& aLeftoverRightTaus);
+CMotivicAdemPolynomial admissify_two_factor_c_motivic_adem_monomial_AssumeNoSq0Factors(CMotivicAdemMonomialFactor aLeft, CMotivicAdemMonomialFactor aRight);
 CMotivicAdemPolynomial admissify_c_motivic_adem_monomial_one_step_AssumeNoSq0Factors(const CMotivicAdemMonomial& aMonomial);
 void admissify_c_motivic_adem_polynomial_one_step_AssumeNoSq0Factors(CMotivicAdemPolynomial& aPolynomial);
 }}
@@ -45,10 +45,9 @@ ademma_core::CMotivicAdemPolynomial ademma_core::c_motivic_adem_math::admissify_
 
 // PRIVATE FUNCTIONS DEFINITION
 
-ademma_core::CMotivicAdemPolynomial ademma_core::c_motivic_adem_math::admissify_two_factor_c_motivic_adem_monomial_AssumeNoSq0Factors(CMotivicAdemMonomialFactor aLeft, CMotivicAdemMonomialFactor aRight, int& aLeftoverRightTaus)
+ademma_core::CMotivicAdemPolynomial ademma_core::c_motivic_adem_math::admissify_two_factor_c_motivic_adem_monomial_AssumeNoSq0Factors(CMotivicAdemMonomialFactor aLeft, CMotivicAdemMonomialFactor aRight)
 {
     DEBUG_PRINT("c_mot_math::admissify_two_factor... called with: " + CMotivicAdemMonomialFactor_ToString(aLeft) + ", " + CMotivicAdemMonomialFactor_ToString(aRight));
-    aLeftoverRightTaus = 0;
     CMotivicAdemPolynomial cmap {};
     if (CMotivicAdemMonomialFactor_IsPairAdmissible(aLeft, aRight))
     {
@@ -121,7 +120,7 @@ ademma_core::CMotivicAdemPolynomial ademma_core::c_motivic_adem_math::admissify_
             }
         }
     }
-    DEBUG_PRINT("c_mot_math::admissify_two_factor... done:        " + CMotivicAdemPolynomial_ToString(cmap) + ", " + std::to_string(aLeftoverRightTaus));
+    DEBUG_PRINT("c_mot_math::admissify_two_factor... done:        " + CMotivicAdemPolynomial_ToString(cmap));
     return cmap;
 }
 
@@ -143,12 +142,7 @@ ademma_core::CMotivicAdemPolynomial ademma_core::c_motivic_adem_math::admissify_
         {
             continue;
         }
-        int num_leftover_right_taus;
-        capOut = admissify_two_factor_c_motivic_adem_monomial_AssumeNoSq0Factors(aMonomial[i - 1], aMonomial[i], num_leftover_right_taus);
-        if (num_leftover_right_taus > 0)
-        {
-            right_leftover_monomial.insert(right_leftover_monomial.begin(), CMotivicAdemMonomialFactor_CreateTau(num_leftover_right_taus));
-        }
+        capOut = admissify_two_factor_c_motivic_adem_monomial_AssumeNoSq0Factors(aMonomial[i - 1], aMonomial[i]);
         for (size_t left_j = 0; left_j < i - 1; left_j++)
         {
             left_leftover_monomial.push_back(aMonomial[left_j]);
