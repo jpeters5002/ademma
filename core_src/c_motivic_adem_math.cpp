@@ -72,18 +72,14 @@ ademma_core::CMotivicAdemPolynomial ademma_core::c_motivic_adem_math::admissify_
                 cmam.push_back(combined);
                 cmap.push_back(cmam);
             }
-            else if (left_type == CMotivicAdemMonomialFactor_Type::cSteenrodSquareDegree)
+            else
             {
                 // Sq^a * tau^b
+                assert(type_left == CMotivicAdemMonomialFactor_Type::cSteenrodSquareDegree);
                 CMotivicAdemMonomial cmam {};
                 cmam.push_back(aRight);
                 cmam.push_back(aLeft);
                 cmap.push_back(cmam);
-            }
-            else
-            {
-                // no more types for aLeft
-                throw std::runtime_error("unreachable code: logically impossible to reach this code (rho^a * tau^b somehow considered inadmissible)");
             }
         } // r = steenrod_square_degree
         else
