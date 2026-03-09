@@ -23,7 +23,7 @@ The ademma LaTeX package defines a few macros, the following of which are useful
 ```
 \ademmaclassical{...} % returns the admissible form of the given calculation-input in the classical setting
 \ademmarmotivic{...} % returns the admissible form of the given calculation-input in the rmotivic setting
-\ademmacmotivic{...} % returns the admissible form of the given calculation-input in the rmotivic setting
+\ademmacmotivic{...} % returns the admissible form of the given calculation-input in the cmotivic setting
 ```
 
 The calculation-input should have equivalent requirements to the calculation-input specifications found when running `ademma --help`.
