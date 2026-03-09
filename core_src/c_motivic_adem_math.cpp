@@ -81,7 +81,7 @@ ademma_core::CMotivicAdemPolynomial ademma_core::c_motivic_adem_math::admissify_
                 cmam.push_back(aLeft);
                 cmap.push_back(cmam);
             }
-        } // r = steenrod_square_degree
+        }
         else
         {
             assert(right_type == CMotivicAdemMonomialFactor_Type::cSteenrodSquareDegree);
