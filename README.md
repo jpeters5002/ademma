@@ -1,5 +1,5 @@
 # Ademma
-ADEM Mathematical Analyzer (ademma) is a computational tool to write arbitrary Steenrod algebra polynomials in admissible form. Ademma currently supports Classical (i.e., singular cohomology) and R-Motivic Steenrod algebras over the prime 2.
+ADEM Mathematical Analyzer (ademma) is a computational tool to write arbitrary Steenrod algebra polynomials in admissible form. Ademma currently supports Classical (i.e., singular cohomology), R-Motivic, and C-Motivic Steenrod algebras over the prime 2.
 
 ## Binaries
 Find the latest Windows and Linux release binaries at [Latest Release](https://github.com/jpeters5002/ademma/releases/latest).
@@ -79,7 +79,8 @@ or run without `--help` for a Terminal User Interface (TUI) experience.
 See `ademma/latex_integration/README.md` for details on LaTeX integration (currently only Linux supported but MacOS/OSX may work too).
 
 ## Planned Future Work
-- Supporting C-Motivic.
+- Web implementation.
+- Supporting primes other than 2.
 - And more!
 - Request your own features to be added to ademma [here](https://github.com/jpeters5002/ademma/issues).
 

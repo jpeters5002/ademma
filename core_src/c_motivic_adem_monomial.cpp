@@ -189,17 +189,6 @@ ademma_core::CMotivicAdemMonomial ademma_core::CMotivicAdemMonomial_FromString(P
     return cmamOut;
 }
 
-void ademma_core::CMotivicAdemMonomial_EliminateAllPower0Taus(CMotivicAdemMonomial& aMonomial)
-{
-    for (size_t i = aMonomial.size(); i > 0; i--)
-    {
-        if (CMotivicAdemMonomialFactor_GetType(aMonomial[i - 1]) == CMotivicAdemMonomialFactor_Type::cTau && CMotivicAdemMonomialFactor_GetPower_AssumeTau(aMonomial[i - 1]) == 0)
-        {
-            aMonomial.erase(aMonomial.begin() + (i - 1));
-        }
-    }
-}
-
 void ademma_core::CMotivicAdemMonomial_EliminateAllSq0Factors(CMotivicAdemMonomial& aMonomial)
 {
     for (size_t i = aMonomial.size(); i > 0; i--)

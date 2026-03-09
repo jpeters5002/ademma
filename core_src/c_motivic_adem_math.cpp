@@ -22,7 +22,6 @@ void admissify_c_motivic_adem_polynomial_one_step_AssumeNoSq0Factors(CMotivicAde
 ademma_core::CMotivicAdemPolynomial ademma_core::c_motivic_adem_math::admissify_c_motivic_adem_polynomial(const CMotivicAdemPolynomial& aPolynomial)
 {
     CMotivicAdemPolynomial cmapOut = aPolynomial;
-    CMotivicAdemMonomial_EliminateAllPower0Taus(cmapOut[0]);
     for (;;)
     {
         CMotivicAdemPolynomial_EliminateAllSq0Factors(cmapOut);

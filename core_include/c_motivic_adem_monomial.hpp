@@ -48,8 +48,6 @@ std::string CMotivicAdemMonomial_ToString(const CMotivicAdemMonomial& aValue);
 
 CMotivicAdemMonomial CMotivicAdemMonomial_FromString(ParsingInfo& aParsingInfo);
 
-void CMotivicAdemMonomial_EliminateAllPower0Taus(CMotivicAdemMonomial& aMonomial);
-
 void CMotivicAdemMonomial_EliminateAllSq0Factors(CMotivicAdemMonomial& aMonomial);
 
 void CMotivicAdemMonomial_ShoveTauLeft(CMotivicAdemMonomial& aMonomial);
