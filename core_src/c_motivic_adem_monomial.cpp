@@ -104,7 +104,7 @@ ademma_core::CMotivicAdemMonomialFactor ademma_core::CMotivicAdemMonomialFactor_
         if (power & (cCMotivicAdemMonomialFactor_IS_TAU_BIT))
         {
             aParsingInfo.mErrorInfo.mIsError = true;
-            aParsingInfo.mErrorInfo.mErrorString = "Too large value for power of tau would clobber allocated info bits (" + std::to_string(sizeof(CMotivicAdemMonomialFactor) * 8 - 2) + " bits available for the power)";
+            aParsingInfo.mErrorInfo.mErrorString = "Too large value for power of tau would clobber allocated info bits (" + std::to_string(sizeof(CMotivicAdemMonomialFactor) * 8 - 1) + " bits available for the power)";
             aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
             return cCMotivicAdemMonomialFactor_ERROR_VALUE;
         }
