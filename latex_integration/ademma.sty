@@ -79,3 +79,17 @@
     \ademmaimplproxy{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametempB.rm.tex}
 }
 
+% #1                                                       , #2
+% (optional) print-calculation-input-equals [default: true], calculation-input
+\newcommand{\ademmacmotivic}[2][true]
+{
+    \IfStrEq{#1}{true}
+    {
+        #2 =
+    }{}
+    \replacebackslashwithB{#2}{\ademmasanitizedbackslashtemp}
+    \StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
+    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
+    \ademmaimplproxy{\ademmasanitizedbackslashtemp}{cm}{\ademmafilenametempB.cm.tex}
+}
+
