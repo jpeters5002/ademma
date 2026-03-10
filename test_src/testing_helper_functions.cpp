@@ -56,6 +56,46 @@ skip_cl_poly_push_back:
     return cl_poly;
 }
 
+ademma_core::ClassicalAdemPolynomial testing::classical_polynomial_from_c_motivic_polynomial(const ademma_core::CMotivicAdemPolynomial& aCMPolynomial, int* aNumTermsWithTau)
+{
+    if (aNumTermsWithTau)
+    {
+        *aNumTermsWithTau = 0;
+    }
+    using namespace ademma_core;
+    if (!CMotivicAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(aCMPolynomial))
+    {
+        throw std::runtime_error("Error: testing::classical_polynomial_from_c_motivic_polynomialcalled with non-admissible input polynomial");
+    }
+    ClassicalAdemPolynomial cl_poly {};
+    for (size_t i = 0; i < aCMPolynomial.size(); i++)
+    {
+        const CMotivicAdemMonomial& cm_monomial = aCMPolynomial[i];
+        ClassicalAdemMonomial cl_monomial {};
+        bool term_has_tau = false;
+        for (size_t j = 0; j < cm_monomial.size(); j++)
+        {
+            CMotivicAdemMonomialFactor factor = cm_monomial[j];
+            CMotivicAdemMonomialFactor_Type type = CMotivicAdemMonomialFactor_GetType(factor);
+            if (type == CMotivicAdemMonomialFactor_Type::cTau)
+            {
+                if (!term_has_tau && aNumTermsWithTau)
+                {
+                    term_has_tau = true;
+                    *aNumTermsWithTau++;
+                }
+                continue;
+            }
+            else
+            {
+                cl_monomial.push_back((SteenrodSquareDegree)factor);
+            }
+        }
+        cl_poly.push_back(cl_monomial);
+    }
+    return cl_poly;
+}
+
 int testing::two_to_power(int n)
 {
     int result = 1;

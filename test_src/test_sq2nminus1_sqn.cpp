@@ -1,5 +1,8 @@
 #include "test_sq2nminus1_sqn.hpp"
 
+#include "c_motivic_adem_math.hpp"
+#include "c_motivic_adem_monomial.hpp"
+#include "c_motivic_adem_polynomial.hpp"
 #include "classical_adem_math.hpp"
 #include "classical_adem_monomial.hpp"
 #include "classical_adem_polynomial.hpp"
@@ -55,6 +58,18 @@ int test_sq2nminus1_sqn()
             RMotivicAdemMonomialFactor f2 = RMotivicAdemMonomialFactor_CreateSteenrodSquareDegree(second_factor);
             std::string expected_result_str = ((n % 2 == 1) ? "0" : RMotivicAdemMonomialFactor_ToString(rho1) + RMotivicAdemMonomialFactor_ToString(f1) + RMotivicAdemMonomialFactor_ToString(f2 - 1));
             std::cerr << "R-Motivic - expected result: " << expected_result_str << "; Calculation: " << RMotivicAdemMonomial_ToString(rmam) << " -> " << RMotivicAdemPolynomial_ToString(rmap) << std::endl;
+            success = false;
+        }
+
+        // cm
+        CMotivicAdemMonomial cmam {};
+        cmam.push_back(first_factor);
+        cmam.push_back(second_factor);
+        CMotivicAdemPolynomial cmap = c_motivic_adem_math::admissify_c_motivic_adem_monomial(cmam);
+        expected_result = (cmap.size() == 0);
+        if (!expected_result)
+        {
+            std::cerr << "C-Motivic - expected result: 0; Calculation: " << CMotivicAdemMonomial_ToString(cmam) << " -> " << CMotivicAdemPolynomial_ToString(cmap) << std::endl;
             success = false;
         }
     }

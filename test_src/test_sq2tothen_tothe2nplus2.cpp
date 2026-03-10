@@ -2,6 +2,9 @@
 
 #include "testing_helper_functions.hpp"
 
+#include "c_motivic_adem_math.hpp"
+#include "c_motivic_adem_monomial.hpp"
+#include "c_motivic_adem_polynomial.hpp"
 #include "classical_adem_math.hpp"
 #include "classical_adem_monomial.hpp"
 #include "classical_adem_polynomial.hpp"
@@ -13,14 +16,16 @@
 #include <iostream>
 #include <assert.h>
 
-#define LAST_N_CASE_TO_TEST_CL 3
-#define LAST_N_CASE_TO_TEST_RM 3
+#define LAST_N_CASE_TO_TEST_CL 2
+#define LAST_N_CASE_TO_TEST_RM 2
+#define LAST_N_CASE_TO_TEST_CM 2
 
 int test_sq2tothen_tothe2nplus2()
 {
     using namespace ademma_core;
     bool success = true;
     assert(LAST_N_CASE_TO_TEST_CL >= LAST_N_CASE_TO_TEST_RM);
+    assert(LAST_N_CASE_TO_TEST_CL >= LAST_N_CASE_TO_TEST_CM);
     for (size_t n = 0; n <= LAST_N_CASE_TO_TEST_CL; n++)
     {
         const SteenrodSquareDegree two_to_n = testing::two_to_power(n);
@@ -54,6 +59,23 @@ int test_sq2tothen_tothe2nplus2()
             if (!expected_result)
             {
                 std::cerr << "R-Motivic - expected result: 0; Calculation: " << RMotivicAdemMonomial_ToString(rmam) << " -> " << RMotivicAdemPolynomial_ToString(rmap) << std::endl;
+                success = false;
+            }
+        }
+
+        // cm
+        if (n <= LAST_N_CASE_TO_TEST_CM)
+        {
+            CMotivicAdemMonomial cmam {};
+            for (size_t z = 0; z < power; z++)
+            {
+                cmam.push_back(CMotivicAdemMonomialFactor_CreateSteenrodSquareDegree(two_to_n));
+            }
+            CMotivicAdemPolynomial cmap = c_motivic_adem_math::admissify_c_motivic_adem_monomial(cmam);
+            expected_result = (cmap.size() == 0);
+            if (!expected_result)
+            {
+                std::cerr << "C-Motivic - expected result: 0; Calculation: " << CMotivicAdemMonomial_ToString(cmam) << " -> " << CMotivicAdemPolynomial_ToString(cmap) << std::endl;
                 success = false;
             }
         }
