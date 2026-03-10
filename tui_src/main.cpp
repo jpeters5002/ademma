@@ -271,10 +271,9 @@ int int_from_control_return_e(control_return_e aValue)
             return 1;
         case cCONTROL_RETURN_FAIL2:
             return 2;
-        default:
-            assert(!"unreachable");
-            return -1;
     }
+    assert(!"unreachable");
+    return -1;
 }
 
 control_return_e argv_handle(option_values_t& aOptionValues, std::string& aCalculationInput, int argc, char** argv)
