@@ -31,12 +31,14 @@ enum option_type_specifier_e
     cOPTION_TYPE_SPECIFIER_ONLY_CLI,
     cOPTION_TYPE_SPECIFIER_NO_LOOP_TUI,
     cOPTION_TYPE_SPECIFIER_SETTING,
+    cOPTION_TYPE_SPECIFIER_OPTION_EXISTS,
 
     cOPTION_TYPE_SPECIFIER_COUNT,
     cOPTION_TYPE_SPECIFIER_NONE = cOPTION_TYPE_SPECIFIER_COUNT,
 };
 option_type_details_t option_type_details_from_option_type_specifier(option_type_specifier_e aValue);
 option_type_specifier_e option_type_specifier_from_str(const char* aStr);
+bool option_exists(const char* aStr);
 struct option_value_details_t
 {
     const char* mFullName;
@@ -63,7 +65,13 @@ struct option_values_t
 
 // PRIVATE FUNCTIONS DECLARATION
 
-enum control_return_e { cCONTROL_RETURN_SUCCESS, cCONTROL_RETURN_SUCCESS_EXIT, cCONTROL_RETURN_FAIL };
+enum control_return_e { cCONTROL_RETURN_SUCCESS, cCONTROL_RETURN_SUCCESS_EXIT, cCONTROL_RETURN_FAIL, cCONTROL_RETURN_FAIL2 };
+int int_from_control_return_e(control_return_e aValue);
+#define CONTROL_SEQUENCE(control_return_value) \
+    { const control_return_e val = control_return_value; \
+    if (val != cCONTROL_RETURN_SUCCESS) \
+    { return int_from_control_return_e(val); } \
+    } do {} while(0)
 control_return_e argv_handle(option_values_t& aOptionValues, std::string& aCalculationInput, int argc, char** argv);
 bool is_token_option_specifier(const char* aToken);
 void print_help();
@@ -79,15 +87,7 @@ int main (int argc, char** argv)
     option_values_t option_values_using {};
     std::string calculation_input_argv_chosen {};
     std::string calculation_input_using {};
-    switch (argv_handle(option_values_argv_chosen, calculation_input_argv_chosen, argc, argv))
-    {
-        case cCONTROL_RETURN_SUCCESS:
-            break;
-        case cCONTROL_RETURN_SUCCESS_EXIT:
-            return 0;
-        case cCONTROL_RETURN_FAIL:
-            return 1;
-    }
+    CONTROL_SEQUENCE(argv_handle(option_values_argv_chosen, calculation_input_argv_chosen, argc, argv));
     for (size_t i = 0; i < calculation_input_argv_chosen.size(); i++)
     {
         if (calculation_input_argv_chosen[i] == 'B')
@@ -166,11 +166,12 @@ int main (int argc, char** argv)
             case cCONTROL_RETURN_SUCCESS_EXIT:
                 return 0;
             case cCONTROL_RETURN_FAIL:
+            case cCONTROL_RETURN_FAIL2:
                 break;
         }
         if (option_values_using.mOnlyCLI || option_values_using.mNoLoopTUI || (option_values_argv_chosen.mSetting != cOPTION_VALUE_SETTING_NONE && !calculation_input_argv_chosen.empty()))
         {
-            return (subhandle_control_return == cCONTROL_RETURN_FAIL) ? 1 : 0;
+            return (subhandle_control_return == cCONTROL_RETURN_FAIL || subhandle_control_return == cCONTROL_RETURN_FAIL2) ? 1 : 0;
         }
         option_values_using = option_values_argv_chosen;
         calculation_input_using = "";
@@ -197,6 +198,8 @@ option_type_details_t option_type_details_from_option_type_specifier(option_type
             return {"no-loop-tui", "Exit after first calculation when using the TUI instead of looping", false, ""};
         case cOPTION_TYPE_SPECIFIER_SETTING:
             return {"setting", "Which Steenrod algebra setting we are working with", true, "classical, cl; r-motivic, rm; c-motivic, cm"};
+        case cOPTION_TYPE_SPECIFIER_OPTION_EXISTS:
+            return {"option-exists", "Exits with return value 0 if the given value exists and exits with return value 2 otherwise", true, "<option-string-to-check-for-existence>"};
         case cOPTION_TYPE_SPECIFIER_NONE:
             break;
     }
@@ -216,6 +219,11 @@ option_type_specifier_e option_type_specifier_from_str(const char* aStr)
         }
     }
     return ots;
+}
+
+bool option_exists(const char* aStr)
+{
+    return option_type_specifier_from_str(aStr) != cOPTION_TYPE_SPECIFIER_NONE;
 }
 
 option_value_details_t option_value_details_from_option_value_setting(option_value_setting_e aValue)
@@ -252,6 +260,23 @@ option_value_setting_e option_value_setting_from_str(const char* aStr)
 
 // PRIVATE FUNCTIONS DEFINITION
 
+int int_from_control_return_e(control_return_e aValue)
+{
+    switch (aValue)
+    {
+        case cCONTROL_RETURN_SUCCESS:
+        case cCONTROL_RETURN_SUCCESS_EXIT:
+            return 0;
+        case cCONTROL_RETURN_FAIL:
+            return 1;
+        case cCONTROL_RETURN_FAIL2:
+            return 2;
+        default:
+            assert(!"unreachable");
+            return -1;
+    }
+}
+
 control_return_e argv_handle(option_values_t& aOptionValues, std::string& aCalculationInput, int argc, char** argv)
 {
     option_type_specifier_e option_type_specifier;
@@ -275,6 +300,8 @@ control_return_e argv_handle(option_values_t& aOptionValues, std::string& aCalcu
                         return cCONTROL_RETURN_FAIL;
                     }
                     break;
+                case cOPTION_TYPE_SPECIFIER_OPTION_EXISTS:
+                    return option_exists(argv_i) ? cCONTROL_RETURN_SUCCESS_EXIT : cCONTROL_RETURN_FAIL2;
                 default:
                     assert(!"unreachable"); // we only get here with a value required for the option, which should be handled by the previous cases
                     std::cerr << "[INTERNAL ERROR]: Unexpectedly reached theoretically unreachable code while handling CLI arguments" << std::endl;
