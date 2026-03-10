@@ -171,7 +171,7 @@ int main (int argc, char** argv)
         }
         if (option_values_using.mOnlyCLI || option_values_using.mNoLoopTUI || (option_values_argv_chosen.mSetting != cOPTION_VALUE_SETTING_NONE && !calculation_input_argv_chosen.empty()))
         {
-            return (subhandle_control_return == cCONTROL_RETURN_FAIL || subhandle_control_return == cCONTROL_RETURN_FAIL2) ? 1 : 0;
+            return int_from_control_return_e(subhandle_control_return);;
         }
         option_values_using = option_values_argv_chosen;
         calculation_input_using = "";
