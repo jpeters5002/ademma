@@ -16,6 +16,8 @@ enum class ACITerm_Type
     cMULTIPLY,
     cSUBACI, // implies ACITerm::mData is type ArbitraryCalculationInput*
     cPOLYNOMIAL, // implies ACITerm::mData is type <Setting>AdemPolynomial*
+
+    cNONE,
 };
 struct ACITerm
 {
