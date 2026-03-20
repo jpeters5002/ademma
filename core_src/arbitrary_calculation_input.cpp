@@ -12,7 +12,9 @@
 namespace ademma_core
 {
 bool only_whitespace_in_string_section(const std::string& aStr, size_t aLowIndex, size_t aHighIndexExcluded);
+char prev_non_whitespace_char_in_string(const std::string& aStr, size_t aHighIndexExcluded, size_t* aCharAtIndex);
 ArbitraryCalculationInput ArbitraryCalculationInput_FromString_Recursive(ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower);
+void ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(ArbitraryCalculationInput& aACI, void* aPoly, Setting_Type aSetting);
 }
 
 // PRIVATE FUNCTION DEFINITIONS
@@ -40,6 +42,20 @@ ademma_core::ACITerm ademma_core::ACITerm_Construct(ACITerm_Type aType, Setting_
                     break;
                 case Setting_Type::cR_MOTIVIC:
                     aci_termOut.mData = reinterpret_cast<void*>(new RMotivicAdemPolynomial());
+                    break;
+            }
+            break;
+        case ACITerm_Type::cMONOMIAL:
+            switch (aci_termOut.mSetting)
+            {
+                case Setting_Type::cCLASSICAL:
+                    aci_termOut.mData = reinterpret_cast<void*>(new ClassicalAdemMonomial());
+                    break;
+                case Setting_Type::cC_MOTIVIC:
+                    aci_termOut.mData = reinterpret_cast<void*>(new CMotivicAdemMonomial());
+                    break;
+                case Setting_Type::cR_MOTIVIC:
+                    aci_termOut.mData = reinterpret_cast<void*>(new RMotivicAdemMonomial());
                     break;
             }
             break;
@@ -72,6 +88,20 @@ void ademma_core::ACITerm_Destruct(ACITerm& aSelf)
                     break;
             }
             break;
+        case ACITerm_Type::cMONOMIAL:
+            switch (aSelf.mSetting)
+            {
+                case Setting_Type::cCLASSICAL:
+                    delete reinterpret_cast<ClassicalAdemMonomial*>(aSelf.mData);
+                    break;
+                case Setting_Type::cC_MOTIVIC:
+                    delete reinterpret_cast<CMotivicAdemMonomial*>(aSelf.mData);
+                    break;
+                case Setting_Type::cR_MOTIVIC:
+                    delete reinterpret_cast<RMotivicAdemMonomial*>(aSelf.mData);
+                    break;
+            }
+            break;
     }
 }
 
@@ -83,29 +113,27 @@ void ademma_core::ArbitraryCalculationInput_Destruct(ArbitraryCalculationInput& 
     }
 }
 
-#define POLYNOMIAL_FROMSTRING_INTOACITERM(parse_info, setting, aci_term_ptr, cleanup_fail_exit_label) \
+#define POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, setting_ucc) \
+    { \
+        setting_ucc##AdemPolynomial poly##setting_ucc = setting_ucc##AdemPolynomial_FromString(parse_info); \
+        if (parse_info.mErrorInfo.mIsError) \
+        { \
+            goto cleanup_fail_exit_label; \
+        } \
+        ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(aci, &poly##setting_ucc, setting); \
+    } \
+
+#define POLYNOMIAL_FROMSTRING_INTOACI_ASMONOS(parse_info, setting, aci, cleanup_fail_exit_label) \
     switch (setting) \
     { \
         case Setting_Type::cCLASSICAL: \
-            *reinterpret_cast<ClassicalAdemPolynomial*>(aci_term_ptr->mData) = ClassicalAdemPolynomial_FromString(parse_info); \
-            if (parse_info.mErrorInfo.mIsError) \
-            { \
-                goto cleanup_fail_exit_label; \
-            } \
+            POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, Classical); \
             break; \
         case Setting_Type::cC_MOTIVIC: \
-            *reinterpret_cast<CMotivicAdemPolynomial*>(aci_term_ptr->mData) = CMotivicAdemPolynomial_FromString(parse_info); \
-            if (parse_info.mErrorInfo.mIsError) \
-            { \
-                goto cleanup_fail_exit_label; \
-            } \
+            POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, CMotivic); \
             break; \
         case Setting_Type::cR_MOTIVIC: \
-            *reinterpret_cast<RMotivicAdemPolynomial*>(aci_term_ptr->mData) = RMotivicAdemPolynomial_FromString(parse_info); \
-            if (parse_info.mErrorInfo.mIsError) \
-            { \
-                goto cleanup_fail_exit_label; \
-            } \
+            POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, RMotivic); \
             break; \
     } do {} while(0)
 
@@ -130,8 +158,11 @@ ademma_core::ArbitraryCalculationInput ademma_core::ArbitraryCalculationInput_Fr
         size_t l_paren_binop_add_pos;
         size_t l_paren_binop_mult_pos;
         size_t l_paren_binop_pos;
-        ACITerm_Type l_paren_binop_type;
         bool only_whitespace_in_section;
+        char prev_char;
+        ACITerm_Type l_paren_binop_type;
+        size_t l_cut_to_pos;
+        bool nothing_on_left;
         char next_char;
         size_t r_paren_after_power_pos;
         bool power_is_bracketed;
@@ -140,10 +171,7 @@ ademma_core::ArbitraryCalculationInput ademma_core::ArbitraryCalculationInput_Fr
         ACITerm* aci_term_ptr;
         if (l_paren_pos == std::string::npos)
         {
-            aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aSetting));
-            aci_term_ptr = &aciOut.mTerms[aciOut.mTerms.size() - 1];
-            assert(aci_term->mData);
-            POLYNOMIAL_FROMSTRING_INTOACITERM(aParsingInfo, aSetting, aci_term_ptr, cleanup_fail_exit);
+            POLYNOMIAL_FROMSTRING_INTOACI_ASMONOS(aParsingInfo, aSetting, aciOut, cleanup_fail_exit);
             break;
         }
         r_paren_pos = aParsingInfo.mStringToParse.find(")", l_paren_pos + 1);
@@ -166,229 +194,84 @@ ademma_core::ArbitraryCalculationInput ademma_core::ArbitraryCalculationInput_Fr
                 goto error_no_r_paren_exit;
             }
         }
-        // l_paren_pos and r_paren_pos correct now
-        l_paren_binop_mult_pos = aParsingInfo.mStringToParse.rfind("*", l_paren_pos);
-        if (l_paren_binop_mult_pos != std::string::npos && l_paren_binop_mult_pos < aParsingInfo.mCurrentIndex)
+        // l_paren_pos and r_paren_pos correct now and not npos
+        prev_char = prev_non_whitespace_char_in_string(aParsingInfo.mStringToParse, l_paren_pos, &l_cut_to_pos);
+        if (l_cut_to_pos < aParsingInfo.mCurrentIndex)
         {
-            l_paren_binop_mult_pos = std::string::npos;
+            prev_char = '\0';
         }
-        l_paren_binop_add_pos = aParsingInfo.mStringToParse.rfind("+", l_paren_pos);
-        if (l_paren_binop_add_pos != std::string::npos && l_paren_binop_add_pos < aParsingInfo.mCurrentIndex)
+        nothing_on_left = false;
+        switch (prev_char)
         {
-            l_paren_binop_add_pos = std::string::npos;
-        }
-        // l_paren_binop_mult_pos and l_paren_binop_add_pos correct now
-        if (l_paren_binop_mult_pos == std::string::npos)
-        {
-            if (l_paren_binop_add_pos == std::string::npos)
-            {
-                l_paren_binop_type = ACITerm_Type::cNONE;
-                l_paren_binop_pos = std::string::npos;
-            }
-            else
-            {
+            case '+':
+                // ... + (...) so cut up to '+', poly_fromstring, aciterm_add
                 l_paren_binop_type = ACITerm_Type::cADD;
-                l_paren_binop_pos = l_paren_binop_add_pos;
-            }
-        }
-        else
-        {
-            if (l_paren_binop_add_pos == std::string::npos)
-            {
+                break;
+            case '*':
+                // ... * (...) so cut up to '*', poly_fromstring, aciterm_multiply
                 l_paren_binop_type = ACITerm_Type::cMULTIPLY;
-                l_paren_binop_pos = l_paren_binop_mult_pos;
-            }
-            else
-            {
-                l_paren_binop_type = (l_paren_binop_add_pos > l_paren_binop_mult_pos) ? ACITerm_Type::cADD : ACITerm_Type::cMULTIPLY;
-                l_paren_binop_pos = (l_paren_binop_add_pos > l_paren_binop_mult_pos) ? l_paren_binop_add_pos : l_paren_binop_mult_pos;
-            }
+                break;
+            case '\0':
+                // (...) so do nothing
+                nothing_on_left = true;
+                break;
+            default:
+                // ... (...) so cut up to '(', poly_fromstring, aciterm_multiply
+                l_paren_binop_type = ACITerm_Type::cMULTIPLY;
+                l_cut_to_pos = l_paren_pos;
+                break;
         }
-        // l_paren_binop_pos and l_paren_binop_type correct now
-        if (l_paren_binop_pos == std::string::npos)
+        if (!nothing_on_left)
         {
-            // (...) or monomial (...) or bad input
-            only_whitespace_in_section = only_whitespace_in_string_section(aParsingInfo.mStringToParse, aParsingInfo.mCurrentIndex, l_paren_pos);
-            if (!only_whitespace_in_section)
-            {
-                // monomial (...) or bad input - handle as polynomial for ease of data structures
-                sub_parsing_info = aParsingInfo;
-                sub_parsing_info.mStringToParse = sub_parsing_info.mStringToParse.substr(0, l_paren_pos);
-                aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aSetting));
-                aci_term_ptr = &aciOut.mTerms[aciOut.mTerms.size() - 1];
-                POLYNOMIAL_FROMSTRING_INTOACITERM(sub_parsing_info, aSetting, aci_term_ptr, subparseinfo_error_exit);
-                aParsingInfo.mCurrentIndex = sub_parsing_info.mCurrentIndex;
-                aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cMULTIPLY, aSetting));
-            }
-        }
-        else
-        {
-            // mult != npos or add != npos
-            // [polynomial +] monomial * (...) or polynomial + (...) or polynomial + monomial (...) or [polynomial +] monomial * monomial (...) or bad input
-            only_whitespace_in_section = only_whitespace_in_string_section(aParsingInfo.mStringToParse, l_paren_binop_pos + 1, l_paren_pos);
-            if (!only_whitespace_in_section)
-            {
-                // polynomial + monomial (...) or [polynomial +] monomial * monomial (...) or bad input
-                if (l_paren_binop_type == ACITerm_Type::cADD)
-                {
-                    // polynomial + monomial (...) or bad input
-                    sub_parsing_info = aParsingInfo;
-                    sub_parsing_info.mStringToParse = sub_parsing_info.mStringToParse.substr(0, l_paren_binop_add_pos);
-                    aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aSetting));
-                    aci_term_ptr = &aciOut.mTerms[aciOut.mTerms.size() - 1];
-                    POLYNOMIAL_FROMSTRING_INTOACITERM(sub_parsing_info, aSetting, aci_term_ptr, subparseinfo_error_exit);
-                    aParsingInfo.mCurrentIndex = sub_parsing_info.mCurrentIndex;
-                    if (!aParsingInfo.MatchString_IncreaseIndexOnSuccess("+"))
-                    {
-                        aParsingInfo.mErrorInfo.mIsError = true;
-                        aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
-                        aParsingInfo.mErrorInfo.mErrorString = "[INTERNAL ERROR] Perceived '+' character to be next in previous logic but didn't find it in this logic";
-                        goto cleanup_fail_exit;
-                    }
-                    aParsingInfo.IncreaseIndexOverWhitespace();
-
-                    aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cADD, aSetting));
-
-                    sub_parsing_info = aParsingInfo;
-                    sub_parsing_info.mStringToParse = sub_parsing_info.mStringToParse.substr(0, l_paren_pos);
-                    aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aSetting));
-                    aci_term_ptr = &aciOut.mTerms[aciOut.mTerms.size() - 1];
-                    POLYNOMIAL_FROMSTRING_INTOACITERM(sub_parsing_info, aSetting, aci_term_ptr, subparseinfo_error_exit);
-                    aParsingInfo.mCurrentIndex = sub_parsing_info.mCurrentIndex;
-
-                    aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cMULTIPLY, aSetting));
-                }
-                else
-                {
-                    assert(l_paren_binop_type == ACITerm_Type::cMULTIPLY);
-                    // [polynomial +] monomial * monomial (...) or bad input
-                    if (l_paren_binop_add_pos == std::string::npos)
-                    {
-                        // monomial * monomial (...) or bad input
-                        // handled after (the else case aligns after the 'polynomial +')
-                    }
-                    else
-                    {
-                        // polynomial + monomial * monomial (...) or bad input
-                        sub_parsing_info = aParsingInfo;
-                        sub_parsing_info.mStringToParse = sub_parsing_info.mStringToParse.substr(0, l_paren_binop_add_pos);
-                        aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aSetting));
-                        aci_term_ptr = &aciOut.mTerms[aciOut.mTerms.size() - 1];
-                        POLYNOMIAL_FROMSTRING_INTOACITERM(sub_parsing_info, aSetting, aci_term_ptr, subparseinfo_error_exit);
-                        aParsingInfo.mCurrentIndex = sub_parsing_info.mCurrentIndex;
-                        if (!aParsingInfo.MatchString_IncreaseIndexOnSuccess("+"))
-                        {
-                            aParsingInfo.mErrorInfo.mIsError = true;
-                            aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
-                            aParsingInfo.mErrorInfo.mErrorString = "[INTERNAL ERROR] Perceived '+' character to be next in previous logic but didn't find it in this logic";
-                            goto cleanup_fail_exit;
-                        }
-                        aParsingInfo.IncreaseIndexOverWhitespace();
-
-                        aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cADD, aSetting));
-                    }
-                    // monomial * monomial (...) or bad input - possibly already handled a 'polynomial +'
-                    sub_parsing_info = aParsingInfo;
-                    sub_parsing_info.mStringToParse = sub_parsing_info.mStringToParse.substr(0, l_paren_pos);
-                    aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aSetting));
-                    aci_term_ptr = &aciOut.mTerms[aciOut.mTerms.size() - 1];
-                    POLYNOMIAL_FROMSTRING_INTOACITERM(sub_parsing_info, aSetting, aci_term_ptr, subparseinfo_error_exit);
-                    aParsingInfo.mCurrentIndex = sub_parsing_info.mCurrentIndex;
-
-                    aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cMULTIPLY, aSetting));
-                }
-                // (...) - everything else handled
-            }
-            else
-            {
-                // [polynomial +] monomial * (...) or polynomial + (...) or bad input
-                if (l_paren_binop_add_pos != std::string::npos)
-                {
-                    // polynomial + ...
-                    sub_parsing_info = aParsingInfo;
-                    sub_parsing_info.mStringToParse = sub_parsing_info.mStringToParse.substr(0, l_paren_binop_add_pos);
-                    aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aSetting));
-                    aci_term_ptr = &aciOut.mTerms[aciOut.mTerms.size() - 1];
-                    POLYNOMIAL_FROMSTRING_INTOACITERM(sub_parsing_info, aSetting, aci_term_ptr, subparseinfo_error_exit);
-                    aParsingInfo.mCurrentIndex = sub_parsing_info.mCurrentIndex;
-                    if (!aParsingInfo.MatchString_IncreaseIndexOnSuccess("+"))
-                    {
-                        aParsingInfo.mErrorInfo.mIsError = true;
-                        aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
-                        aParsingInfo.mErrorInfo.mErrorString = "[INTERNAL ERROR] Perceived '+' character to be next in previous logic but didn't find it in this logic";
-                        goto cleanup_fail_exit;
-                    }
-                    aParsingInfo.IncreaseIndexOverWhitespace();
-
-                    aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cADD, aSetting));
-                }
-                // monomial * (...) or (...) or bad input
-                only_whitespace_in_section = only_whitespace_in_string_section(aParsingInfo.mStringToParse, aParsingInfo.mCurrentIndex, l_paren_pos);
-                if (!only_whitespace_in_section)
-                {
-                    // monomial * (...)
-                    sub_parsing_info = aParsingInfo;
-                    sub_parsing_info.mStringToParse = sub_parsing_info.mStringToParse.substr(0, l_paren_pos);
-                    aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aSetting));
-                    aci_term_ptr = &aciOut.mTerms[aciOut.mTerms.size() - 1];
-                    POLYNOMIAL_FROMSTRING_INTOACITERM(sub_parsing_info, aSetting, aci_term_ptr, subparseinfo_error_exit);
-                    aParsingInfo.mCurrentIndex = sub_parsing_info.mCurrentIndex;
-                    if (!aParsingInfo.MatchString_IncreaseIndexOnSuccess("*"))
-                    {
-                        aParsingInfo.mErrorInfo.mIsError = true;
-                        aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
-                        aParsingInfo.mErrorInfo.mErrorString = "[INTERNAL ERROR] Perceived '*' character to be next in previous logic but didn't find it in this logic";
-                        goto cleanup_fail_exit;
-                    }
-                    aParsingInfo.IncreaseIndexOverWhitespace();
-
-                    aciOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cMULTIPLY, aSetting));
-                }
-            }
-            // (...) - everything handled (left side)
-            // now right side (power only)
-            // (...) or (...) ^ {<num>} or (...) ^ <num> or bad input
             sub_parsing_info = aParsingInfo;
-            sub_parsing_info.mCurrentIndex = r_paren_pos + 1;
-            power = 1;
-            if (sub_parsing_info.MatchString_IncreaseIndexOnSuccess("^"))
+            sub_parsing_info.mStringToParse = sub_parsing_info.mStringToParse.substr(0, l_cut_to_pos);
+            POLYNOMIAL_FROMSTRING_INTOACI_ASMONOS(sub_parsing_info, aSetting, aciOut, subparseinfo_error_exit);
+            aciOut.mTerms.push_back(ACITerm_Construct(l_paren_binop_type, aSetting));
+        }
+        aParsingInfo.mCurrentIndex = l_paren_pos;
+        // (...) - everything handled (left side)
+        // now right side (power only)
+        // (...) or (...) ^ {<num>} or (...) ^ <num> or bad input
+        sub_parsing_info = aParsingInfo;
+        sub_parsing_info.mCurrentIndex = r_paren_pos + 1;
+        power = 1;
+        if (sub_parsing_info.MatchString_IncreaseIndexOnSuccess("^"))
+        {
+            power_is_bracketed = false;
+            if (sub_parsing_info.MatchString_IncreaseIndexOnSuccess("{"))
             {
-                power_is_bracketed = false;
-                if (sub_parsing_info.MatchString_IncreaseIndexOnSuccess("{"))
-                {
-                    power_is_bracketed = true;
-                }
-                if (!sub_parsing_info.ParseInt(power))
+                power_is_bracketed = true;
+            }
+            if (!sub_parsing_info.ParseInt(power))
+            {
+                aParsingInfo.mErrorInfo.mIsError = true;
+                aParsingInfo.mErrorInfo.mErrorNearbyIndex = sub_parsing_info.mCurrentIndex;
+                aParsingInfo.mErrorInfo.mErrorString = "Unable to parse int exponent of parentheses-contained input";
+                goto cleanup_fail_exit;
+            }
+            if (power <= 0)
+            {
+                aParsingInfo.mErrorInfo.mIsError = true;
+                aParsingInfo.mErrorInfo.mErrorNearbyIndex = sub_parsing_info.mCurrentIndex;
+                aParsingInfo.mErrorInfo.mErrorString = "Power of parentheses-contained input section yeilded a non-positive int";
+                goto cleanup_fail_exit;
+            }
+            sub_parsing_info.IncreaseIndexOverInt();
+            if (power_is_bracketed)
+            {
+                if (!sub_parsing_info.MatchString_IncreaseIndexOnSuccess("}"))
                 {
                     aParsingInfo.mErrorInfo.mIsError = true;
-                    aParsingInfo.mErrorInfo.mErrorNearbyIndex = sub_parsing_info.mCurrentIndex;
-                    aParsingInfo.mErrorInfo.mErrorString = "Unable to parse int exponent of parentheses-contained input";
+                    aParsingInfo.mErrorInfo.mErrorNearbyIndex = r_paren_after_power_pos;
+                    aParsingInfo.mErrorInfo.mErrorString = "Left bracket '{' before exponent has no matching right bracket '}'.";
                     goto cleanup_fail_exit;
-                }
-                if (power <= 0)
-                {
-                    aParsingInfo.mErrorInfo.mIsError = true;
-                    aParsingInfo.mErrorInfo.mErrorNearbyIndex = sub_parsing_info.mCurrentIndex;
-                    aParsingInfo.mErrorInfo.mErrorString = "Power of parentheses-contained input section yeilded a non-positive int";
-                    goto cleanup_fail_exit;
-                }
-                sub_parsing_info.IncreaseIndexOverInt();
-                if (power_is_bracketed)
-                {
-                    if (!sub_parsing_info.MatchString_IncreaseIndexOnSuccess("}"))
-                    {
-                        aParsingInfo.mErrorInfo.mIsError = true;
-                        aParsingInfo.mErrorInfo.mErrorNearbyIndex = r_paren_after_power_pos;
-                        aParsingInfo.mErrorInfo.mErrorString = "Left bracket '{' before exponent has no matching right bracket '}'.";
-                        goto cleanup_fail_exit;
-                    }
                 }
             }
-            r_paren_after_power_pos = sub_parsing_info.mCurrentIndex;
-            // TODO: use the now-valid 'power' variable and l_paren_pos, r_paren_pos variables to recurse this function on what's inside the '(' ')' section, checking sub_parsing_info.mErrorInfo.mIsError for an error internal to that input section
-            // TODO: use r_paren_after_power_pos to set into aParsingInfo.mCurrentIndex and check for a binary operator (a plus even not immediately after is bad news as that means we may have a polynomial on the right with no gosh dang stupid I should have written this function differently)
-            // first check that you can't just split out your polynomials into monomials with some separate function that can be leveraged by the macro. If everything is in terms of monomials after FromString, then order of operations doesn't become a complete headache to manage.
         }
+        r_paren_after_power_pos = sub_parsing_info.mCurrentIndex;
+        // TODO: use the now-valid 'power' variable and l_paren_pos, r_paren_pos variables to recurse this function on what's inside the '(' ')' section, checking sub_parsing_info.mErrorInfo.mIsError for an error internal to that input section
+        // TODO: use r_paren_after_power_pos to set into aParsingInfo.mCurrentIndex and check for a binary operator (a plus even not immediately after is bad news as that means we may have a polynomial on the right with no gosh dang stupid I should have written this function differently)
+        // first check that you can't just split out your polynomials into monomials with some separate function that can be leveraged by the macro. If everything is in terms of monomials after FromString, then order of operations doesn't become a complete headache to manage.
     }
     return aciOut;
 subparseinfo_error_exit:
@@ -424,5 +307,74 @@ bool ademma_core::only_whitespace_in_string_section(const std::string& aStr, siz
         break;
     }
     return only_whitespace;
+}
+
+char ademma_core::prev_non_whitespace_char_in_string(const std::string& aStr, size_t aHighIndexExcluded, size_t* aCharAtIndex)
+{
+    if (aHighIndexExcluded == 0)
+    {
+        return '\0';
+    }
+    for (size_t i = aHighIndexExcluded - 1;; i--)
+    {
+        switch (aStr[i])
+        {
+            case ' ':
+            case '\n':
+            case '\t':
+                break;
+            default:
+                if (aCharAtIndex)
+                {
+                    *aCharAtIndex = i;
+                }
+                return aStr[i];
+        }
+        if (i == 0)
+        {
+            break;
+        }
+    }
+    return '\0';
+}
+
+#define ACI_ADDPOLYASMONOTERMS_SETTINGIMPL(aci, aci_term_ptr, setting_enum, setting_ucc) \
+    for (size_t i = 0; i < poly##setting_ucc->size(); i++) \
+    { \
+        aACI.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cMONOMIAL, aSetting)); \
+        aci_term_ptr = &aACI.mTerms[aACI.mTerms.size() - 1]; \
+        mono##setting_ucc = new setting_ucc##AdemMonomial(); \
+        *mono##setting_ucc = (*poly##setting_ucc)[i]; \
+        aci_term_ptr->mData = reinterpret_cast<void*>(mono##setting_ucc); \
+        if (i < poly##setting_ucc->size() - 1) \
+        { \
+            aACI.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cADD, aSetting)); \
+        } \
+    } do {} while(0)
+
+void ademma_core::ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(ArbitraryCalculationInput& aACI, void* aPoly, Setting_Type aSetting)
+{
+    ClassicalAdemPolynomial* polyClassical;
+    ClassicalAdemMonomial* monoClassical;
+    CMotivicAdemPolynomial* polyCMotivic;
+    CMotivicAdemMonomial* monoCMotivic;
+    RMotivicAdemPolynomial* polyRMotivic;
+    RMotivicAdemMonomial* monoRMotivic;
+    ACITerm* aci_term_ptr;
+    switch (aSetting)
+    {
+        case Setting_Type::cCLASSICAL:
+            polyClassical = reinterpret_cast<ClassicalAdemPolynomial*>(aPoly);
+            ACI_ADDPOLYASMONOTERMS_SETTINGIMPL(aACI, aci_term_ptr, aSetting, Classical);
+            break;
+        case Setting_Type::cC_MOTIVIC:
+            polyCMotivic = reinterpret_cast<CMotivicAdemPolynomial*>(aPoly);
+            ACI_ADDPOLYASMONOTERMS_SETTINGIMPL(aACI, aci_term_ptr, aSetting, CMotivic);
+            break;
+        case Setting_Type::cR_MOTIVIC:
+            polyRMotivic = reinterpret_cast<RMotivicAdemPolynomial*>(aPoly);
+            ACI_ADDPOLYASMONOTERMS_SETTINGIMPL(aACI, aci_term_ptr, aSetting, RMotivic);
+            break;
+    }
 }
 
