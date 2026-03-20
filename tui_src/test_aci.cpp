@@ -22,6 +22,8 @@ int main(int argc, char** argv)
     }
     std::cout << "parsed correctly (perhaps)" << std::endl;
     std::cout << ademma_core::ArbitraryCalculationInput_ToString(aci) << std::endl;
+    ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly(aci);
+    std::cout << ademma_core::ArbitraryCalculationInput_ToString(aci) << std::endl;
     ademma_core::ArbitraryCalculationInput_Destruct(aci);
     return 0;
 }

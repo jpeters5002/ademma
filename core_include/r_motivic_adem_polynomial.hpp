@@ -23,6 +23,8 @@ bool RMotivicAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(co
 
 RMotivicAdemPolynomial RMotivicAdemPolynomial_MultiplyPolynomial(const RMotivicAdemPolynomial& aLeft, const RMotivicAdemPolynomial& aRight);
 
+void RMotivicAdemPolynomial_AddRightPolynomial(RMotivicAdemPolynomial& aLeft, const RMotivicAdemPolynomial& aRight);
+
 void RMotivicAdemPolynomial_MultiplyLeftMonomial(const RMotivicAdemMonomial& aLeft, RMotivicAdemPolynomial& aRight);
 
 void RMotivicAdemPolynomial_MultiplyRightMonomial(RMotivicAdemPolynomial& aLeft, const RMotivicAdemMonomial& aRight);

@@ -235,7 +235,8 @@ std::string ademma_core::ArbitraryCalculationInput_ToString(const ArbitraryCalcu
                         poly##setting_ucc.push_back(*reinterpret_cast<setting_ucc##AdemMonomial*>(aci_term_ptr->mData)); \
                         break; \
                     case ACITerm_Type::cPOLYNOMIAL: \
-                        setting_ucc##AdemPolynomial_AddRightPolynomial(poly##setting_ucc, *reinterpret_cast<setting_ucc##AdemMonomial*>(aci_term_ptr->mData)); \
+                        setting_ucc##AdemPolynomial_AddRightPolynomial(poly##setting_ucc, *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_term_ptr->mData)); \
+                        break; \
                     default: \
                         assert(!"unreachable"); \
                 } \
@@ -248,7 +249,7 @@ std::string ademma_core::ArbitraryCalculationInput_ToString(const ArbitraryCalcu
         ArbitraryCalculationInput_Destruct(aACI); \
         aci.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aci.mSetting)); \
         aci_term_ptr = &aci.mTerms[0]; \
-        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_term_ptr) = poly##setting_ucc; \
+        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_term_ptr->mData) = poly##setting_ucc; \
     } do {} while (0)
 
 void ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly(ArbitraryCalculationInput& aACI)

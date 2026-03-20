@@ -153,6 +153,14 @@ ademma_core::CMotivicAdemPolynomial ademma_core::CMotivicAdemPolynomial_Multiply
     return cmapOut;
 }
 
+void ademma_core::CMotivicAdemPolynomial_AddRightPolynomial(CMotivicAdemPolynomial& aLeft, const CMotivicAdemPolynomial& aRight)
+{
+    for (size_t i = 0; i < aRight.size(); i++)
+    {
+        aLeft.push_back(aRight[i]);
+    }
+}
+
 void ademma_core::CMotivicAdemPolynomial_MultiplyLeftMonomial(const CMotivicAdemMonomial& aLeft, CMotivicAdemPolynomial& aRight)
 {
     DEBUG_PRINT("CMotPoly_MultiplyLeftMonomial called with: " + CMotivicAdemMonomial_ToString(aLeft) + "(" + CMotivicAdemPolynomial_ToString(aRight) + ")");

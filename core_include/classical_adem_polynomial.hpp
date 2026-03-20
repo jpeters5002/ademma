@@ -24,6 +24,8 @@ bool ClassicalAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(c
 
 ClassicalAdemPolynomial ClassicalAdemPolynomial_MultiplyPolynomial(const ClassicalAdemPolynomial& aLeft, const ClassicalAdemPolynomial& aRight);
 
+void ClassicalAdemPolynomial_AddRightPolynomial(ClassicalAdemPolynomial& aLeft, const ClassicalAdemPolynomial& aRight);
+
 void ClassicalAdemPolynomial_MultiplyLeftMonomial(const ClassicalAdemMonomial& aLeft, ClassicalAdemPolynomial& aRight);
 
 void ClassicalAdemPolynomial_MultiplyRightMonomial(ClassicalAdemPolynomial& aLeft, const ClassicalAdemMonomial& aRight);

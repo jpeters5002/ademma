@@ -145,6 +145,15 @@ ademma_core::ClassicalAdemPolynomial ademma_core::ClassicalAdemPolynomial_Multip
     return capOut;
 }
 
+void ademma_core::ClassicalAdemPolynomial_AddRightPolynomial(ClassicalAdemPolynomial& aLeft, const ClassicalAdemPolynomial& aRight)
+{
+    for (size_t i = 0; i < aRight.size(); i++)
+    {
+        aLeft.push_back(aRight[i]);
+    }
+}
+
+
 void ademma_core::ClassicalAdemPolynomial_MultiplyLeftMonomial(const ClassicalAdemMonomial& aLeft, ClassicalAdemPolynomial& aRight)
 {
     for (size_t i = 0; i < aRight.size(); i++)
