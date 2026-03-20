@@ -22,7 +22,7 @@ void ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(ArbitraryCalculation
 
 ademma_core::ACITerm ademma_core::ACITerm_Construct(ACITerm_Type aType, Setting_Type aSetting)
 {
-    ACITerm aci_termOut {aType, aSetting};
+    ACITerm aci_termOut {aType, aSetting, nullptr};
     switch (aci_termOut.mType)
     {
         case ACITerm_Type::cADD:
@@ -59,6 +59,8 @@ ademma_core::ACITerm ademma_core::ACITerm_Construct(ACITerm_Type aType, Setting_
                     aci_termOut.mData = reinterpret_cast<void*>(new RMotivicAdemMonomial());
                     break;
             }
+            break;
+        case ACITerm_Type::cNONE:
             break;
     }
     return aci_termOut;
@@ -102,6 +104,8 @@ void ademma_core::ACITerm_Destruct(ACITerm& aSelf)
                     delete reinterpret_cast<RMotivicAdemMonomial*>(aSelf.mData);
                     break;
             }
+            break;
+        case ACITerm_Type::cNONE:
             break;
     }
 }
@@ -159,19 +163,13 @@ void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalcul
         l_paren_pos = aParsingInfo.mStringToParse.find("(", aParsingInfo.mCurrentIndex);
         size_t r_paren_pos;
         size_t sub_l_paren_pos;
-        size_t l_paren_binop_add_pos;
-        size_t l_paren_binop_mult_pos;
-        size_t l_paren_binop_pos;
-        bool only_whitespace_in_section;
         char prev_char;
         ACITerm_Type l_paren_binop_type;
         size_t l_cut_to_pos;
         bool nothing_on_left;
-        char next_char;
         size_t r_paren_after_power_pos;
         bool power_is_bracketed;
         int power;
-        bool expected_success;
         ACITerm* aci_term_ptr;
         if (l_paren_pos == std::string::npos)
         {
@@ -266,7 +264,7 @@ void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalcul
                 if (!sub_parsing_info.MatchString_IncreaseIndexOnSuccess("}"))
                 {
                     aParsingInfo.mErrorInfo.mIsError = true;
-                    aParsingInfo.mErrorInfo.mErrorNearbyIndex = r_paren_after_power_pos;
+                    aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
                     aParsingInfo.mErrorInfo.mErrorString = "Left bracket '{' before exponent has no matching right bracket '}'.";
                     goto cleanup_fail_exit;
                 }
@@ -292,13 +290,11 @@ void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalcul
             switch (aParsingInfo.mStringToParse[aParsingInfo.mCurrentIndex])
             {
                 case '+':
-                    expected_success = aParsingInfo.MatchString_IncreaseIndexOnSuccess("+");
-                    assert(expected_success);
+                    aParsingInfo.MatchString_IncreaseIndexOnSuccess("+");
                     aACIOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cADD, aSetting));
                     break;
                 case '*':
-                    expected_success = aParsingInfo.MatchString_IncreaseIndexOnSuccess("*");
-                    assert(expected_success);
+                    aParsingInfo.MatchString_IncreaseIndexOnSuccess("*");
                     // falls through
                 default:
                     aACIOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cMULTIPLY, aSetting));
