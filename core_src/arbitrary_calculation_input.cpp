@@ -12,6 +12,7 @@
 namespace ademma_core
 {
 void ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalculationInput& aACIOut, ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower);
+std::string ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI);
 bool only_whitespace_in_string_section(const std::string& aStr, size_t aLowIndex, size_t aHighIndexExcluded);
 char prev_non_whitespace_char_in_string(const std::string& aStr, size_t aHighIndexExcluded, size_t* aCharAtIndex);
 char next_non_whitespace_char_in_string(const std::string& aStr, size_t aLowIndex, size_t* aCharAtIndex);
@@ -119,6 +120,60 @@ void ademma_core::ArbitraryCalculationInput_Destruct(ArbitraryCalculationInput& 
     aSelf.mTerms.clear();
 }
 
+std::string ademma_core::ACITerm_ToString(const ACITerm& aSelf)
+{
+    std::string strOut {};
+    int power;
+    switch (aSelf.mType)
+    {
+        case ACITerm_Type::cADD:
+            strOut = " + ";
+            break;
+        case ACITerm_Type::cMULTIPLY:
+            strOut = " * ";
+            break;
+        case ACITerm_Type::cSUBACI:
+            strOut = "(" + ArbitraryCalculationInput_ToString_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData)) + ")";
+            power = reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData)->mPower;
+            if (power != 1)
+            {
+                strOut += "^{" + std::to_string(power) + "}";
+            }
+            break;
+        case ACITerm_Type::cPOLYNOMIAL:
+            switch (aSelf.mSetting)
+            {
+                case Setting_Type::cCLASSICAL:
+                    strOut = ClassicalAdemPolynomial_ToString(*reinterpret_cast<ClassicalAdemPolynomial*>(aSelf.mData));
+                    break;
+                case Setting_Type::cC_MOTIVIC:
+                    strOut = CMotivicAdemPolynomial_ToString(*reinterpret_cast<CMotivicAdemPolynomial*>(aSelf.mData));
+                    break;
+                case Setting_Type::cR_MOTIVIC:
+                    strOut = RMotivicAdemPolynomial_ToString(*reinterpret_cast<RMotivicAdemPolynomial*>(aSelf.mData));
+                    break;
+            }
+            break;
+        case ACITerm_Type::cMONOMIAL:
+            switch (aSelf.mSetting)
+            {
+                case Setting_Type::cCLASSICAL:
+                    strOut = ClassicalAdemMonomial_ToString(*reinterpret_cast<ClassicalAdemMonomial*>(aSelf.mData));
+                    break;
+                case Setting_Type::cC_MOTIVIC:
+                    strOut = CMotivicAdemMonomial_ToString(*reinterpret_cast<CMotivicAdemMonomial*>(aSelf.mData));
+                    break;
+                case Setting_Type::cR_MOTIVIC:
+                    strOut = RMotivicAdemMonomial_ToString(*reinterpret_cast<RMotivicAdemMonomial*>(aSelf.mData));
+                    break;
+            }
+            break;
+        case ACITerm_Type::cNONE:
+            break;
+    }
+    return strOut;
+}
+
 #define POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, setting_ucc) \
     { \
         setting_ucc##AdemPolynomial poly##setting_ucc = setting_ucc##AdemPolynomial_FromString(parse_info); \
@@ -150,10 +205,26 @@ ademma_core::ArbitraryCalculationInput ademma_core::ArbitraryCalculationInput_Fr
     return aciOut;
 }
 
+std::string ademma_core::ArbitraryCalculationInput_ToString(const ArbitraryCalculationInput& aACI)
+{
+    std::string strOut {};
+    if (aACI.mPower != 1)
+    {
+        strOut += "(";
+    }
+    strOut += ArbitraryCalculationInput_ToString_Recursive(aACI);
+    if (aACI.mPower != 1)
+    {
+        strOut += ")^{" + std::to_string(aACI.mPower) + "}";
+    }
+    return strOut;
+}
+
 // PRIVATE FUNCTION DEFINITIONS
 
 void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalculationInput& aACIOut, ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower)
 {
+    aACIOut.mSetting = aSetting;
     aACIOut.mPower = aPower;
     size_t l_paren_pos;
     ParsingInfo sub_parsing_info;
@@ -319,6 +390,16 @@ error_no_r_paren_exit:
 cleanup_fail_exit:
     ArbitraryCalculationInput_Destruct(aACIOut);
     return;
+}
+
+std::string ademma_core::ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI)
+{
+    std::string strOut {};
+    for (size_t i = 0; i < aACI.mTerms.size(); i++)
+    {
+        strOut += ACITerm_ToString(aACI.mTerms[i]);
+    }
+    return strOut;
 }
 
 bool ademma_core::only_whitespace_in_string_section(const std::string& aStr, size_t aLowIndex, size_t aHighIndexExcluded)

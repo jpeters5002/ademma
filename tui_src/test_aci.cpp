@@ -14,13 +14,15 @@ int main(int argc, char** argv)
     }
     ademma_core::ParsingInfo input;
     input.mStringToParse = argv[1];
-    ademma_core::ArbitraryCalculationInput_FromString(input, ademma_core::Setting_Type::cCLASSICAL);
+    ademma_core::ArbitraryCalculationInput aci = ademma_core::ArbitraryCalculationInput_FromString(input, ademma_core::Setting_Type::cCLASSICAL);
     if (input.mErrorInfo.mIsError)
     {
         std::cout << input.GetFullErrorString() << std::endl;
         return 1;
     }
     std::cout << "parsed correctly (perhaps)" << std::endl;
+    std::cout << ademma_core::ArbitraryCalculationInput_ToString(aci) << std::endl;
+    ademma_core::ArbitraryCalculationInput_Destruct(aci);
     return 0;
 }
 
