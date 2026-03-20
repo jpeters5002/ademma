@@ -220,6 +220,66 @@ std::string ademma_core::ArbitraryCalculationInput_ToString(const ArbitraryCalcu
     return strOut;
 }
 
+#define COAGULATEINNERMOST_SETTINGIMPL(aci, aci_term_ptr, setting_ucc) \
+    { \
+        setting_ucc##AdemPolynomial poly##setting_ucc {}; \
+        assert(aci.mTerms.size() % 2 == 1); \
+        for (size_t i = 0; i < aci.mTerms.size(); i++) \
+        { \
+            if (i % 2 == 0) \
+            { \
+                aci_term_ptr = &aci.mTerms[i]; \
+                switch (aci_term_ptr->mType) \
+                { \
+                    case ACITerm_Type::cMONOMIAL: \
+                        poly##setting_ucc.push_back(*reinterpret_cast<setting_ucc##AdemMonomial*>(aci_term_ptr->mData)); \
+                        break; \
+                    case ACITerm_Type::cPOLYNOMIAL: \
+                        setting_ucc##AdemPolynomial_AddRightPolynomial(poly##setting_ucc, *reinterpret_cast<setting_ucc##AdemMonomial*>(aci_term_ptr->mData)); \
+                    default: \
+                        assert(!"unreachable"); \
+                } \
+            } \
+            else \
+            { \
+                assert(aci.mTerms[i].mType == ACITerm_Type::cADD); \
+            } \
+        } \
+        ArbitraryCalculationInput_Destruct(aACI); \
+        aci.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aci.mSetting)); \
+        aci_term_ptr = &aci.mTerms[0]; \
+        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_term_ptr) = poly##setting_ucc; \
+    } do {} while (0)
+
+void ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly(ArbitraryCalculationInput& aACI)
+{
+    bool contains_subaci = false;
+    for (size_t i = 0; i < aACI.mTerms.size(); i++)
+    {
+        if (aACI.mTerms[i].mType == ACITerm_Type::cSUBACI)
+        {
+            contains_subaci = true;
+            ArbitraryCalculationInput_CoagulateInnermostToPoly(*reinterpret_cast<ArbitraryCalculationInput*>(aACI.mTerms[i].mData));
+        }
+    }
+    ACITerm* aci_term_ptr;
+    if (!contains_subaci)
+    {
+        switch (aACI.mSetting)
+        {
+            case Setting_Type::cCLASSICAL:
+                COAGULATEINNERMOST_SETTINGIMPL(aACI, aci_term_ptr, Classical);
+                break;
+            case Setting_Type::cC_MOTIVIC:
+                COAGULATEINNERMOST_SETTINGIMPL(aACI, aci_term_ptr, CMotivic);
+                break;
+            case Setting_Type::cR_MOTIVIC:
+                COAGULATEINNERMOST_SETTINGIMPL(aACI, aci_term_ptr, RMotivic);
+                break;
+        }
+    }
+}
+
 // PRIVATE FUNCTION DEFINITIONS
 
 void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalculationInput& aACIOut, ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower)

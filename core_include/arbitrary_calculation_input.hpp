@@ -28,7 +28,9 @@ struct ACITerm
 };
 ACITerm ACITerm_Construct(ACITerm_Type aType, Setting_Type aSetting);
 void ACITerm_Destruct(ACITerm& aSelf);
+
 std::string ACITerm_ToString(const ACITerm& aSelf);
+
 struct ArbitraryCalculationInput
 {
     std::vector<ACITerm> mTerms;
@@ -40,6 +42,8 @@ void ArbitraryCalculationInput_Destruct(ArbitraryCalculationInput& aSelf);
 ArbitraryCalculationInput ArbitraryCalculationInput_FromString(ParsingInfo& aParsingInfo, Setting_Type aSetting);
 
 std::string ArbitraryCalculationInput_ToString(const ArbitraryCalculationInput& aACI);
+
+void ArbitraryCalculationInput_CoagulateInnermostToPoly(ArbitraryCalculationInput& aACI);
 }
 
 #endif // CORE_INCLUDE_ARBITRARY_CALCULATION_INPUT_HPP
