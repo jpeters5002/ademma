@@ -11,9 +11,10 @@
 
 namespace ademma_core
 {
+void ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalculationInput& aACIOut, ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower);
 bool only_whitespace_in_string_section(const std::string& aStr, size_t aLowIndex, size_t aHighIndexExcluded);
 char prev_non_whitespace_char_in_string(const std::string& aStr, size_t aHighIndexExcluded, size_t* aCharAtIndex);
-ArbitraryCalculationInput ArbitraryCalculationInput_FromString_Recursive(ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower);
+char next_non_whitespace_char_in_string(const std::string& aStr, size_t aLowIndex, size_t* aCharAtIndex);
 void ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(ArbitraryCalculationInput& aACI, void* aPoly, Setting_Type aSetting);
 }
 
@@ -111,6 +112,7 @@ void ademma_core::ArbitraryCalculationInput_Destruct(ArbitraryCalculationInput& 
     {
         ACITerm_Destruct(aSelf.mTerms[i]);
     }
+    aSelf.mTerms.clear();
 }
 
 #define POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, setting_ucc) \
@@ -139,14 +141,16 @@ void ademma_core::ArbitraryCalculationInput_Destruct(ArbitraryCalculationInput& 
 
 ademma_core::ArbitraryCalculationInput ademma_core::ArbitraryCalculationInput_FromString(ParsingInfo& aParsingInfo, Setting_Type aSetting)
 {
-    return ArbitraryCalculationInput_FromString_Recursive(aParsingInfo, aSetting, 1);
+    ArbitraryCalculationInput aciOut {};
+    ArbitraryCalculationInput_FromString_Recursive(aciOut, aParsingInfo, aSetting, 1);
+    return aciOut;
 }
 
 // PRIVATE FUNCTION DEFINITIONS
 
-ademma_core::ArbitraryCalculationInput ademma_core::ArbitraryCalculationInput_FromString_Recursive(ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower)
+void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalculationInput& aACIOut, ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower)
 {
-    ArbitraryCalculationInput aciOut {{}, aPower};
+    aACIOut.mPower = aPower;
     size_t l_paren_pos;
     ParsingInfo sub_parsing_info;
     std::string swapstr;
@@ -171,7 +175,7 @@ ademma_core::ArbitraryCalculationInput ademma_core::ArbitraryCalculationInput_Fr
         ACITerm* aci_term_ptr;
         if (l_paren_pos == std::string::npos)
         {
-            POLYNOMIAL_FROMSTRING_INTOACI_ASMONOS(aParsingInfo, aSetting, aciOut, cleanup_fail_exit);
+            POLYNOMIAL_FROMSTRING_INTOACI_ASMONOS(aParsingInfo, aSetting, aACIOut, cleanup_fail_exit);
             break;
         }
         r_paren_pos = aParsingInfo.mStringToParse.find(")", l_paren_pos + 1);
@@ -225,10 +229,10 @@ ademma_core::ArbitraryCalculationInput ademma_core::ArbitraryCalculationInput_Fr
         {
             sub_parsing_info = aParsingInfo;
             sub_parsing_info.mStringToParse = sub_parsing_info.mStringToParse.substr(0, l_cut_to_pos);
-            POLYNOMIAL_FROMSTRING_INTOACI_ASMONOS(sub_parsing_info, aSetting, aciOut, subparseinfo_error_exit);
-            aciOut.mTerms.push_back(ACITerm_Construct(l_paren_binop_type, aSetting));
+            POLYNOMIAL_FROMSTRING_INTOACI_ASMONOS(sub_parsing_info, aSetting, aACIOut, subparseinfo_error_exit);
+            aACIOut.mTerms.push_back(ACITerm_Construct(l_paren_binop_type, aSetting));
         }
-        aParsingInfo.mCurrentIndex = l_paren_pos;
+        aParsingInfo.mCurrentIndex = l_paren_pos + 1;
         // (...) - everything handled (left side)
         // now right side (power only)
         // (...) or (...) ^ {<num>} or (...) ^ <num> or bad input
@@ -269,11 +273,39 @@ ademma_core::ArbitraryCalculationInput ademma_core::ArbitraryCalculationInput_Fr
             }
         }
         r_paren_after_power_pos = sub_parsing_info.mCurrentIndex;
-        // TODO: use the now-valid 'power' variable and l_paren_pos, r_paren_pos variables to recurse this function on what's inside the '(' ')' section, checking sub_parsing_info.mErrorInfo.mIsError for an error internal to that input section
-        // TODO: use r_paren_after_power_pos to set into aParsingInfo.mCurrentIndex and check for a binary operator (a plus even not immediately after is bad news as that means we may have a polynomial on the right with no gosh dang stupid I should have written this function differently)
-        // first check that you can't just split out your polynomials into monomials with some separate function that can be leveraged by the macro. If everything is in terms of monomials after FromString, then order of operations doesn't become a complete headache to manage.
+        // optional exponent obtained from right of ')' into variable 'power'
+        sub_parsing_info = aParsingInfo;
+        sub_parsing_info.mStringToParse = sub_parsing_info.mStringToParse.substr(0, r_paren_pos);
+        aACIOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cSUBACI, aSetting));
+        aci_term_ptr = &aACIOut.mTerms[aACIOut.mTerms.size() - 1];
+        assert(aci_term_ptr->mType == ACITerm_Type::cSUBACI);
+        ArbitraryCalculationInput_FromString_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData), sub_parsing_info, aSetting, power);
+        if (sub_parsing_info.mErrorInfo.mIsError)
+        {
+            goto subparseinfo_error_exit;
+        }
+        aParsingInfo.mCurrentIndex = r_paren_after_power_pos;
+        // left of, inside, and optional exponent after handled
+        aParsingInfo.IncreaseIndexOverWhitespace();
+        if (aParsingInfo.mCurrentIndex < aParsingInfo.mStringToParse.size())
+        {
+            switch (aParsingInfo.mStringToParse[aParsingInfo.mCurrentIndex])
+            {
+                case '+':
+                    expected_success = aParsingInfo.MatchString_IncreaseIndexOnSuccess("+");
+                    assert(expected_success);
+                    aACIOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cADD, aSetting));
+                    break;
+                case '*':
+                    expected_success = aParsingInfo.MatchString_IncreaseIndexOnSuccess("*");
+                    assert(expected_success);
+                    // falls through
+                default:
+                    aACIOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cMULTIPLY, aSetting));
+            }
+        }
     }
-    return aciOut;
+    return;
 subparseinfo_error_exit:
     swapstr = aParsingInfo.mStringToParse;
     aParsingInfo = sub_parsing_info;
@@ -285,8 +317,8 @@ error_no_r_paren_exit:
     aParsingInfo.mErrorInfo.mErrorString = "No matching right parenthesis for given left parenthesis";
     goto cleanup_fail_exit;
 cleanup_fail_exit:
-    ArbitraryCalculationInput_Destruct(aciOut);
-    return {};
+    ArbitraryCalculationInput_Destruct(aACIOut);
+    return;
 }
 
 bool ademma_core::only_whitespace_in_string_section(const std::string& aStr, size_t aLowIndex, size_t aHighIndexExcluded)
@@ -333,6 +365,27 @@ char ademma_core::prev_non_whitespace_char_in_string(const std::string& aStr, si
         if (i == 0)
         {
             break;
+        }
+    }
+    return '\0';
+}
+
+char next_non_whitespace_char_in_string(const std::string& aStr, size_t aLowIndex, size_t* aCharAtIndex)
+{
+    for (size_t i = aLowIndex; i < aStr.size(); i++)
+    {
+        switch (aStr[i])
+        {
+            case ' ':
+            case '\n':
+            case '\t':
+                break;
+            default:
+                if (aCharAtIndex)
+                {
+                    *aCharAtIndex = i;
+                }
+                return aStr[i];
         }
     }
     return '\0';
