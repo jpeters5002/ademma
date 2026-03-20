@@ -300,6 +300,10 @@ void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalcul
                     aACIOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cMULTIPLY, aSetting));
             }
         }
+        else
+        {
+            break;
+        }
     }
     return;
 subparseinfo_error_exit:
