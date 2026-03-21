@@ -22,8 +22,8 @@ enum class ACITerm_Type
 };
 struct ACITerm
 {
-    const ACITerm_Type mType;
-    const Setting_Type mSetting;
+    ACITerm_Type mType;
+    Setting_Type mSetting;
     void* mData;
 };
 ACITerm ACITerm_Construct(ACITerm_Type aType, Setting_Type aSetting);
@@ -43,7 +43,13 @@ ArbitraryCalculationInput ArbitraryCalculationInput_FromString(ParsingInfo& aPar
 
 std::string ArbitraryCalculationInput_ToString(const ArbitraryCalculationInput& aACI);
 
-void ArbitraryCalculationInput_CoagulateInnermostToPoly(ArbitraryCalculationInput& aACI);
+void ArbitraryCalculationInput_CoagulateInnermostToPoly_Recursive(ArbitraryCalculationInput& aACI);
+
+bool ArbitraryCalculationInput_IsOnlyPolynomial(const ArbitraryCalculationInput& aACI);
+
+bool ArbitraryCalculationInput_IsOnlyPower1Polynomial(const ArbitraryCalculationInput& aACI);
+
+void ArbitraryCalculationInput_ExpandPolyExponent_Recursive(ArbitraryCalculationInput& aACI);
 }
 
 #endif // CORE_INCLUDE_ARBITRARY_CALCULATION_INPUT_HPP

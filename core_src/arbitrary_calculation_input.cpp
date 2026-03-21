@@ -252,7 +252,7 @@ std::string ademma_core::ArbitraryCalculationInput_ToString(const ArbitraryCalcu
         *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_term_ptr->mData) = poly##setting_ucc; \
     } do {} while (0)
 
-void ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly(ArbitraryCalculationInput& aACI)
+void ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly_Recursive(ArbitraryCalculationInput& aACI)
 {
     bool contains_subaci = false;
     for (size_t i = 0; i < aACI.mTerms.size(); i++)
@@ -260,7 +260,7 @@ void ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly(ArbitraryCa
         if (aACI.mTerms[i].mType == ACITerm_Type::cSUBACI)
         {
             contains_subaci = true;
-            ArbitraryCalculationInput_CoagulateInnermostToPoly(*reinterpret_cast<ArbitraryCalculationInput*>(aACI.mTerms[i].mData));
+            ArbitraryCalculationInput_CoagulateInnermostToPoly_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aACI.mTerms[i].mData));
         }
     }
     ACITerm* aci_term_ptr;
@@ -276,6 +276,90 @@ void ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly(ArbitraryCa
                 break;
             case Setting_Type::cR_MOTIVIC:
                 COAGULATEINNERMOST_SETTINGIMPL(aACI, aci_term_ptr, RMotivic);
+                break;
+        }
+    }
+}
+
+bool ademma_core::ArbitraryCalculationInput_IsOnlyPolynomial(const ArbitraryCalculationInput& aACI)
+{
+    if (aACI.mTerms.size() == 1 && aACI.mTerms[0].mType == ACITerm_Type::cPOLYNOMIAL)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool ademma_core::ArbitraryCalculationInput_IsOnlyPower1Polynomial(const ArbitraryCalculationInput& aACI)
+{
+    if (ArbitraryCalculationInput_IsOnlyPolynomial(aACI) && aACI.mPower == 1)
+    {
+        return true;
+    }
+    return false;
+}
+
+#define EXPANDPOLYEXPONENT_RECURSIONIMPL(aci_term_ptr, setting_ucc) \
+    ArbitraryCalculationInput_ExpandPolyExponent_Recursive(*reinterpret_cast<setting_ucc##AdemPolynomial*>aci_term_ptr->mData)
+
+
+void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(ArbitraryCalculationInput& aACI)
+{
+    ACITerm* aci_term_ptr;
+    ArbitraryCalculationInput* powered_subaci_ptr;
+    ArbitraryCalculationInput* subaci_ptr;
+    int power;
+    for (size_t i = 0; i < aACI.mTerms.size(); i++)
+    {
+        aci_term_ptr = &aACI.mTerms[i];
+        switch (aci_term_ptr->mType)
+        {
+            case ACITerm_Type::cADD:
+            case ACITerm_Type::cMULTIPLY:
+                assert(i > 0);
+                assert(i < aACI.mTerms.size() - 1);
+                break;
+            case ACITerm_Type::cSUBACI:
+                powered_subaci_ptr = reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData);
+                assert(powered_subaci_ptr->mPower > 0);
+                if (ArbitraryCalculationInput_IsOnlyPolynomial(*powered_subaci_ptr))
+                {
+                    power = powered_subaci_ptr->mPower;
+                    for (size_t j = 1; j < (size_t)power; j++)
+                    {
+                        aACI.mTerms.insert(aACI.mTerms.begin() + (i + 1), ACITerm_Construct(ACITerm_Type::cMULTIPLY, aACI.mSetting));
+                        i++;
+                        aACI.mTerms.insert(aACI.mTerms.begin() + (i + 1), ACITerm_Construct(ACITerm_Type::cSUBACI, aACI.mSetting));
+                        i++;
+                        subaci_ptr = reinterpret_cast<ArbitraryCalculationInput*>(aACI.mTerms[i].mData);
+                        subaci_ptr->mSetting = aACI.mSetting;
+                        subaci_ptr->mPower = 1;
+                        subaci_ptr->mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aACI.mSetting));
+                        switch (aACI.mSetting)
+                        {
+                            case Setting_Type::cCLASSICAL:
+                                *reinterpret_cast<ClassicalAdemPolynomial*>(subaci_ptr->mTerms[0].mData) = *reinterpret_cast<ClassicalAdemPolynomial*>(powered_subaci_ptr->mTerms[0].mData);
+                                break;
+                            case Setting_Type::cC_MOTIVIC:
+                                *reinterpret_cast<CMotivicAdemPolynomial*>(subaci_ptr->mTerms[0].mData) = *reinterpret_cast<CMotivicAdemPolynomial*>(powered_subaci_ptr->mTerms[0].mData);
+                                break;
+                            case Setting_Type::cR_MOTIVIC:
+                                *reinterpret_cast<RMotivicAdemPolynomial*>(subaci_ptr->mTerms[0].mData) = *reinterpret_cast<RMotivicAdemPolynomial*>(powered_subaci_ptr->mTerms[0].mData);
+                                break;
+                        }
+                        powered_subaci_ptr->mPower--;
+                    }
+                }
+                else
+                {
+                    ArbitraryCalculationInput_ExpandPolyExponent_Recursive(*subaci_ptr);
+                }
+                break;
+            case ACITerm_Type::cMONOMIAL:
+            case ACITerm_Type::cPOLYNOMIAL:
+                break;
+            case ACITerm_Type::cNONE:
+                assert(!"unreachable");
                 break;
         }
     }
