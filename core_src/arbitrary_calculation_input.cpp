@@ -315,20 +315,50 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
     }
 }
 
-#define ENSUREPOWER1POLYNOMIAL_BREAKIFNOT(aci_term_ptr) \
+#define ENSUREPOWER1POLYNOMIALORMONOMIAL_BREAKIFNOT(aci_term_ptr) \
     if (aci_term_ptr->mType != ACITerm_Type::cPOLYNOMIAL) \
     { \
-        if (aci_term_ptr->mType != ACITerm_Type::cSUBACI || !ArbitraryCalculationInput_IsOnlyPower1Polynomial(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData))) \
+        if (aci_term_ptr->mType == ACITerm_Type::cMONOMIAL) \
+        {} \
+        else if (aci_term_ptr->mType == ACITerm_Type::cSUBACI && ArbitraryCalculationInput_IsOnlyPower1Polynomial(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData))) \
+        { \
+            aci_term_ptr = &reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData)->mTerms[0]; \
+        } \
+        else \
         { \
             break; \
         } \
-        aci_term_ptr = &reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData)->mTerms[0]; \
+    } do {} while(0)
+
+#define POLYNOMIALORMONOMIAL_MULTIPLYINTO_SETTINGIMPL(aci_left_ptr, aci_right_ptr, aci_product_ptr, setting_ucc) \
+    if (aci_left_ptr->mType == ACITerm_Type::cPOLYNOMIAL && aci_right_ptr->mType == ACITerm_Type::cPOLYNOMIAL) \
+    { \
+        /* poly multiply */ \
+        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_product_ptr->mData) = setting_ucc##AdemPolynomial_MultiplyPolynomial(*reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_left_ptr->mData), *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_right_ptr->mData)); \
+    } \
+    else if (aci_left_ptr->mType == ACITerm_Type::cMONOMIAL && aci_right_ptr->mType == ACITerm_Type::cPOLYNOMIAL) \
+    { \
+        /* multiply left monomial then copy */ \
+        setting_ucc##AdemPolynomial_MultiplyLeftMonomial(*reinterpret_cast<setting_ucc##AdemMonomial*>(aci_left_ptr->mData), *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_right_ptr->mData)); \
+        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_product_ptr->mData) = *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_right_ptr->mData); \
+    } \
+    else if (aci_left_ptr->mType == ACITerm_Type::cPOLYNOMIAL && aci_right_ptr->mType == ACITerm_Type::cMONOMIAL) \
+    { \
+        /* multiply right monomial then copy */ \
+        setting_ucc##AdemPolynomial_MultiplyRightMonomial(*reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_left_ptr->mData), *reinterpret_cast<setting_ucc##AdemMonomial*>(aci_right_ptr->mData)); \
+        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_product_ptr->mData) = *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_left_ptr->mData); \
+    } \
+    else \
+    { \
+        assert(aci_left_ptr->mType == ACITerm_Type::cMONOMIAL && aci_right_ptr->mType == ACITerm_Type::cMONOMIAL); \
+        /* multiply monomial terms, form poly with one term, then copy all in one step */ \
+        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_product_ptr->mData) = { setting_ucc##AdemMonomial_Multiply(*reinterpret_cast<setting_ucc##AdemMonomial*>(aci_left_ptr->mData), *reinterpret_cast<setting_ucc##AdemMonomial*>(aci_right_ptr->mData)) }; \
     } do {} while(0)
 
 void ademma_core::ArbitraryCalculationInput_ExpandPolyFoil_Recursive(ArbitraryCalculationInput& aACI)
 {
-    ACITerm* aci_term_left_poly_factor_ptr;
-    ACITerm* aci_term_right_poly_factor_ptr;
+    ACITerm* aci_term_left_poly_or_mono_factor_ptr;
+    ACITerm* aci_term_right_poly_or_mono_factor_ptr;
     ACITerm* aci_term_product_ptr;
     ACITerm* aci_term_ptr;
     for (size_t i = 0; i < aACI.mTerms.size(); i++)
@@ -343,22 +373,22 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyFoil_Recursive(ArbitraryCa
             case ACITerm_Type::cMULTIPLY:
                 assert(i > 0);
                 assert(i < aACI.mTerms.size() - 1);
-                aci_term_left_poly_factor_ptr = &aACI.mTerms[i - 1];
-                ENSUREPOWER1POLYNOMIAL_BREAKIFNOT(aci_term_left_poly_factor_ptr);
-                aci_term_right_poly_factor_ptr = &aACI.mTerms[i + 1];
-                ENSUREPOWER1POLYNOMIAL_BREAKIFNOT(aci_term_right_poly_factor_ptr);
+                aci_term_left_poly_or_mono_factor_ptr = &aACI.mTerms[i - 1];
+                ENSUREPOWER1POLYNOMIALORMONOMIAL_BREAKIFNOT(aci_term_left_poly_or_mono_factor_ptr);
+                aci_term_right_poly_or_mono_factor_ptr = &aACI.mTerms[i + 1];
+                ENSUREPOWER1POLYNOMIALORMONOMIAL_BREAKIFNOT(aci_term_right_poly_or_mono_factor_ptr);
                 aACI.mTerms.insert(aACI.mTerms.begin() + (i + 2), ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aACI.mSetting));
                 aci_term_product_ptr = &aACI.mTerms[i + 2];
                 switch (aACI.mSetting)
                 {
                     case Setting_Type::cCLASSICAL:
-                        *reinterpret_cast<ClassicalAdemPolynomial*>(aci_term_product_ptr->mData) = ClassicalAdemPolynomial_MultiplyPolynomial(*reinterpret_cast<ClassicalAdemPolynomial*>(aci_term_left_poly_factor_ptr->mData), *reinterpret_cast<ClassicalAdemPolynomial*>(aci_term_right_poly_factor_ptr->mData));
+                        POLYNOMIALORMONOMIAL_MULTIPLYINTO_SETTINGIMPL(aci_term_left_poly_or_mono_factor_ptr, aci_term_right_poly_or_mono_factor_ptr, aci_term_product_ptr, Classical);
                         break;
                     case Setting_Type::cC_MOTIVIC:
-                        *reinterpret_cast<CMotivicAdemPolynomial*>(aci_term_product_ptr->mData) = CMotivicAdemPolynomial_MultiplyPolynomial(*reinterpret_cast<CMotivicAdemPolynomial*>(aci_term_left_poly_factor_ptr->mData), *reinterpret_cast<CMotivicAdemPolynomial*>(aci_term_right_poly_factor_ptr->mData));
+                        POLYNOMIALORMONOMIAL_MULTIPLYINTO_SETTINGIMPL(aci_term_left_poly_or_mono_factor_ptr, aci_term_right_poly_or_mono_factor_ptr, aci_term_product_ptr, CMotivic);
                         break;
                     case Setting_Type::cR_MOTIVIC:
-                        *reinterpret_cast<RMotivicAdemPolynomial*>(aci_term_product_ptr->mData) = RMotivicAdemPolynomial_MultiplyPolynomial(*reinterpret_cast<RMotivicAdemPolynomial*>(aci_term_left_poly_factor_ptr->mData), *reinterpret_cast<RMotivicAdemPolynomial*>(aci_term_right_poly_factor_ptr->mData));
+                        POLYNOMIALORMONOMIAL_MULTIPLYINTO_SETTINGIMPL(aci_term_left_poly_or_mono_factor_ptr, aci_term_right_poly_or_mono_factor_ptr, aci_term_product_ptr, RMotivic);
                         break;
                 }
                 ACITerm_Destruct(aACI.mTerms[i + 1]);
