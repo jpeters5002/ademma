@@ -21,6 +21,9 @@ int main(int argc, char** argv)
         return 1;
     }
     std::cout << "parsed correctly (perhaps)" << std::endl;
+    ademma_core::ACITerm aci_term_poly = ademma_core::ArbitraryCalculationInput_ExpandToPolynomial(aci);
+    std::cout << ademma_core::ACITerm_ToString(aci_term_poly) << std::endl;
+    /*
     std::cout << ademma_core::ArbitraryCalculationInput_ToString(aci) << std::endl;
     ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly_Recursive(aci);
     std::cout << ademma_core::ArbitraryCalculationInput_ToString(aci) << std::endl;
@@ -28,6 +31,8 @@ int main(int argc, char** argv)
     std::cout << ademma_core::ArbitraryCalculationInput_ToString(aci) << std::endl;
     ademma_core::ArbitraryCalculationInput_ExpandFoil_Recursive(aci);
     std::cout << ademma_core::ArbitraryCalculationInput_ToString(aci) << std::endl;
+    */
+    ademma_core::ACITerm_Destruct(aci_term_poly);
     ademma_core::ArbitraryCalculationInput_Destruct(aci);
     return 0;
 }

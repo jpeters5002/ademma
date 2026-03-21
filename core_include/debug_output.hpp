@@ -1,7 +1,7 @@
 #ifndef CORE_INCLUDE_DEBUG_OUTPUT_HPP
 #define CORE_INCLUDE_DEBUG_OUTPUT_HPP
 
-#define DEBUG_OUTPUT 0
+#define DEBUG_OUTPUT 1
 #if DEBUG_OUTPUT
 #include <iostream>
 #define DEBUG_PRINT(str) std::cout << "    DEBUG: " << str << std::endl

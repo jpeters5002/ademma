@@ -415,6 +415,31 @@ void ademma_core::ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalcul
     }
 }
 
+#include <unistd.h>
+ademma_core::ACITerm ademma_core::ArbitraryCalculationInput_ExpandToPolynomial(ArbitraryCalculationInput& aACI)
+{
+    ACITerm* aci_term_ptr;
+    DEBUG_PRINT("ACI_ExpandToPolynomial start: " + ArbitraryCalculationInput_ToString(aACI));
+    for (;;)
+    {
+        ArbitraryCalculationInput_CoagulateInnermostToPoly_Recursive(aACI);
+        DEBUG_PRINT("ACI_ExpandToPolynomial coagulated: " + ArbitraryCalculationInput_ToString(aACI));
+        if (ArbitraryCalculationInput_IsOnlyPower1Polynomial(aACI))
+        {
+            aci_term_ptr = &aACI.mTerms[0];
+            aACI.mTerms.clear();
+            break;
+        }
+        ArbitraryCalculationInput_ExpandPolyExponent_Recursive(aACI);
+        DEBUG_PRINT("ACI_ExpandToPolynomial expanded poly exponent: " + ArbitraryCalculationInput_ToString(aACI));
+        ArbitraryCalculationInput_ExpandFoil_Recursive(aACI);
+        DEBUG_PRINT("ACI_ExpandToPolynomial expanded foil: " + ArbitraryCalculationInput_ToString(aACI));
+        sleep(1);
+    }
+    DEBUG_PRINT("ACI_ExpandToPolynomial done: " + ACITerm_ToString(*aci_term_ptr));
+    return *aci_term_ptr;
+}
+
 // PRIVATE FUNCTION DEFINITIONS
 
 std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf)
