@@ -16,7 +16,6 @@ namespace ademma_core
 std::string ACITerm_ToString_Recursive(const ACITerm& aSelf, bool aSkipPowerPrint);
 void ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalculationInput& aACIOut, ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower);
 std::string ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI, bool aSkipPowerPrint);
-bool only_whitespace_in_string_section(const std::string& aStr, size_t aLowIndex, size_t aHighIndexExcluded);
 char prev_non_whitespace_char_in_string(const std::string& aStr, size_t aHighIndexExcluded, size_t* aCharAtIndex);
 char next_non_whitespace_char_in_string(const std::string& aStr, size_t aLowIndex, size_t* aCharAtIndex);
 void ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(ArbitraryCalculationInput& aACI, void* aPoly, Setting_Type aSetting);
@@ -316,6 +315,76 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
     }
 }
 
+#define ENSUREPOWER1POLYNOMIAL_BREAKIFNOT(aci_term_ptr) \
+    if (aci_term_ptr->mType != ACITerm_Type::cPOLYNOMIAL) \
+    { \
+        if (aci_term_ptr->mType != ACITerm_Type::cSUBACI || !ArbitraryCalculationInput_IsOnlyPower1Polynomial(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData))) \
+        { \
+            break; \
+        } \
+        aci_term_ptr = &reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData)->mTerms[0]; \
+    } do {} while(0)
+
+void ademma_core::ArbitraryCalculationInput_ExpandPolyFoil_Recursive(ArbitraryCalculationInput& aACI)
+{
+    ACITerm* aci_term_left_poly_factor_ptr;
+    ACITerm* aci_term_right_poly_factor_ptr;
+    ACITerm* aci_term_product_ptr;
+    ACITerm* aci_term_ptr;
+    for (size_t i = 0; i < aACI.mTerms.size(); i++)
+    {
+        aci_term_ptr = &aACI.mTerms[i];
+        switch (aci_term_ptr->mType)
+        {
+            case ACITerm_Type::cADD:
+                assert(i > 0);
+                assert(i < aACI.mTerms.size() - 1);
+                break;
+            case ACITerm_Type::cMULTIPLY:
+                assert(i > 0);
+                assert(i < aACI.mTerms.size() - 1);
+                aci_term_left_poly_factor_ptr = &aACI.mTerms[i - 1];
+                ENSUREPOWER1POLYNOMIAL_BREAKIFNOT(aci_term_left_poly_factor_ptr);
+                aci_term_right_poly_factor_ptr = &aACI.mTerms[i + 1];
+                ENSUREPOWER1POLYNOMIAL_BREAKIFNOT(aci_term_right_poly_factor_ptr);
+                aACI.mTerms.insert(aACI.mTerms.begin() + (i + 2), ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aACI.mSetting));
+                aci_term_product_ptr = &aACI.mTerms[i + 2];
+                switch (aACI.mSetting)
+                {
+                    case Setting_Type::cCLASSICAL:
+                        *reinterpret_cast<ClassicalAdemPolynomial*>(aci_term_product_ptr->mData) = ClassicalAdemPolynomial_MultiplyPolynomial(*reinterpret_cast<ClassicalAdemPolynomial*>(aci_term_left_poly_factor_ptr->mData), *reinterpret_cast<ClassicalAdemPolynomial*>(aci_term_right_poly_factor_ptr->mData));
+                        break;
+                    case Setting_Type::cC_MOTIVIC:
+                        *reinterpret_cast<CMotivicAdemPolynomial*>(aci_term_product_ptr->mData) = CMotivicAdemPolynomial_MultiplyPolynomial(*reinterpret_cast<CMotivicAdemPolynomial*>(aci_term_left_poly_factor_ptr->mData), *reinterpret_cast<CMotivicAdemPolynomial*>(aci_term_right_poly_factor_ptr->mData));
+                        break;
+                    case Setting_Type::cR_MOTIVIC:
+                        *reinterpret_cast<RMotivicAdemPolynomial*>(aci_term_product_ptr->mData) = RMotivicAdemPolynomial_MultiplyPolynomial(*reinterpret_cast<RMotivicAdemPolynomial*>(aci_term_left_poly_factor_ptr->mData), *reinterpret_cast<RMotivicAdemPolynomial*>(aci_term_right_poly_factor_ptr->mData));
+                        break;
+                }
+                ACITerm_Destruct(aACI.mTerms[i + 1]);
+                ACITerm_Destruct(aACI.mTerms[i]);
+                ACITerm_Destruct(aACI.mTerms[i - 1]);
+                aACI.mTerms.erase(aACI.mTerms.begin() + (i + 1));
+                aACI.mTerms.erase(aACI.mTerms.begin() + i);
+                aACI.mTerms.erase(aACI.mTerms.begin() + (i - 1));
+                i--;
+                break;
+            case ACITerm_Type::cSUBACI:
+                if (!ArbitraryCalculationInput_IsOnlyPower1Polynomial(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData)))
+                {
+                    ArbitraryCalculationInput_ExpandPolyFoil_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData));
+                }
+                break;
+            case ACITerm_Type::cPOLYNOMIAL:
+            case ACITerm_Type::cMONOMIAL:
+                break;
+            case ACITerm_Type::cNONE:
+                assert(!"unreachable");
+                break;
+        }
+    }
+}
+
 // PRIVATE FUNCTION DEFINITIONS
 
 std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf, bool aSkipPowerPrint)
@@ -558,26 +627,6 @@ std::string ademma_core::ArbitraryCalculationInput_ToString_Recursive(const Arbi
         strOut += ACITerm_ToString_Recursive(aACI.mTerms[i], aSkipPowerPrint);
     }
     return strOut;
-}
-
-bool ademma_core::only_whitespace_in_string_section(const std::string& aStr, size_t aLowIndex, size_t aHighIndexExcluded)
-{
-    bool only_whitespace = true;
-    for (size_t i = aLowIndex; i < aHighIndexExcluded && i < aStr.size(); i++)
-    {
-        switch (aStr[i])
-        {
-            case ' ':
-            case '\n':
-            case '\t':
-                continue;
-            default:
-                only_whitespace = false;
-                break;
-        }
-        break;
-    }
-    return only_whitespace;
 }
 
 char ademma_core::prev_non_whitespace_char_in_string(const std::string& aStr, size_t aHighIndexExcluded, size_t* aCharAtIndex)
