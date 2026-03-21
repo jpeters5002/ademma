@@ -4,6 +4,8 @@
 #include "c_motivic_adem_polynomial.hpp"
 #include "r_motivic_adem_polynomial.hpp"
 
+#include "debug_output.hpp"
+
 #include <string>
 #include <assert.h>
 
@@ -11,15 +13,14 @@
 
 namespace ademma_core
 {
+std::string ACITerm_ToString_Recursive(const ACITerm& aSelf, bool aSkipPowerPrint);
 void ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalculationInput& aACIOut, ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower);
-std::string ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI);
+std::string ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI, bool aSkipPowerPrint);
 bool only_whitespace_in_string_section(const std::string& aStr, size_t aLowIndex, size_t aHighIndexExcluded);
 char prev_non_whitespace_char_in_string(const std::string& aStr, size_t aHighIndexExcluded, size_t* aCharAtIndex);
 char next_non_whitespace_char_in_string(const std::string& aStr, size_t aLowIndex, size_t* aCharAtIndex);
 void ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(ArbitraryCalculationInput& aACI, void* aPoly, Setting_Type aSetting);
 }
-
-// PRIVATE FUNCTION DEFINITIONS
 
 ademma_core::ACITerm ademma_core::ACITerm_Construct(ACITerm_Type aType, Setting_Type aSetting)
 {
@@ -122,56 +123,7 @@ void ademma_core::ArbitraryCalculationInput_Destruct(ArbitraryCalculationInput& 
 
 std::string ademma_core::ACITerm_ToString(const ACITerm& aSelf)
 {
-    std::string strOut {};
-    int power;
-    switch (aSelf.mType)
-    {
-        case ACITerm_Type::cADD:
-            strOut = " + ";
-            break;
-        case ACITerm_Type::cMULTIPLY:
-            strOut = " * ";
-            break;
-        case ACITerm_Type::cSUBACI:
-            strOut = "(" + ArbitraryCalculationInput_ToString_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData)) + ")";
-            power = reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData)->mPower;
-            if (power != 1)
-            {
-                strOut += "^{" + std::to_string(power) + "}";
-            }
-            break;
-        case ACITerm_Type::cPOLYNOMIAL:
-            switch (aSelf.mSetting)
-            {
-                case Setting_Type::cCLASSICAL:
-                    strOut = ClassicalAdemPolynomial_ToString(*reinterpret_cast<ClassicalAdemPolynomial*>(aSelf.mData));
-                    break;
-                case Setting_Type::cC_MOTIVIC:
-                    strOut = CMotivicAdemPolynomial_ToString(*reinterpret_cast<CMotivicAdemPolynomial*>(aSelf.mData));
-                    break;
-                case Setting_Type::cR_MOTIVIC:
-                    strOut = RMotivicAdemPolynomial_ToString(*reinterpret_cast<RMotivicAdemPolynomial*>(aSelf.mData));
-                    break;
-            }
-            break;
-        case ACITerm_Type::cMONOMIAL:
-            switch (aSelf.mSetting)
-            {
-                case Setting_Type::cCLASSICAL:
-                    strOut = ClassicalAdemMonomial_ToString(*reinterpret_cast<ClassicalAdemMonomial*>(aSelf.mData));
-                    break;
-                case Setting_Type::cC_MOTIVIC:
-                    strOut = CMotivicAdemMonomial_ToString(*reinterpret_cast<CMotivicAdemMonomial*>(aSelf.mData));
-                    break;
-                case Setting_Type::cR_MOTIVIC:
-                    strOut = RMotivicAdemMonomial_ToString(*reinterpret_cast<RMotivicAdemMonomial*>(aSelf.mData));
-                    break;
-            }
-            break;
-        case ACITerm_Type::cNONE:
-            break;
-    }
-    return strOut;
+    return ACITerm_ToString_Recursive(aSelf, true);
 }
 
 #define POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, setting_ucc) \
@@ -212,7 +164,7 @@ std::string ademma_core::ArbitraryCalculationInput_ToString(const ArbitraryCalcu
     {
         strOut += "(";
     }
-    strOut += ArbitraryCalculationInput_ToString_Recursive(aACI);
+    strOut += ArbitraryCalculationInput_ToString_Recursive(aACI, true);
     if (aACI.mPower != 1)
     {
         strOut += ")^{" + std::to_string(aACI.mPower) + "}";
@@ -283,10 +235,13 @@ void ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly_Recursive(A
 
 bool ademma_core::ArbitraryCalculationInput_IsOnlyPolynomial(const ArbitraryCalculationInput& aACI)
 {
+    DEBUG_PRINT("ArbitraryCalculationInput_IsOnlyPolynomial start: " + ArbitraryCalculationInput_ToString(aACI));
     if (aACI.mTerms.size() == 1 && aACI.mTerms[0].mType == ACITerm_Type::cPOLYNOMIAL)
     {
+        DEBUG_PRINT("ArbitraryCalculationInput_IsOnlyPolynomial end: true");
         return true;
     }
+    DEBUG_PRINT("ArbitraryCalculationInput_IsOnlyPolynomial end: false");
     return false;
 }
 
@@ -298,10 +253,6 @@ bool ademma_core::ArbitraryCalculationInput_IsOnlyPower1Polynomial(const Arbitra
     }
     return false;
 }
-
-#define EXPANDPOLYEXPONENT_RECURSIONIMPL(aci_term_ptr, setting_ucc) \
-    ArbitraryCalculationInput_ExpandPolyExponent_Recursive(*reinterpret_cast<setting_ucc##AdemPolynomial*>aci_term_ptr->mData)
-
 
 void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(ArbitraryCalculationInput& aACI)
 {
@@ -322,15 +273,15 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
             case ACITerm_Type::cSUBACI:
                 powered_subaci_ptr = reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData);
                 assert(powered_subaci_ptr->mPower > 0);
-                if (ArbitraryCalculationInput_IsOnlyPolynomial(*powered_subaci_ptr))
+                if (ArbitraryCalculationInput_IsOnlyPolynomial(*powered_subaci_ptr) && powered_subaci_ptr->mPower > 1)
                 {
                     power = powered_subaci_ptr->mPower;
                     for (size_t j = 1; j < (size_t)power; j++)
                     {
-                        aACI.mTerms.insert(aACI.mTerms.begin() + (i + 1), ACITerm_Construct(ACITerm_Type::cMULTIPLY, aACI.mSetting));
                         i++;
-                        aACI.mTerms.insert(aACI.mTerms.begin() + (i + 1), ACITerm_Construct(ACITerm_Type::cSUBACI, aACI.mSetting));
+                        aACI.mTerms.insert(aACI.mTerms.begin() + i, ACITerm_Construct(ACITerm_Type::cMULTIPLY, aACI.mSetting));
                         i++;
+                        aACI.mTerms.insert(aACI.mTerms.begin() + i, ACITerm_Construct(ACITerm_Type::cSUBACI, aACI.mSetting));
                         subaci_ptr = reinterpret_cast<ArbitraryCalculationInput*>(aACI.mTerms[i].mData);
                         subaci_ptr->mSetting = aACI.mSetting;
                         subaci_ptr->mPower = 1;
@@ -352,7 +303,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
                 }
                 else
                 {
-                    ArbitraryCalculationInput_ExpandPolyExponent_Recursive(*subaci_ptr);
+                    ArbitraryCalculationInput_ExpandPolyExponent_Recursive(*powered_subaci_ptr);
                 }
                 break;
             case ACITerm_Type::cMONOMIAL:
@@ -366,6 +317,68 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
 }
 
 // PRIVATE FUNCTION DEFINITIONS
+
+std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf, bool aSkipPowerPrint)
+{
+    std::string strOut {};
+    int power;
+    switch (aSelf.mType)
+    {
+        case ACITerm_Type::cADD:
+            strOut = " + ";
+            break;
+        case ACITerm_Type::cMULTIPLY:
+            strOut = " * ";
+            break;
+        case ACITerm_Type::cSUBACI:
+            if (!aSkipPowerPrint)
+            {
+                strOut += "(";
+            }
+            strOut += ArbitraryCalculationInput_ToString_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData), false);
+            if (!aSkipPowerPrint)
+            {
+                strOut += ")";
+                power = reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData)->mPower;
+                if (power != 1)
+                {
+                    strOut += "^{" + std::to_string(power) + "}";
+                }
+            }
+            break;
+        case ACITerm_Type::cPOLYNOMIAL:
+            switch (aSelf.mSetting)
+            {
+                case Setting_Type::cCLASSICAL:
+                    strOut = ClassicalAdemPolynomial_ToString(*reinterpret_cast<ClassicalAdemPolynomial*>(aSelf.mData));
+                    break;
+                case Setting_Type::cC_MOTIVIC:
+                    strOut = CMotivicAdemPolynomial_ToString(*reinterpret_cast<CMotivicAdemPolynomial*>(aSelf.mData));
+                    break;
+                case Setting_Type::cR_MOTIVIC:
+                    strOut = RMotivicAdemPolynomial_ToString(*reinterpret_cast<RMotivicAdemPolynomial*>(aSelf.mData));
+                    break;
+            }
+            break;
+        case ACITerm_Type::cMONOMIAL:
+            switch (aSelf.mSetting)
+            {
+                case Setting_Type::cCLASSICAL:
+                    strOut = ClassicalAdemMonomial_ToString(*reinterpret_cast<ClassicalAdemMonomial*>(aSelf.mData));
+                    break;
+                case Setting_Type::cC_MOTIVIC:
+                    strOut = CMotivicAdemMonomial_ToString(*reinterpret_cast<CMotivicAdemMonomial*>(aSelf.mData));
+                    break;
+                case Setting_Type::cR_MOTIVIC:
+                    strOut = RMotivicAdemMonomial_ToString(*reinterpret_cast<RMotivicAdemMonomial*>(aSelf.mData));
+                    break;
+            }
+            break;
+        case ACITerm_Type::cNONE:
+            break;
+    }
+    return strOut;
+}
 
 void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalculationInput& aACIOut, ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower)
 {
@@ -537,12 +550,12 @@ cleanup_fail_exit:
     return;
 }
 
-std::string ademma_core::ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI)
+std::string ademma_core::ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI, bool aSkipPowerPrint)
 {
     std::string strOut {};
     for (size_t i = 0; i < aACI.mTerms.size(); i++)
     {
-        strOut += ACITerm_ToString(aACI.mTerms[i]);
+        strOut += ACITerm_ToString_Recursive(aACI.mTerms[i], aSkipPowerPrint);
     }
     return strOut;
 }
