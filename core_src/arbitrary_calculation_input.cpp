@@ -13,9 +13,9 @@
 
 namespace ademma_core
 {
-std::string ACITerm_ToString_Recursive(const ACITerm& aSelf, bool aSkipPowerPrint);
+std::string ACITerm_ToString_Recursive(const ACITerm& aSelf);
 void ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalculationInput& aACIOut, ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower);
-std::string ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI, bool aSkipPowerPrint);
+std::string ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI);
 char prev_non_whitespace_char_in_string(const std::string& aStr, size_t aHighIndexExcluded, size_t* aCharAtIndex);
 char next_non_whitespace_char_in_string(const std::string& aStr, size_t aLowIndex, size_t* aCharAtIndex);
 void ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(ArbitraryCalculationInput& aACI, void* aPoly, Setting_Type aSetting);
@@ -122,7 +122,7 @@ void ademma_core::ArbitraryCalculationInput_Destruct(ArbitraryCalculationInput& 
 
 std::string ademma_core::ACITerm_ToString(const ACITerm& aSelf)
 {
-    return ACITerm_ToString_Recursive(aSelf, true);
+    return ACITerm_ToString_Recursive(aSelf);
 }
 
 #define POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, setting_ucc) \
@@ -163,7 +163,7 @@ std::string ademma_core::ArbitraryCalculationInput_ToString(const ArbitraryCalcu
     {
         strOut += "(";
     }
-    strOut += ArbitraryCalculationInput_ToString_Recursive(aACI, true);
+    strOut += ArbitraryCalculationInput_ToString_Recursive(aACI);
     if (aACI.mPower != 1)
     {
         strOut += ")^{" + std::to_string(aACI.mPower) + "}";
@@ -417,7 +417,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyFoil_Recursive(ArbitraryCa
 
 // PRIVATE FUNCTION DEFINITIONS
 
-std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf, bool aSkipPowerPrint)
+std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf)
 {
     std::string strOut {};
     int power;
@@ -430,15 +430,15 @@ std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf, bool a
             strOut = " * ";
             break;
         case ACITerm_Type::cSUBACI:
-            if (!aSkipPowerPrint)
+            power = reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData)->mPower;
+            if (power != 1)
             {
                 strOut += "(";
             }
-            strOut += ArbitraryCalculationInput_ToString_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData), false);
-            if (!aSkipPowerPrint)
+            strOut += ArbitraryCalculationInput_ToString_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData));
+            if (power != 1)
             {
                 strOut += ")";
-                power = reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData)->mPower;
                 if (power != 1)
                 {
                     strOut += "^{" + std::to_string(power) + "}";
@@ -649,12 +649,12 @@ cleanup_fail_exit:
     return;
 }
 
-std::string ademma_core::ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI, bool aSkipPowerPrint)
+std::string ademma_core::ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI)
 {
     std::string strOut {};
     for (size_t i = 0; i < aACI.mTerms.size(); i++)
     {
-        strOut += ACITerm_ToString_Recursive(aACI.mTerms[i], aSkipPowerPrint);
+        strOut += ACITerm_ToString_Recursive(aACI.mTerms[i]);
     }
     return strOut;
 }
