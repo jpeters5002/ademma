@@ -51,7 +51,7 @@ bool ArbitraryCalculationInput_IsOnlyPower1Polynomial(const ArbitraryCalculation
 
 void ArbitraryCalculationInput_ExpandPolyExponent_Recursive(ArbitraryCalculationInput& aACI);
 
-void ArbitraryCalculationInput_ExpandPolyFoil_Recursive(ArbitraryCalculationInput& aACI);
+void ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalculationInput& aACI);
 }
 
 #endif // CORE_INCLUDE_ARBITRARY_CALCULATION_INPUT_HPP

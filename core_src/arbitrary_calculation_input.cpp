@@ -355,7 +355,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
         *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_product_ptr->mData) = { setting_ucc##AdemMonomial_Multiply(*reinterpret_cast<setting_ucc##AdemMonomial*>(aci_left_ptr->mData), *reinterpret_cast<setting_ucc##AdemMonomial*>(aci_right_ptr->mData)) }; \
     } do {} while(0)
 
-void ademma_core::ArbitraryCalculationInput_ExpandPolyFoil_Recursive(ArbitraryCalculationInput& aACI)
+void ademma_core::ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalculationInput& aACI)
 {
     ACITerm* aci_term_left_poly_or_mono_factor_ptr;
     ACITerm* aci_term_right_poly_or_mono_factor_ptr;
@@ -402,7 +402,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyFoil_Recursive(ArbitraryCa
             case ACITerm_Type::cSUBACI:
                 if (!ArbitraryCalculationInput_IsOnlyPower1Polynomial(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData)))
                 {
-                    ArbitraryCalculationInput_ExpandPolyFoil_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData));
+                    ArbitraryCalculationInput_ExpandFoil_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData));
                 }
                 break;
             case ACITerm_Type::cPOLYNOMIAL:
