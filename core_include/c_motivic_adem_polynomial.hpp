@@ -19,6 +19,8 @@ void CMotivicAdemPolynomial_ShoveTauLeft(CMotivicAdemPolynomial& aPolynomial);
 
 void CMotivicAdemPolynomial_CombineLikeTerms_AssumeNoSq0Factors_AssumeTauLeft(CMotivicAdemPolynomial& aPolynomial);
 
+bool CMotivicAdemPolynomial_IsEqualInForm(const CMotivicAdemPolynomial& aLeft, const CMotivicAdemPolynomial& aRight);
+
 bool CMotivicAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(const CMotivicAdemPolynomial& aPolynomial);
 
 CMotivicAdemPolynomial CMotivicAdemPolynomial_MultiplyPolynomial(const CMotivicAdemPolynomial& aLeft, const CMotivicAdemPolynomial& aRight);

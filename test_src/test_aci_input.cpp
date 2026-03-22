@@ -23,12 +23,22 @@ struct acistr_expectedstr
 };
 static const acistr_expectedstr lut_cl_cm_rm_acistr_expectedstr[] = {
     {"Sq^1Sq^3", "Sq^1Sq^3"},
+    {"(Sq^1Sq^3)^2", "Sq^1Sq^3Sq^1Sq^3"},
+    {"(Sq^3)^5", "Sq^3Sq^3Sq^3Sq^3Sq^3"},
+    {"(Sq^2 + (Sq^3)^5)(Sq^1)", "Sq^2Sq^1 + Sq^3Sq^3Sq^3Sq^3Sq^3Sq^1"},
+    {"(Sq^1 + (Sq^2 + (Sq^3 + (Sq^4 + (Sq^5 + (Sq^6))))))", "Sq^1 + Sq^2 + Sq^3 + Sq^4 + Sq^5 + Sq^6"},
+    {"((Sq^1)^2(Sq^2)^2)^2", "Sq^1Sq^1Sq^2Sq^2Sq^1Sq^1Sq^2Sq^2"},
+    {"(Sq^1) + (Sq^2)", "Sq^1 + Sq^2"},
 };
 static const acistr_expectedstr lut_cm_rm_acistr_expectedstr[] = {
     {"\\tauSq^4", "\\tauSq^4"},
+    {"\\tau^0", "\\tau^0"},
+    {"(\\tau^0)^2", "\\tau^0\\tau^0"},
 };
 static const acistr_expectedstr lut_rm_acistr_expectedstr[] = {
     {"\\rho\\tauSq^5", "\\rho\\tauSq^5"},
+    {"\\rho^0", "\\rho^0"},
+    {"(\\rho^0)^2", "\\rho^0\\rho^0"},
 };
 
 #define SIZEOF_LUT(lut) (sizeof(lut) / sizeof(lut[0]))
@@ -47,6 +57,7 @@ bool check_expansion_correct(const std::string& aACIStr, const std::string& aExp
     }
     ParsingInfo expected {};
     expected.mStringToParse = aExpectedStr;
+    bool success = false;
     switch (aSetting)
     {
         case Setting_Type::cCLASSICAL:
@@ -54,26 +65,31 @@ bool check_expansion_correct(const std::string& aACIStr, const std::string& aExp
             ClassicalAdemPolynomial cap_aci {};
             ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(&cap_aci, aci);
             ClassicalAdemPolynomial cap_expected = ClassicalAdemPolynomial_FromString(expected);
-            return ClassicalAdemPolynomial_IsEqualInForm(cap_aci, cap_expected);
+            success = ClassicalAdemPolynomial_IsEqualInForm(cap_aci, cap_expected);
         }
+            break;
         case Setting_Type::cC_MOTIVIC:
         {
             CMotivicAdemPolynomial cmap_aci {};
             ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(&cmap_aci, aci);
             CMotivicAdemPolynomial cmap_expected = CMotivicAdemPolynomial_FromString(expected);
-            return CMotivicAdemPolynomial_IsEqualInForm(cmap_aci, cmap_expected);
+            success = CMotivicAdemPolynomial_IsEqualInForm(cmap_aci, cmap_expected);
         }
+            break;
         case Setting_Type::cR_MOTIVIC:
         {
             RMotivicAdemPolynomial rmap_aci {};
             ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(&rmap_aci, aci);
             RMotivicAdemPolynomial rmap_expected = RMotivicAdemPolynomial_FromString(expected);
-            return RMotivicAdemPolynomial_IsEqualInForm(rmap_aci, rmap_expected);
+            success = RMotivicAdemPolynomial_IsEqualInForm(rmap_aci, rmap_expected);
         }
+            break;
     }
-    assert(!"unreachable");
-    std::cerr << "Unreachable code reached" << std::endl;
-    return false;
+    if (!success)
+    {
+        std::cerr << "Error: Expected the ACI expansion of \"" << aACIStr << "\" in setting '" << str_from_Setting_Type(aSetting) << "' to be \"" << aExpectedStr << "\" but they were not equal (in form)" << std::endl;
+    }
+    return success;
 }
 
 int test_aci_input()

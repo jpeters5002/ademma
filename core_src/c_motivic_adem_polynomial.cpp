@@ -123,6 +123,22 @@ skip_i_increment:
     DEBUG_PRINT("CMotPoly_CombineLikeTerms_AssumeNoSq0Factors_AssumeTauLeft done:      " + CMotivicAdemPolynomial_ToString(aPolynomial));
 }
 
+bool ademma_core::CMotivicAdemPolynomial_IsEqualInForm(const CMotivicAdemPolynomial& aLeft, const CMotivicAdemPolynomial& aRight)
+{
+    if (aLeft.size() != aRight.size())
+    {
+        return false;
+    }
+    for (size_t i = 0; i < aLeft.size(); i++)
+    {
+        if (!CMotivicAdemMonomial_IsEqualInForm(aLeft[i], aRight[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool ademma_core::CMotivicAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(const CMotivicAdemPolynomial& aPolynomial)
 {
     DEBUG_PRINT("CMotPoly_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors called on: " + CMotivicAdemPolynomial_ToString(aPolynomial));

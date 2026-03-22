@@ -123,6 +123,22 @@ skip_i_increment:
     DEBUG_PRINT("RMotPoly_CombineLikeTerms_AssumeNoSq0Factors_AssumeRhoLeft done:      " + RMotivicAdemPolynomial_ToString(aPolynomial));
 }
 
+bool ademma_core::RMotivicAdemPolynomial_IsEqualInForm(const RMotivicAdemPolynomial& aLeft, const RMotivicAdemPolynomial& aRight)
+{
+    if (aLeft.size() != aRight.size())
+    {
+        return false;
+    }
+    for (size_t i = 0; i < aLeft.size(); i++)
+    {
+        if (!RMotivicAdemMonomial_IsEqualInForm(aLeft[i], aRight[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool ademma_core::RMotivicAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(const RMotivicAdemPolynomial& aPolynomial)
 {
     DEBUG_PRINT("RMotPoly_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors called on: " + RMotivicAdemPolynomial_ToString(aPolynomial));
