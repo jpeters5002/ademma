@@ -53,6 +53,8 @@ void ArbitraryCalculationInput_ExpandPolyExponent_Recursive(ArbitraryCalculation
 
 void ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalculationInput& aACI);
 
+void ArbitraryCalculationInput_UnsubPower1Poly_Recursive(ArbitraryCalculationInput& aACI);
+
 ACITerm ArbitraryCalculationInput_ExpandToPolynomial(ArbitraryCalculationInput& aACI);
 }
 
