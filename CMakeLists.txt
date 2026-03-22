@@ -29,6 +29,7 @@ set(CORE_SOURCES
 	core_src/r_motivic_adem_math.cpp
 	core_src/r_motivic_adem_monomial.cpp
 	core_src/r_motivic_adem_polynomial.cpp
+	core_src/setting.cpp
 	core_src/steenrod_square.cpp
 )
 set(TUI_SOURCES
@@ -49,6 +50,7 @@ if (BUILD_TESTING)
     set(TEST_PROJECT_NAME test_${PROJECT_NAME})
     set(TEST_SOURCES
         test_src/main.cpp
+        test_src/test_aci_input.cpp
         test_src/testing_helper_functions.cpp
         test_src/test_cl_prod_binary_degrees_1_to_n.cpp
         test_src/test_rm_two_factor.cpp

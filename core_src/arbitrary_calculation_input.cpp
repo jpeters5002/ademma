@@ -448,9 +448,8 @@ void ademma_core::ArbitraryCalculationInput_UnsubPower1Poly_Recursive(ArbitraryC
     }
 }
 
-ademma_core::ACITerm ademma_core::ArbitraryCalculationInput_ExpandToPolynomial(ArbitraryCalculationInput& aACI)
+void ademma_core::ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(void* aPolynomialOut, ArbitraryCalculationInput& aACI)
 {
-    ACITerm* aci_term_ptr;
     DEBUG_PRINT("ACI_ExpandToPolynomial start: " + ArbitraryCalculationInput_ToString(aACI));
     for (;;)
     {
@@ -458,8 +457,21 @@ ademma_core::ACITerm ademma_core::ArbitraryCalculationInput_ExpandToPolynomial(A
         DEBUG_PRINT("ACI_ExpandToPolynomial coagulated: " + ArbitraryCalculationInput_ToString(aACI));
         if (ArbitraryCalculationInput_IsOnlyPower1Polynomial(aACI))
         {
-            aci_term_ptr = &aACI.mTerms[0];
-            aACI.mTerms.clear();
+            switch (aACI.mSetting)
+            {
+                case Setting_Type::cCLASSICAL:
+                    *reinterpret_cast<ClassicalAdemPolynomial*>(aPolynomialOut) = *reinterpret_cast<ClassicalAdemPolynomial*>(aACI.mTerms[0].mData);
+                    DEBUG_PRINT("ACI_ExpandToPolynomial done: " + ClassicalAdemPolynomial_ToString(*reinterpret_cast<ClassicalAdemPolynomial*>(aPolynomialOut)));
+                    break;
+                case Setting_Type::cC_MOTIVIC:
+                    *reinterpret_cast<CMotivicAdemPolynomial*>(aPolynomialOut) = *reinterpret_cast<CMotivicAdemPolynomial*>(aACI.mTerms[0].mData);
+                    DEBUG_PRINT("ACI_ExpandToPolynomial done: " + CMotivicAdemPolynomial_ToString(*reinterpret_cast<CMotivicAdemPolynomial*>(aPolynomialOut)));
+                    break;
+                case Setting_Type::cR_MOTIVIC:
+                    *reinterpret_cast<RMotivicAdemPolynomial*>(aPolynomialOut) = *reinterpret_cast<RMotivicAdemPolynomial*>(aACI.mTerms[0].mData);
+                    DEBUG_PRINT("ACI_ExpandToPolynomial done: " + RMotivicAdemPolynomial_ToString(*reinterpret_cast<RMotivicAdemPolynomial*>(aPolynomialOut)));
+                    break;
+            }
             break;
         }
         ArbitraryCalculationInput_ExpandPolyExponent_Recursive(aACI);
@@ -469,8 +481,7 @@ ademma_core::ACITerm ademma_core::ArbitraryCalculationInput_ExpandToPolynomial(A
         ArbitraryCalculationInput_UnsubPower1Poly_Recursive(aACI);
         DEBUG_PRINT("ACI_ExpandToPolynomial unsub power1 poly: " + ArbitraryCalculationInput_ToString(aACI));
     }
-    DEBUG_PRINT("ACI_ExpandToPolynomial done: " + ACITerm_ToString(*aci_term_ptr));
-    return *aci_term_ptr;
+    ArbitraryCalculationInput_Destruct(aACI);
 }
 
 // PRIVATE FUNCTION DEFINITIONS

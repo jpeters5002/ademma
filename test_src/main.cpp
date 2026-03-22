@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "test_aci_input.hpp"
 #include "test_cl_prod_binary_degrees_1_to_n.hpp"
 #include "test_rm_two_factor.hpp"
 #include "test_sq1_sq2n.hpp"
@@ -17,6 +18,7 @@ struct test_function_t
 #define TEST_FUNCTION(fn) {fn, #fn}
 
 static test_function_t test_functions[] = {
+    TEST_FUNCTION(test_aci_input),
     TEST_FUNCTION(test_cl_prod_binary_degrees_1_to_n),
     TEST_FUNCTION(test_rm_two_factor),
     TEST_FUNCTION(test_sq1_sq2n),

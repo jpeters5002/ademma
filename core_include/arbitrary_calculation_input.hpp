@@ -55,7 +55,7 @@ void ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalculationInput& a
 
 void ArbitraryCalculationInput_UnsubPower1Poly_Recursive(ArbitraryCalculationInput& aACI);
 
-ACITerm ArbitraryCalculationInput_ExpandToPolynomial(ArbitraryCalculationInput& aACI);
+void ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(void* aPolynomialOut, ArbitraryCalculationInput& aACI);
 }
 
 #endif // CORE_INCLUDE_ARBITRARY_CALCULATION_INPUT_HPP
