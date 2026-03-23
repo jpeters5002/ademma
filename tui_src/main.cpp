@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include "arbitrary_calculation_input.hpp"
 #include "c_motivic_adem_math.hpp"
 #include "c_motivic_adem_polynomial.hpp"
 #include "c_motivic_adem_monomial.hpp"
@@ -14,6 +15,7 @@
 #include "r_motivic_adem_math.hpp"
 #include "r_motivic_adem_polynomial.hpp"
 #include "r_motivic_adem_monomial.hpp"
+#include "setting.hpp"
 
 // PRIVATE ENUMS (and helper functions declaration)
 
@@ -75,9 +77,7 @@ int int_from_control_return_e(control_return_e aValue);
 control_return_e argv_handle(option_values_t& aOptionValues, std::string& aCalculationInput, int argc, char** argv);
 bool is_token_option_specifier(const char* aToken);
 void print_help();
-control_return_e handle_classical(const option_values_t& aOptionValues, const std::string& aCalculationInput);
-control_return_e handle_r_motivic(const option_values_t& aOptionValues, const std::string& aCalculationInput);
-control_return_e handle_c_motivic(const option_values_t& aOptionValues, const std::string& aCalculationInput);
+control_return_e handle_setting(const option_values_t& aOptionValues, const std::string& aCalculationInput);
 
 // MAIN
 
@@ -145,20 +145,11 @@ int main (int argc, char** argv)
             }
         }
         control_return_e subhandle_control_return;
-        switch (option_values_using.mSetting)
+        if (option_values_using.mSetting == cOPTION_VALUE_SETTING_NONE)
         {
-            case cOPTION_VALUE_SETTING_CLASSICAL:
-                subhandle_control_return = handle_classical(option_values_using, calculation_input_using);
-                break;
-            case cOPTION_VALUE_SETTING_R_MOTIVIC:
-                subhandle_control_return = handle_r_motivic(option_values_using, calculation_input_using);
-                break;
-            case cOPTION_VALUE_SETTING_C_MOTIVIC:
-                subhandle_control_return = handle_c_motivic(option_values_using, calculation_input_using);
-                break;
-            case cOPTION_VALUE_SETTING_NONE:
-                goto error_unreachable_code_setting_type;
+            goto error_unreachable_code_setting_type;
         }
+        subhandle_control_return = handle_setting(option_values_using, calculation_input_using);
         switch (subhandle_control_return)
         {
             case cCONTROL_RETURN_SUCCESS:
@@ -409,7 +400,7 @@ void print_help()
     std::cout << "NOTE: If calculation-input is passed via CLI then, depending on the shell being used, a double backslash might be necessary for the shell to pass a backslash into the program argument. Usually shells allow arguments to be contained within double quotes, and when this is done, usually the shell will pass in a single backslash within those quotes as part of the argument instead of being treated as an escape character." << std::endl;
 }
 
-control_return_e handle_classical(const option_values_t& aOptionValues, const std::string& aCalculationInput)
+control_return_e handle_setting(const option_values_t& aOptionValues, const std::string& aCalculationInput)
 {
     using namespace ademma_core;
     ParsingInfo parsing_info;
@@ -421,7 +412,21 @@ control_return_e handle_classical(const option_values_t& aOptionValues, const st
             std::cerr << "CLI input error: Option '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_ONLY_CLI).mName << "' was given but specifying the calculation input (as the last argument) is required (and was not given); run with '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_HELP).mName << "' for syntax" << std::endl;
             return cCONTROL_RETURN_FAIL;
         }
-        std::cout << "Enter classical adem polynomial (form eg: Sq^4Sq^5+Sq^5) or 'q' to quit" << std::endl;
+        switch (aOptionValues.mSetting)
+        {
+            case cOPTION_VALUE_SETTING_CLASSICAL:
+                std::cout << "Enter classical adem polynomial (form eg: 'Sq^4Sq^5+Sq^5' or 'Sq^3(Sq^16)^4') or 'q' to quit" << std::endl;
+                break;
+            case cOPTION_VALUE_SETTING_R_MOTIVIC:
+                std::cout << "Enter r_motivic adem polynomial (form eg: '\\tau^2Sq^4Sq^5+\\rho^3\\tauSq^5' or '\\tau(\\rhoSq^8)^3') or 'q' to quit" << std::endl;
+                break;
+            case cOPTION_VALUE_SETTING_C_MOTIVIC:
+                std::cout << "Enter c_motivic adem polynomial (form eg: '\\tauSq^4Sq^5+\\tau^2Sq^5' or '(Sq^3)^2(\\tauSq^7)^3') or 'q' to quit" << std::endl;
+                break;
+            case cOPTION_VALUE_SETTING_NONE:
+                std::cerr << "[INTERNAL ERROR]: Unexpectedly found setting type NONE in handle_setting" << std::endl;
+                return cCONTROL_RETURN_FAIL;
+        }
         std::getline(std::cin, parsing_info.mStringToParse);
         if (parsing_info.mStringToParse == "q")
         {
@@ -429,76 +434,59 @@ control_return_e handle_classical(const option_values_t& aOptionValues, const st
         }
     }
 
-    ClassicalAdemPolynomial user_input_cap = ClassicalAdemPolynomial_FromString(parsing_info);
-    if (parsing_info.mErrorInfo.mIsError)
+    Setting_Type setting;
+    switch (aOptionValues.mSetting)
     {
-        std::cerr << parsing_info.GetFullErrorString() << std::endl;
-        return cCONTROL_RETURN_FAIL;
-    }
-    ClassicalAdemPolynomial cap_return = classical_adem_math::admissify_classical_adem_polynomial(user_input_cap);
-    std::cout << ClassicalAdemPolynomial_ToString(cap_return) << std::endl;
-    return cCONTROL_RETURN_SUCCESS;
-}
-
-control_return_e handle_r_motivic(const option_values_t& aOptionValues, const std::string& aCalculationInput)
-{
-    using namespace ademma_core;
-    ParsingInfo parsing_info;
-    parsing_info.mStringToParse = aCalculationInput;
-    if (aCalculationInput.empty())
-    {
-        if (aOptionValues.mOnlyCLI)
-        {
-            std::cerr << "CLI input error: Option '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_ONLY_CLI).mName << "' was given but specifying the calculation input (as the last argument) is required (and was not given); run with '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_HELP).mName << "' for syntax" << std::endl;
+        case cOPTION_VALUE_SETTING_CLASSICAL:
+            setting = Setting_Type::cCLASSICAL;
+            break;
+        case cOPTION_VALUE_SETTING_R_MOTIVIC:
+            setting = Setting_Type::cR_MOTIVIC;
+            break;
+        case cOPTION_VALUE_SETTING_C_MOTIVIC:
+            setting = Setting_Type::cC_MOTIVIC;
+            break;
+        case cOPTION_VALUE_SETTING_NONE:
+            std::cerr << "[INTERNAL ERROR]: Unexpectedly found setting type NONE in handle_setting" << std::endl;
             return cCONTROL_RETURN_FAIL;
-        }
-        std::cout << "Enter R-motivic adem polynomial (form eg: Sq^1\\tau\\rho^2Sq^2+Sq^3) or 'q' to quit" << std::endl;
-        std::getline(std::cin, parsing_info.mStringToParse);
-        if (parsing_info.mStringToParse == "q")
-        {
-            return cCONTROL_RETURN_SUCCESS_EXIT;
-        }
     }
-
-    RMotivicAdemPolynomial user_input_rmap = RMotivicAdemPolynomial_FromString(parsing_info);
+    ArbitraryCalculationInput input_aci = ArbitraryCalculationInput_FromString(parsing_info, setting);
     if (parsing_info.mErrorInfo.mIsError)
     {
-        std::cerr << parsing_info.GetFullErrorString() << std::endl;
+        std::cerr << "Error parsing " << str_from_Setting_Type(setting) << " input: " << parsing_info.GetFullErrorString() << std::endl;
         return cCONTROL_RETURN_FAIL;
     }
-    RMotivicAdemPolynomial rmap_return = r_motivic_adem_math::admissify_r_motivic_adem_polynomial(user_input_rmap);
-    std::cout << RMotivicAdemPolynomial_ToString(rmap_return) << std::endl;
-    return cCONTROL_RETURN_SUCCESS;
-}
-
-control_return_e handle_c_motivic(const option_values_t& aOptionValues, const std::string& aCalculationInput)
-{
-    using namespace ademma_core;
-    ParsingInfo parsing_info;
-    parsing_info.mStringToParse = aCalculationInput;
-    if (aCalculationInput.empty())
+    switch (aOptionValues.mSetting)
     {
-        if (aOptionValues.mOnlyCLI)
+        case cOPTION_VALUE_SETTING_CLASSICAL:
         {
-            std::cerr << "CLI input error: Option '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_ONLY_CLI).mName << "' was given but specifying the calculation input (as the last argument) is required (and was not given); run with '--" << option_type_details_from_option_type_specifier(cOPTION_TYPE_SPECIFIER_HELP).mName << "' for syntax" << std::endl;
+            ClassicalAdemPolynomial aci_expanded_cap {};
+            ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(&aci_expanded_cap, input_aci);
+            ClassicalAdemPolynomial cap_return = classical_adem_math::admissify_classical_adem_polynomial(aci_expanded_cap);
+            std::cout << ClassicalAdemPolynomial_ToString(cap_return) << std::endl;
+        }
+            break;
+        case cOPTION_VALUE_SETTING_R_MOTIVIC:
+        {
+            RMotivicAdemPolynomial aci_expanded_rmap {};
+            ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(&aci_expanded_rmap, input_aci);
+            RMotivicAdemPolynomial rmap_return = r_motivic_adem_math::admissify_r_motivic_adem_polynomial(aci_expanded_rmap);
+            std::cout << RMotivicAdemPolynomial_ToString(rmap_return) << std::endl;
+        }
+            break;
+        case cOPTION_VALUE_SETTING_C_MOTIVIC:
+        {
+            CMotivicAdemPolynomial aci_expanded_cmap {};
+            ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(&aci_expanded_cmap, input_aci);
+            CMotivicAdemPolynomial cmap_return = c_motivic_adem_math::admissify_c_motivic_adem_polynomial(aci_expanded_cmap);
+            std::cout << CMotivicAdemPolynomial_ToString(cmap_return) << std::endl;
+        }
+            break;
+        case cOPTION_VALUE_SETTING_NONE:
+            std::cerr << "[INTERNAL ERROR]: Unexpectedly found setting type NONE in handle_setting" << std::endl;
+            assert(!"unreachable");
             return cCONTROL_RETURN_FAIL;
-        }
-        std::cout << "Enter C-motivic adem polynomial (form eg: Sq^1\\tauSq^2+Sq^3) or 'q' to quit" << std::endl;
-        std::getline(std::cin, parsing_info.mStringToParse);
-        if (parsing_info.mStringToParse == "q")
-        {
-            return cCONTROL_RETURN_SUCCESS_EXIT;
-        }
     }
-
-    CMotivicAdemPolynomial user_input_cmap = CMotivicAdemPolynomial_FromString(parsing_info);
-    if (parsing_info.mErrorInfo.mIsError)
-    {
-        std::cerr << parsing_info.GetFullErrorString() << std::endl;
-        return cCONTROL_RETURN_FAIL;
-    }
-    CMotivicAdemPolynomial cmap_return = c_motivic_adem_math::admissify_c_motivic_adem_polynomial(user_input_cmap);
-    std::cout << CMotivicAdemPolynomial_ToString(cmap_return) << std::endl;
     return cCONTROL_RETURN_SUCCESS;
 }
 
