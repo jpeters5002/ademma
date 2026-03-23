@@ -39,10 +39,6 @@ add_executable(${PROJECT_NAME} ${TUI_SOURCES} ${CORE_SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC
 	core_include
 )
-add_executable(manual_test_aci tui_src/test_aci.cpp ${CORE_SOURCES})
-target_include_directories(manual_test_aci PUBLIC
-	core_include
-)
 
 option(BUILD_TESTING "Build the project's tests" OFF)
 
