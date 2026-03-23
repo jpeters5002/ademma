@@ -613,7 +613,7 @@ void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalcul
         }
         // l_paren_pos and r_paren_pos correct now and not npos
         prev_char = prev_non_whitespace_char_in_string(aParsingInfo.mStringToParse, l_paren_pos, &l_cut_to_pos);
-        if (l_cut_to_pos < aParsingInfo.mCurrentIndex)
+        if (prev_char != '\0' && l_cut_to_pos < aParsingInfo.mCurrentIndex)
         {
             prev_char = '\0';
         }
