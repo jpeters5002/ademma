@@ -6,6 +6,13 @@
 #include "setting.hpp"
 #include "parsing_info.hpp"
 
+#include "classical_adem_monomial.hpp"
+#include "classical_adem_polynomial.hpp"
+#include "c_motivic_adem_monomial.hpp"
+#include "c_motivic_adem_polynomial.hpp"
+#include "r_motivic_adem_monomial.hpp"
+#include "r_motivic_adem_polynomial.hpp"
+
 // thank you c++ for butchering unions
 
 namespace ademma_core
@@ -20,11 +27,22 @@ enum class ACITerm_Type
 
     cNONE,
 };
+struct ArbitraryCalculationInput;
+union ACITermData
+{
+    ArbitraryCalculationInput* mSubACI;
+    ClassicalAdemPolynomial* mClassicalAdemPolynomial;
+    CMotivicAdemPolynomial* mCMotivicAdemPolynomial;
+    RMotivicAdemPolynomial* mRMotivicAdemPolynomial;
+    ClassicalAdemMonomial* mClassicalAdemMonomial;
+    CMotivicAdemMonomial* mCMotivicAdemMonomial;
+    RMotivicAdemMonomial* mRMotivicAdemMonomial;
+};
 struct ACITerm
 {
     ACITerm_Type mType;
     Setting_Type mSetting;
-    void* mData;
+    ACITermData mData;
 };
 ACITerm ACITerm_Construct(ACITerm_Type aType, Setting_Type aSetting);
 void ACITerm_Destruct(ACITerm& aSelf);

@@ -28,22 +28,21 @@ ademma_core::ACITerm ademma_core::ACITerm_Construct(ACITerm_Type aType, Setting_
     {
         case ACITerm_Type::cADD:
         case ACITerm_Type::cMULTIPLY:
-            aci_termOut.mData = nullptr;
             break;
         case ACITerm_Type::cSUBACI:
-            aci_termOut.mData = reinterpret_cast<void*>(new ArbitraryCalculationInput());
+            aci_termOut.mData.mSubACI = new ArbitraryCalculationInput();
             break;
         case ACITerm_Type::cPOLYNOMIAL:
             switch (aci_termOut.mSetting)
             {
                 case Setting_Type::cCLASSICAL:
-                    aci_termOut.mData = reinterpret_cast<void*>(new ClassicalAdemPolynomial());
+                    aci_termOut.mData.mClassicalAdemPolynomial = new ClassicalAdemPolynomial();
                     break;
                 case Setting_Type::cC_MOTIVIC:
-                    aci_termOut.mData = reinterpret_cast<void*>(new CMotivicAdemPolynomial());
+                    aci_termOut.mData.mCMotivicAdemPolynomial = new CMotivicAdemPolynomial();
                     break;
                 case Setting_Type::cR_MOTIVIC:
-                    aci_termOut.mData = reinterpret_cast<void*>(new RMotivicAdemPolynomial());
+                    aci_termOut.mData.mRMotivicAdemPolynomial = new RMotivicAdemPolynomial();
                     break;
             }
             break;
@@ -51,13 +50,13 @@ ademma_core::ACITerm ademma_core::ACITerm_Construct(ACITerm_Type aType, Setting_
             switch (aci_termOut.mSetting)
             {
                 case Setting_Type::cCLASSICAL:
-                    aci_termOut.mData = reinterpret_cast<void*>(new ClassicalAdemMonomial());
+                    aci_termOut.mData.mClassicalAdemMonomial = new ClassicalAdemMonomial();
                     break;
                 case Setting_Type::cC_MOTIVIC:
-                    aci_termOut.mData = reinterpret_cast<void*>(new CMotivicAdemMonomial());
+                    aci_termOut.mData.mCMotivicAdemMonomial = new CMotivicAdemMonomial();
                     break;
                 case Setting_Type::cR_MOTIVIC:
-                    aci_termOut.mData = reinterpret_cast<void*>(new RMotivicAdemMonomial());
+                    aci_termOut.mData.mRMotivicAdemMonomial = new RMotivicAdemMonomial();
                     break;
             }
             break;
@@ -75,20 +74,20 @@ void ademma_core::ACITerm_Destruct(ACITerm& aSelf)
         case ACITerm_Type::cMULTIPLY:
             break;
         case ACITerm_Type::cSUBACI:
-            ArbitraryCalculationInput_Destruct(*reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData));
-            delete reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData);
+            ArbitraryCalculationInput_Destruct(*aSelf.mData.mSubACI);
+            delete aSelf.mData.mSubACI;
             break;
         case ACITerm_Type::cPOLYNOMIAL:
             switch (aSelf.mSetting)
             {
                 case Setting_Type::cCLASSICAL:
-                    delete reinterpret_cast<ClassicalAdemPolynomial*>(aSelf.mData);
+                    delete aSelf.mData.mClassicalAdemPolynomial;
                     break;
                 case Setting_Type::cC_MOTIVIC:
-                    delete reinterpret_cast<CMotivicAdemPolynomial*>(aSelf.mData);
+                    delete aSelf.mData.mCMotivicAdemPolynomial;
                     break;
                 case Setting_Type::cR_MOTIVIC:
-                    delete reinterpret_cast<RMotivicAdemPolynomial*>(aSelf.mData);
+                    delete aSelf.mData.mRMotivicAdemPolynomial;
                     break;
             }
             break;
@@ -96,13 +95,13 @@ void ademma_core::ACITerm_Destruct(ACITerm& aSelf)
             switch (aSelf.mSetting)
             {
                 case Setting_Type::cCLASSICAL:
-                    delete reinterpret_cast<ClassicalAdemMonomial*>(aSelf.mData);
+                    delete aSelf.mData.mClassicalAdemMonomial;
                     break;
                 case Setting_Type::cC_MOTIVIC:
-                    delete reinterpret_cast<CMotivicAdemMonomial*>(aSelf.mData);
+                    delete aSelf.mData.mCMotivicAdemMonomial;
                     break;
                 case Setting_Type::cR_MOTIVIC:
-                    delete reinterpret_cast<RMotivicAdemMonomial*>(aSelf.mData);
+                    delete aSelf.mData.mRMotivicAdemMonomial;
                     break;
             }
             break;
@@ -183,10 +182,10 @@ std::string ademma_core::ArbitraryCalculationInput_ToString(const ArbitraryCalcu
                 switch (aci_term_ptr->mType) \
                 { \
                     case ACITerm_Type::cMONOMIAL: \
-                        poly##setting_ucc.push_back(*reinterpret_cast<setting_ucc##AdemMonomial*>(aci_term_ptr->mData)); \
+                        poly##setting_ucc.push_back(*aci_term_ptr->mData.m##setting_ucc##AdemMonomial); \
                         break; \
                     case ACITerm_Type::cPOLYNOMIAL: \
-                        setting_ucc##AdemPolynomial_AddRightPolynomial(poly##setting_ucc, *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_term_ptr->mData)); \
+                        setting_ucc##AdemPolynomial_AddRightPolynomial(poly##setting_ucc, *aci_term_ptr->mData.m##setting_ucc##AdemPolynomial); \
                         break; \
                     default: \
                         assert(!"unreachable"); \
@@ -200,7 +199,7 @@ std::string ademma_core::ArbitraryCalculationInput_ToString(const ArbitraryCalcu
         ArbitraryCalculationInput_Destruct(aACI); \
         aci.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aci.mSetting)); \
         aci_term_ptr = &aci.mTerms[0]; \
-        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_term_ptr->mData) = poly##setting_ucc; \
+        *aci_term_ptr->mData.m##setting_ucc##AdemPolynomial = poly##setting_ucc; \
     } do {} while (0)
 
 void ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly_Recursive(ArbitraryCalculationInput& aACI)
@@ -211,7 +210,7 @@ void ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly_Recursive(A
         if (aACI.mTerms[i].mType == ACITerm_Type::cSUBACI)
         {
             contains_subaci = true;
-            ArbitraryCalculationInput_CoagulateInnermostToPoly_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aACI.mTerms[i].mData));
+            ArbitraryCalculationInput_CoagulateInnermostToPoly_Recursive(*aACI.mTerms[i].mData.mSubACI);
         }
     }
     ACITerm* aci_term_ptr;
@@ -267,7 +266,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
                 assert(i < aACI.mTerms.size() - 1);
                 break;
             case ACITerm_Type::cSUBACI:
-                powered_subaci_ptr = reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData);
+                powered_subaci_ptr = aci_term_ptr->mData.mSubACI;
                 assert(powered_subaci_ptr->mPower > 0);
                 if (ArbitraryCalculationInput_IsOnlyPolynomial(*powered_subaci_ptr) && powered_subaci_ptr->mPower > 1)
                 {
@@ -278,20 +277,20 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
                         aACI.mTerms.insert(aACI.mTerms.begin() + i, ACITerm_Construct(ACITerm_Type::cMULTIPLY, aACI.mSetting));
                         i++;
                         aACI.mTerms.insert(aACI.mTerms.begin() + i, ACITerm_Construct(ACITerm_Type::cSUBACI, aACI.mSetting));
-                        subaci_ptr = reinterpret_cast<ArbitraryCalculationInput*>(aACI.mTerms[i].mData);
+                        subaci_ptr = aACI.mTerms[i].mData.mSubACI;
                         subaci_ptr->mSetting = aACI.mSetting;
                         subaci_ptr->mPower = 1;
                         subaci_ptr->mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aACI.mSetting));
                         switch (aACI.mSetting)
                         {
                             case Setting_Type::cCLASSICAL:
-                                *reinterpret_cast<ClassicalAdemPolynomial*>(subaci_ptr->mTerms[0].mData) = *reinterpret_cast<ClassicalAdemPolynomial*>(powered_subaci_ptr->mTerms[0].mData);
+                                *subaci_ptr->mTerms[0].mData.mClassicalAdemPolynomial = *powered_subaci_ptr->mTerms[0].mData.mClassicalAdemPolynomial;
                                 break;
                             case Setting_Type::cC_MOTIVIC:
-                                *reinterpret_cast<CMotivicAdemPolynomial*>(subaci_ptr->mTerms[0].mData) = *reinterpret_cast<CMotivicAdemPolynomial*>(powered_subaci_ptr->mTerms[0].mData);
+                                *subaci_ptr->mTerms[0].mData.mCMotivicAdemPolynomial = *powered_subaci_ptr->mTerms[0].mData.mCMotivicAdemPolynomial;
                                 break;
                             case Setting_Type::cR_MOTIVIC:
-                                *reinterpret_cast<RMotivicAdemPolynomial*>(subaci_ptr->mTerms[0].mData) = *reinterpret_cast<RMotivicAdemPolynomial*>(powered_subaci_ptr->mTerms[0].mData);
+                                *subaci_ptr->mTerms[0].mData.mRMotivicAdemPolynomial = *powered_subaci_ptr->mTerms[0].mData.mRMotivicAdemPolynomial;
                                 break;
                         }
                         powered_subaci_ptr->mPower--;
@@ -317,9 +316,9 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
     { \
         if (aci_term_ptr->mType == ACITerm_Type::cMONOMIAL) \
         {} \
-        else if (aci_term_ptr->mType == ACITerm_Type::cSUBACI && ArbitraryCalculationInput_IsOnlyPower1Polynomial(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData))) \
+        else if (aci_term_ptr->mType == ACITerm_Type::cSUBACI && ArbitraryCalculationInput_IsOnlyPower1Polynomial(*aci_term_ptr->mData.mSubACI)) \
         { \
-            aci_term_ptr = &reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData)->mTerms[0]; \
+            aci_term_ptr = &aci_term_ptr->mData.mSubACI->mTerms[0]; \
         } \
         else \
         { \
@@ -331,25 +330,25 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
     if (aci_left_ptr->mType == ACITerm_Type::cPOLYNOMIAL && aci_right_ptr->mType == ACITerm_Type::cPOLYNOMIAL) \
     { \
         /* poly multiply */ \
-        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_product_ptr->mData) = setting_ucc##AdemPolynomial_MultiplyPolynomial(*reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_left_ptr->mData), *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_right_ptr->mData)); \
+        *aci_product_ptr->mData.m##setting_ucc##AdemPolynomial = setting_ucc##AdemPolynomial_MultiplyPolynomial(*aci_left_ptr->mData.m##setting_ucc##AdemPolynomial, *aci_right_ptr->mData.m##setting_ucc##AdemPolynomial); \
     } \
     else if (aci_left_ptr->mType == ACITerm_Type::cMONOMIAL && aci_right_ptr->mType == ACITerm_Type::cPOLYNOMIAL) \
     { \
         /* multiply left monomial then copy */ \
-        setting_ucc##AdemPolynomial_MultiplyLeftMonomial(*reinterpret_cast<setting_ucc##AdemMonomial*>(aci_left_ptr->mData), *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_right_ptr->mData)); \
-        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_product_ptr->mData) = *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_right_ptr->mData); \
+        setting_ucc##AdemPolynomial_MultiplyLeftMonomial(*aci_left_ptr->mData.m##setting_ucc##AdemMonomial, *aci_right_ptr->mData.m##setting_ucc##AdemPolynomial); \
+        *aci_product_ptr->mData.m##setting_ucc##AdemPolynomial = *aci_right_ptr->mData.m##setting_ucc##AdemPolynomial; \
     } \
     else if (aci_left_ptr->mType == ACITerm_Type::cPOLYNOMIAL && aci_right_ptr->mType == ACITerm_Type::cMONOMIAL) \
     { \
         /* multiply right monomial then copy */ \
-        setting_ucc##AdemPolynomial_MultiplyRightMonomial(*reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_left_ptr->mData), *reinterpret_cast<setting_ucc##AdemMonomial*>(aci_right_ptr->mData)); \
-        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_product_ptr->mData) = *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_left_ptr->mData); \
+        setting_ucc##AdemPolynomial_MultiplyRightMonomial(*aci_left_ptr->mData.m##setting_ucc##AdemPolynomial, *aci_right_ptr->mData.m##setting_ucc##AdemMonomial); \
+        *aci_product_ptr->mData.m##setting_ucc##AdemPolynomial = *aci_left_ptr->mData.m##setting_ucc##AdemPolynomial; \
     } \
     else \
     { \
         assert(aci_left_ptr->mType == ACITerm_Type::cMONOMIAL && aci_right_ptr->mType == ACITerm_Type::cMONOMIAL); \
         /* multiply monomial terms, form poly with one term, then copy all in one step */ \
-        *reinterpret_cast<setting_ucc##AdemPolynomial*>(aci_product_ptr->mData) = { setting_ucc##AdemMonomial_Multiply(*reinterpret_cast<setting_ucc##AdemMonomial*>(aci_left_ptr->mData), *reinterpret_cast<setting_ucc##AdemMonomial*>(aci_right_ptr->mData)) }; \
+        *aci_product_ptr->mData.m##setting_ucc##AdemPolynomial = { setting_ucc##AdemMonomial_Multiply(*aci_left_ptr->mData.m##setting_ucc##AdemMonomial, *aci_right_ptr->mData.m##setting_ucc##AdemMonomial) }; \
     } do {} while(0)
 
 void ademma_core::ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalculationInput& aACI)
@@ -397,9 +396,9 @@ void ademma_core::ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalcul
                 i--;
                 break;
             case ACITerm_Type::cSUBACI:
-                if (!ArbitraryCalculationInput_IsOnlyPower1Polynomial(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData)))
+                if (!ArbitraryCalculationInput_IsOnlyPower1Polynomial(*aci_term_ptr->mData.mSubACI))
                 {
-                    ArbitraryCalculationInput_ExpandFoil_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData));
+                    ArbitraryCalculationInput_ExpandFoil_Recursive(*aci_term_ptr->mData.mSubACI);
                 }
                 break;
             case ACITerm_Type::cPOLYNOMIAL:
@@ -425,17 +424,18 @@ void ademma_core::ArbitraryCalculationInput_UnsubPower1Poly_Recursive(ArbitraryC
             case ACITerm_Type::cMULTIPLY:
                 break;
             case ACITerm_Type::cSUBACI:
-                if (ArbitraryCalculationInput_IsOnlyPower1Polynomial(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData)))
+                if (ArbitraryCalculationInput_IsOnlyPower1Polynomial(*aci_term_ptr->mData.mSubACI))
                 {
-                    subaci_poly_term_data_ptr = reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData)->mTerms[0].mData;
-                    reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData)->mTerms.clear();
+                    // works regardless of setting due to just moving pointers around so use Classical
+                    subaci_poly_term_data_ptr = aci_term_ptr->mData.mSubACI->mTerms[0].mData.mClassicalAdemPolynomial;
+                    aci_term_ptr->mData.mSubACI->mTerms.clear();
                     ACITerm_Destruct(*aci_term_ptr);
                     aACI.mTerms[i].mType = ACITerm_Type::cPOLYNOMIAL;
-                    aACI.mTerms[i].mData = subaci_poly_term_data_ptr;
+                    aACI.mTerms[i].mData.mClassicalAdemPolynomial = reinterpret_cast<ClassicalAdemPolynomial*>(subaci_poly_term_data_ptr);
                 }
                 else
                 {
-                    ArbitraryCalculationInput_UnsubPower1Poly_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData));
+                    ArbitraryCalculationInput_UnsubPower1Poly_Recursive(*aci_term_ptr->mData.mSubACI);
                 }
                 break;
             case ACITerm_Type::cPOLYNOMIAL:
@@ -460,15 +460,15 @@ void ademma_core::ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(void*
             switch (aACI.mSetting)
             {
                 case Setting_Type::cCLASSICAL:
-                    *reinterpret_cast<ClassicalAdemPolynomial*>(aPolynomialOut) = *reinterpret_cast<ClassicalAdemPolynomial*>(aACI.mTerms[0].mData);
+                    *reinterpret_cast<ClassicalAdemPolynomial*>(aPolynomialOut) = *aACI.mTerms[0].mData.mClassicalAdemPolynomial;
                     DEBUG_PRINT("ACI_ExpandToPolynomial done: " + ClassicalAdemPolynomial_ToString(*reinterpret_cast<ClassicalAdemPolynomial*>(aPolynomialOut)));
                     break;
                 case Setting_Type::cC_MOTIVIC:
-                    *reinterpret_cast<CMotivicAdemPolynomial*>(aPolynomialOut) = *reinterpret_cast<CMotivicAdemPolynomial*>(aACI.mTerms[0].mData);
+                    *reinterpret_cast<CMotivicAdemPolynomial*>(aPolynomialOut) = *aACI.mTerms[0].mData.mCMotivicAdemPolynomial;
                     DEBUG_PRINT("ACI_ExpandToPolynomial done: " + CMotivicAdemPolynomial_ToString(*reinterpret_cast<CMotivicAdemPolynomial*>(aPolynomialOut)));
                     break;
                 case Setting_Type::cR_MOTIVIC:
-                    *reinterpret_cast<RMotivicAdemPolynomial*>(aPolynomialOut) = *reinterpret_cast<RMotivicAdemPolynomial*>(aACI.mTerms[0].mData);
+                    *reinterpret_cast<RMotivicAdemPolynomial*>(aPolynomialOut) = *aACI.mTerms[0].mData.mRMotivicAdemPolynomial;
                     DEBUG_PRINT("ACI_ExpandToPolynomial done: " + RMotivicAdemPolynomial_ToString(*reinterpret_cast<RMotivicAdemPolynomial*>(aPolynomialOut)));
                     break;
             }
@@ -499,7 +499,7 @@ std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf)
             strOut = " * ";
             break;
         case ACITerm_Type::cSUBACI:
-            power = reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData)->mPower;
+            power = aSelf.mData.mSubACI->mPower;
 #if DEBUG_OUTPUT
             strOut += " SUB<";
 #endif
@@ -507,7 +507,7 @@ std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf)
             {
                 strOut += "(";
             }
-            strOut += ArbitraryCalculationInput_ToString_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aSelf.mData));
+            strOut += ArbitraryCalculationInput_ToString_Recursive(*aSelf.mData.mSubACI);
             if (power != 1)
             {
                 strOut += ")";
@@ -527,13 +527,13 @@ std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf)
             switch (aSelf.mSetting)
             {
                 case Setting_Type::cCLASSICAL:
-                    strOut += ClassicalAdemPolynomial_ToString(*reinterpret_cast<ClassicalAdemPolynomial*>(aSelf.mData));
+                    strOut += ClassicalAdemPolynomial_ToString(*aSelf.mData.mClassicalAdemPolynomial);
                     break;
                 case Setting_Type::cC_MOTIVIC:
-                    strOut += CMotivicAdemPolynomial_ToString(*reinterpret_cast<CMotivicAdemPolynomial*>(aSelf.mData));
+                    strOut += CMotivicAdemPolynomial_ToString(*aSelf.mData.mCMotivicAdemPolynomial);
                     break;
                 case Setting_Type::cR_MOTIVIC:
-                    strOut += RMotivicAdemPolynomial_ToString(*reinterpret_cast<RMotivicAdemPolynomial*>(aSelf.mData));
+                    strOut += RMotivicAdemPolynomial_ToString(*aSelf.mData.mRMotivicAdemPolynomial);
                     break;
             }
 #if DEBUG_OUTPUT
@@ -547,13 +547,13 @@ std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf)
             switch (aSelf.mSetting)
             {
                 case Setting_Type::cCLASSICAL:
-                    strOut += ClassicalAdemMonomial_ToString(*reinterpret_cast<ClassicalAdemMonomial*>(aSelf.mData));
+                    strOut += ClassicalAdemMonomial_ToString(*aSelf.mData.mClassicalAdemMonomial);
                     break;
                 case Setting_Type::cC_MOTIVIC:
-                    strOut += CMotivicAdemMonomial_ToString(*reinterpret_cast<CMotivicAdemMonomial*>(aSelf.mData));
+                    strOut += CMotivicAdemMonomial_ToString(*aSelf.mData.mCMotivicAdemMonomial);
                     break;
                 case Setting_Type::cR_MOTIVIC:
-                    strOut += RMotivicAdemMonomial_ToString(*reinterpret_cast<RMotivicAdemMonomial*>(aSelf.mData));
+                    strOut += RMotivicAdemMonomial_ToString(*aSelf.mData.mRMotivicAdemMonomial);
                     break;
             }
 #if DEBUG_OUTPUT
@@ -692,7 +692,7 @@ void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalcul
         aACIOut.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cSUBACI, aSetting));
         aci_term_ptr = &aACIOut.mTerms[aACIOut.mTerms.size() - 1];
         assert(aci_term_ptr->mType == ACITerm_Type::cSUBACI);
-        ArbitraryCalculationInput_FromString_Recursive(*reinterpret_cast<ArbitraryCalculationInput*>(aci_term_ptr->mData), sub_parsing_info, aSetting, power);
+        ArbitraryCalculationInput_FromString_Recursive(*aci_term_ptr->mData.mSubACI, sub_parsing_info, aSetting, power);
         if (sub_parsing_info.mErrorInfo.mIsError)
         {
             goto subparseinfo_error_exit;
@@ -803,7 +803,7 @@ char next_non_whitespace_char_in_string(const std::string& aStr, size_t aLowInde
         aci_term_ptr = &aACI.mTerms[aACI.mTerms.size() - 1]; \
         mono##setting_ucc = new setting_ucc##AdemMonomial(); \
         *mono##setting_ucc = (*poly##setting_ucc)[i]; \
-        aci_term_ptr->mData = reinterpret_cast<void*>(mono##setting_ucc); \
+        aci_term_ptr->mData.m##setting_ucc##AdemMonomial = mono##setting_ucc; \
         if (i < poly##setting_ucc->size() - 1) \
         { \
             aACI.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cADD, aSetting)); \
