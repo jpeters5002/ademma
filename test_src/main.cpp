@@ -7,6 +7,8 @@
 #include "test_sq2nminus1_sqn.hpp"
 #include "test_sq2tothen_tothe2nplus2.hpp"
 
+#include "debug_output.hpp"
+
 #define SIZEOF_LUT(lut) (sizeof(lut) / sizeof(lut[0]))
 
 struct test_function_t
@@ -47,7 +49,12 @@ int main()
     }
     else
     {
+#if DEBUG_OUTPUT
+        std::cout << std::endl << "TESTS FAILED (DEBUG_OUTPUT is activated)" << std::endl;
+        out_val = 1;
+#else
         std::cout << std::endl << "TESTS PASSED" << std::endl;
+#endif
     }
     return out_val;
 }
