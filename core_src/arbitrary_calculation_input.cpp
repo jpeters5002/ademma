@@ -196,7 +196,7 @@ std::string ademma_core::ArbitraryCalculationInput_ToString(const ArbitraryCalcu
                 assert(aci.mTerms[i].mType == ACITerm_Type::cADD); \
             } \
         } \
-        ArbitraryCalculationInput_Destruct(aACI); \
+        ArbitraryCalculationInput_Destruct(aci); \
         aci.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aci.mSetting)); \
         aci_term_ptr = &aci.mTerms[0]; \
         *aci_term_ptr->mData.m##setting_ucc##AdemPolynomial = poly##setting_ucc; \
@@ -801,9 +801,7 @@ char next_non_whitespace_char_in_string(const std::string& aStr, size_t aLowInde
     { \
         aACI.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cMONOMIAL, aSetting)); \
         aci_term_ptr = &aACI.mTerms[aACI.mTerms.size() - 1]; \
-        mono##setting_ucc = new setting_ucc##AdemMonomial(); \
-        *mono##setting_ucc = (*poly##setting_ucc)[i]; \
-        aci_term_ptr->mData.m##setting_ucc##AdemMonomial = mono##setting_ucc; \
+        *aci_term_ptr->mData.m##setting_ucc##AdemMonomial = (*poly##setting_ucc)[i]; \
         if (i < poly##setting_ucc->size() - 1) \
         { \
             aACI.mTerms.push_back(ACITerm_Construct(ACITerm_Type::cADD, aSetting)); \
@@ -813,11 +811,8 @@ char next_non_whitespace_char_in_string(const std::string& aStr, size_t aLowInde
 void ademma_core::ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(ArbitraryCalculationInput& aACI, void* aPoly, Setting_Type aSetting)
 {
     ClassicalAdemPolynomial* polyClassical;
-    ClassicalAdemMonomial* monoClassical;
     CMotivicAdemPolynomial* polyCMotivic;
-    CMotivicAdemMonomial* monoCMotivic;
     RMotivicAdemPolynomial* polyRMotivic;
-    RMotivicAdemMonomial* monoRMotivic;
     ACITerm* aci_term_ptr;
     switch (aSetting)
     {

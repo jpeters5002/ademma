@@ -7,26 +7,36 @@
 
 int main(int argc, char** argv)
 {
+    using namespace ademma_core;
     if (argc != 3)
     {
         std::cout << "bad number of arguments (2 expected)" << std::endl;
         return 1;
     }
-    ademma_core::ParsingInfo input;
+    ParsingInfo input;
     std::string setting = argv[1];
     input.mStringToParse = argv[2];
-    ademma_core::ArbitraryCalculationInput aci;
+    ArbitraryCalculationInput aci;
     if (setting == "cl")
     {
-        aci = ademma_core::ArbitraryCalculationInput_FromString(input, ademma_core::Setting_Type::cCLASSICAL);
+        aci = ArbitraryCalculationInput_FromString(input, Setting_Type::cCLASSICAL);
+        CMotivicAdemPolynomial cap {};
+        ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(&cap, aci);
+        std::cout << ClassicalAdemPolynomial_ToString(cap) << std::endl;
     }
     else if (setting == "cm")
     {
-        aci = ademma_core::ArbitraryCalculationInput_FromString(input, ademma_core::Setting_Type::cC_MOTIVIC);
+        aci = ArbitraryCalculationInput_FromString(input, Setting_Type::cC_MOTIVIC);
+        CMotivicAdemPolynomial cmap {};
+        ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(&cmap, aci);
+        std::cout << CMotivicAdemPolynomial_ToString(cmap) << std::endl;
     }
     else if (setting == "rm")
     {
-        aci = ademma_core::ArbitraryCalculationInput_FromString(input, ademma_core::Setting_Type::cR_MOTIVIC);
+        aci = ArbitraryCalculationInput_FromString(input, Setting_Type::cR_MOTIVIC);
+        RMotivicAdemPolynomial rmap {};
+        ArbitraryCalculationInput_ExpandToPolynomial_AndDestruct(&rmap, aci);
+        std::cout << RMotivicAdemPolynomial_ToString(rmap) << std::endl;
     }
     else
     {
@@ -38,11 +48,6 @@ int main(int argc, char** argv)
         std::cout << input.GetFullErrorString() << std::endl;
         return 1;
     }
-    //std::cout << "parsed correctly (perhaps)" << std::endl;
-    //ademma_core::ACITerm aci_term_poly = ademma_core::ArbitraryCalculationInput_ExpandToPolynomial(aci);
-    //std::cout << ademma_core::ACITerm_ToString(aci_term_poly) << std::endl;
-    //ademma_core::ACITerm_Destruct(aci_term_poly);
-    //ademma_core::ArbitraryCalculationInput_Destruct(aci);
     return 0;
 }
 

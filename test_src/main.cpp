@@ -26,7 +26,7 @@ static test_function_t test_functions[] = {
     TEST_FUNCTION(test_sq2tothen_tothe2nplus2),
 };
 
-int main(int argc, char** argv)
+int main()
 {
     int out_val = 0;
     for (size_t i = 0; i < SIZEOF_LUT(test_functions); i++)
