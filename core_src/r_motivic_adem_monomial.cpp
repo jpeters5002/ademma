@@ -211,11 +211,25 @@ std::string ademma_core::RMotivicAdemMonomial_ToString(const RMotivicAdemMonomia
 ademma_core::RMotivicAdemMonomial ademma_core::RMotivicAdemMonomial_FromString(ParsingInfo& aParsingInfo)
 {
     RMotivicAdemMonomial rmamOut {};
+    bool first = true;
+    bool most_recent_multiply = false;
     for (;;)
     {
         aParsingInfo.IncreaseIndexOverWhitespace();
+        if (!first && aParsingInfo.MatchString_IncreaseIndexOnSuccess("*"))
+        {
+            aParsingInfo.IncreaseIndexOverWhitespace();
+            most_recent_multiply = true;
+        }
         if (aParsingInfo.mCurrentIndex >= aParsingInfo.mStringToParse.size())
         {
+            if (most_recent_multiply)
+            {
+                aParsingInfo.mErrorInfo.mIsError = true;
+                aParsingInfo.mErrorInfo.mErrorString = "No factor given after '*'";
+                aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
+                return {};
+            }
             break;
         }
         SteenrodSquareDegree rmamf = RMotivicAdemMonomialFactor_FromString(aParsingInfo);
@@ -224,6 +238,8 @@ ademma_core::RMotivicAdemMonomial ademma_core::RMotivicAdemMonomial_FromString(P
             return {};
         }
         rmamOut.push_back(rmamf);
+        most_recent_multiply = false;
+        first = false;
     }
     return rmamOut;
 }
