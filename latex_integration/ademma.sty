@@ -19,7 +19,7 @@
     }
     {
         {\immediate\write18{mkdir -p #6}}
-        {\immediate\write18{ademma --only-cli --setting #2 #1 > #3 2> #4 \detokenize{||} touch #5}}
+        {\immediate\write18{ademma --only-cli --setting #2 "#1" > #3 2> #4 \detokenize{||} touch #5}}
         \IfFileExists{#5}
         {
             {\immediate\write18{rm -f #5}}
