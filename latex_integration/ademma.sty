@@ -4,7 +4,7 @@
 
 \makeatletter
 \newcommand{\replacebackslashwithB}[2]{{\escapechar=`B 
-  \xdef#2{\expandafter\zap@space\detokenize\expandafter{#1} \@empty}}}
+  \xdef#2{\expandafter\detokenize\expandafter{#1} \@empty}}}
 \makeatother
 
 %main implementation macros
@@ -52,11 +52,13 @@
 % calculation-input-backslash-sanitized, setting
 \newcommand{\ademmaimplproxyproxy}[2]
 {
-    \StrDel{#1}{ }[\ademmafilenametempA]%rm spaces
+    \StrSubstitute{#1}{+}{OplusO}[\ademmasanitizedinputtempA]%'+' -> 'OplusO'
+    \StrSubstitute{\ademmasanitizedinputtempA}{*}{OasteriskO}[\ademmasanitizedinputtempB]%'+' -> 'OplusO'
+    \StrDel{\ademmasanitizedinputtempB}{ }[\ademmafilenametempA]%rm spaces
     \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]%rm newlines
     \StrDel{\ademmafilenametempB}{\{}[\ademmafilenametempC]%rm left curly brackets
     \StrDel{\ademmafilenametempC}{\}}[\ademmafilenametempD]%rm right curly brackets
-    \ademmaimplproxy{#1}{#2}{\ademmafilenametempD.tex}
+    \ademmaimplproxy{\ademmasanitizedinputtempB}{#2}{\ademmafilenametempD.tex}
 }
 
 %user-friendly macros
