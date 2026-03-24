@@ -3,7 +3,7 @@
 %helper macros
 
 \makeatletter
-\newcommand{\replacebackslashwithZ}[2]{{\escapechar=`Z 
+\newcommand{\replacebackslashwithB}[2]{{\escapechar=`B
   \xdef#2{\expandafter\detokenize\expandafter{#1} \@empty}}}
 \makeatother
 
@@ -49,19 +49,21 @@
     \ademmaimpl{#1}{#2}{\ademmafullpathcachefile}{\ademmafullpatherroutfile}{\ademmafullpatherrindicatorfile}{\ademmadir}
 }
 
-% calculation-input-backslash-Z-caret-handled, setting
+% calculation-input, setting
 \newcommand{\ademmaimplproxyproxy}[2]
 {
-    \StrSubstitute{#1}{Z}{ObslashO}[\ademmasanitizedinputtempA]%                          'Z' -> 'ObslashO' (by now '\' -> 'Z' has occurred)
-    \StrSubstitute{\ademmasanitizedinputtempA}{+}{OplusO}[\ademmasanitizedinputtempB]%    '+' -> 'OplusO'
-    \StrSubstitute{\ademmasanitizedinputtempB}{*}{OasteriskO}[\ademmasanitizedinputtempC]%'*' -> 'OasteriskO'
-    \StrSubstitute{\ademmasanitizedinputtempC}{(}{OlparenO}[\ademmasanitizedinputtempD]%  '(' -> 'OlparenO'
-    \StrSubstitute{\ademmasanitizedinputtempD}{)}{OrparenO}[\ademmasanitizedinputtempE]%  ')' -> 'OrparenO'
-    \StrDel{\ademmasanitizedinputtempE}{ }[\ademmafilenametempA]%rm spaces
-    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]%rm newlines
-    \StrDel{\ademmafilenametempB}{\{}[\ademmafilenametempC]%rm left curly brackets
-    \StrDel{\ademmafilenametempC}{\}}[\ademmafilenametempD]%rm right curly brackets
-    \ademmaimplproxy{\ademmasanitizedinputtempE}{#2}{\ademmafilenametempD.tex}
+    \replacebackslashwithB{#1}{\ademmasanitizedinputtempA}%                                   '\' -> 'B'
+    \StrSubstitute{\ademmasanitizedinputtempA}{B}{ObslashO}[\ademmasanitizedinputtempB]%      'B' -> 'ObslashO' - somehow this one doesn't work and idk why
+    \StrSubstitute{\ademmasanitizedinputtempB}{+}{OplusO}[\ademmasanitizedinputtempC]%        '+' -> 'OplusO'
+    \StrSubstitute{\ademmasanitizedinputtempC}{*}{OasteriskO}[\ademmasanitizedinputtempD]%    '*' -> 'OasteriskO'
+    \StrSubstitute{\ademmasanitizedinputtempD}{(}{OlparenO}[\ademmasanitizedinputtempE]%      '(' -> 'OlparenO'
+    \StrSubstitute{\ademmasanitizedinputtempE}{)}{OrparenO}[\ademmasanitizedinputtempF]%      ')' -> 'OrparenO'
+    \StrSubstitute{\ademmasanitizedinputtempF}{\string^}{OcaretO}[\ademmasanitizedinputtempG]%'^' -> 'OcaretO'
+    \StrDel{\ademmasanitizedinputtempG}{ }[\ademmafilenametempA]%rm spaces
+    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]%   rm newlines
+    \StrDel{\ademmafilenametempB}{\{}[\ademmafilenametempC]%     rm left curly brackets
+    \StrDel{\ademmafilenametempC}{\}}[\ademmafilenametempD]%     rm right curly brackets
+    \ademmaimplproxy{\ademmasanitizedinputtempG}{#2}{\ademmafilenametempD.#2.tex}
 }
 
 %user-friendly macros
@@ -74,9 +76,7 @@
     {
         #2 =
     }{}
-    \replacebackslashwithZ{#2}{\ademmasanitizedinputtempA}
-    \StrSubstitute{\ademmasanitizedinputtempA}{\string^}{OcaretO}[\ademmasanitizedinputtempB]%'^' -> 'OcaretO'
-    \ademmaimplproxyproxy{\ademmasanitizedinputtempB}{cl}
+    \ademmaimplproxyproxy{#2}{cl}
 }
 
 % #1                                                       , #2
@@ -87,8 +87,7 @@
     {
         #2 =
     }{}
-    \replacebackslashwithZ{#2}{\ademmasanitizedbackslashtemp}
-    \ademmaimplproxyproxy{\ademmasanitizedbackslashtemp}{rm}
+    \ademmaimplproxyproxy{#2}{rm}
 }
 
 % #1                                                       , #2
@@ -99,7 +98,6 @@
     {
         #2 =
     }{}
-    \replacebackslashwithZ{#2}{\ademmasanitizedbackslashtemp}
-    \ademmaimplproxyproxy{\ademmasanitizedbackslashtemp}{cm}
+    \ademmaimplproxyproxy{#2}{cm}
 }
 

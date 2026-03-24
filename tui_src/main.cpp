@@ -506,7 +506,7 @@ void str_find_replace(std::string& aString, const std::string& aFindStr, const s
 
 void desanitize_cli_calculation_input(std::string& aString)
 {
-    str_find_replace(aString, "ObslashO", "\\");
+    str_find_replace(aString, "B", "\\");
     str_find_replace(aString, "OcaretO", "^");
     str_find_replace(aString, "OlparenO", "(");
     str_find_replace(aString, "OrparenO", ")");
