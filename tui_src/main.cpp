@@ -78,6 +78,8 @@ control_return_e argv_handle(option_values_t& aOptionValues, std::string& aCalcu
 bool is_token_option_specifier(const char* aToken);
 void print_help();
 control_return_e handle_setting(const option_values_t& aOptionValues, const std::string& aCalculationInput);
+void str_find_replace(std::string& aString, const std::string& aFindStr, const std::string& aReplaceStr);
+void desanitize_cli_calculation_input(std::string& aString);
 
 // MAIN
 
@@ -88,12 +90,9 @@ int main (int argc, char** argv)
     std::string calculation_input_argv_chosen {};
     std::string calculation_input_using {};
     CONTROL_SEQUENCE(argv_handle(option_values_argv_chosen, calculation_input_argv_chosen, argc, argv));
-    for (size_t i = 0; i < calculation_input_argv_chosen.size(); i++)
+    if (calculation_input_argv_chosen.size() > 0)
     {
-        if (calculation_input_argv_chosen[i] == 'B')
-        {
-            calculation_input_argv_chosen[i] = '\\';
-        }
+        desanitize_cli_calculation_input(calculation_input_argv_chosen);
     }
     option_values_using = option_values_argv_chosen;
     calculation_input_using = calculation_input_argv_chosen;
@@ -488,5 +487,30 @@ control_return_e handle_setting(const option_values_t& aOptionValues, const std:
             return cCONTROL_RETURN_FAIL;
     }
     return cCONTROL_RETURN_SUCCESS;
+}
+
+void str_find_replace(std::string& aString, const std::string& aFindStr, const std::string& aReplaceStr)
+{
+    if (aFindStr.size() == 0)
+    {
+        return;
+    }
+    size_t str_idx = aString.find(aFindStr);
+    while (str_idx != std::string::npos)
+    {
+        aString.erase(str_idx, aFindStr.size());
+        aString.insert(str_idx, aReplaceStr);
+        str_idx = aString.find(aFindStr);
+    }
+}
+
+void desanitize_cli_calculation_input(std::string& aString)
+{
+    str_find_replace(aString, "ObslashO", "\\");
+    str_find_replace(aString, "OcaretO", "^");
+    str_find_replace(aString, "OlparenO", "(");
+    str_find_replace(aString, "OrparenO", ")");
+    str_find_replace(aString, "OasteriskO", "*");
+    str_find_replace(aString, "OplusO", "+");
 }
 

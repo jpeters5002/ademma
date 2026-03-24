@@ -52,9 +52,11 @@
 % calculation-input-backslash-sanitized, setting
 \newcommand{\ademmaimplproxyproxy}[2]
 {
-    \StrDel{#1}{ }[\ademmafilenametempA]
-    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
-    \ademmaimplproxy{#1}{#2}{\ademmafilenametempB.tex}
+    \StrDel{#1}{ }[\ademmafilenametempA]%rm spaces
+    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]%rm newlines
+    \StrDel{\ademmafilenametempB}{\{}[\ademmafilenametempC]%rm left curly brackets
+    \StrDel{\ademmafilenametempC}{\}}[\ademmafilenametempD]%rm right curly brackets
+    \ademmaimplproxy{#1}{#2}{\ademmafilenametempD.tex}
 }
 
 %user-friendly macros
