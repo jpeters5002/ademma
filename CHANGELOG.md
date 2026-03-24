@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Allow arbitrary calculation input with sub-expressions within `(`, `)` and powered sub-expressions.
+- Allow explicit multiplication `*` between factors.
 - `--option-exists` CLI option.
 
 ## [0.2.1] - 2026-03-09
