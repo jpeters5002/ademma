@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow explicit multiplication `*` between factors.
 - `--option-exists` CLI option.
 
+### Changed
+
+- Cached file filenames for LaTeX integration have special characters sanitized to allow better compatibility, especially with smaller, lesser-known operating systems like Windows.
+
 ## [0.2.1] - 2026-03-09
 
 ### Added
