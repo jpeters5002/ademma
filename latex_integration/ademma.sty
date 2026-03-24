@@ -52,13 +52,13 @@
 % calculation-input, setting
 \newcommand{\ademmaimplproxyproxy}[2]
 {
-    \replacebackslashwithB{#1}{\ademmasanitizedinputtempA}%                                   '\' -> 'B'
-    \StrSubstitute{\ademmasanitizedinputtempA}{B}{ObslashO}[\ademmasanitizedinputtempB]%      'B' -> 'ObslashO' - somehow this one doesn't work and idk why
-    \StrSubstitute{\ademmasanitizedinputtempB}{+}{OplusO}[\ademmasanitizedinputtempC]%        '+' -> 'OplusO'
-    \StrSubstitute{\ademmasanitizedinputtempC}{*}{OasteriskO}[\ademmasanitizedinputtempD]%    '*' -> 'OasteriskO'
-    \StrSubstitute{\ademmasanitizedinputtempD}{(}{OlparenO}[\ademmasanitizedinputtempE]%      '(' -> 'OlparenO'
-    \StrSubstitute{\ademmasanitizedinputtempE}{)}{OrparenO}[\ademmasanitizedinputtempF]%      ')' -> 'OrparenO'
-    \StrSubstitute{\ademmasanitizedinputtempF}{\string^}{OcaretO}[\ademmasanitizedinputtempG]%'^' -> 'OcaretO'
+    \replacebackslashwithB{#1}{\ademmasanitizedinputtempA}%                                    '\' -> 'B'
+    \StrSubstitute{\ademmasanitizedinputtempA}{B}{ObslashO}[\ademmasanitizedinputtempB]%       'B' -> 'ObslashO' - somehow this one doesn't work and idk why
+    \StrSubstitute{\ademmasanitizedinputtempB}{+}{OplusO}[\ademmasanitizedinputtempC]%         '+' -> 'OplusO'
+    \StrSubstitute{\ademmasanitizedinputtempC}{*}{OasteriskO}[\ademmasanitizedinputtempD]%     '*' -> 'OasteriskO'
+    \StrSubstitute{\ademmasanitizedinputtempD}{\string(}{OlparenO}[\ademmasanitizedinputtempE]%'(' -> 'OlparenO'
+    \StrSubstitute{\ademmasanitizedinputtempE}{\string)}{OrparenO}[\ademmasanitizedinputtempF]%')' -> 'OrparenO'
+    \StrSubstitute{\ademmasanitizedinputtempF}{\string^}{OcaretO}[\ademmasanitizedinputtempG]% '^' -> 'OcaretO'
     \StrDel{\ademmasanitizedinputtempG}{ }[\ademmafilenametempA]%rm spaces
     \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]%   rm newlines
     \StrDel{\ademmafilenametempB}{\{}[\ademmafilenametempC]%     rm left curly brackets
