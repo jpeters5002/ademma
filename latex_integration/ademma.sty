@@ -59,10 +59,10 @@
     \StrSubstitute{\ademmasanitizedinputtempD}{\string(}{OlparenO}[\ademmasanitizedinputtempE]%'(' -> 'OlparenO'
     \StrSubstitute{\ademmasanitizedinputtempE}{\string)}{OrparenO}[\ademmasanitizedinputtempF]%')' -> 'OrparenO'
     \StrSubstitute{\ademmasanitizedinputtempF}{\string^}{OcaretO}[\ademmasanitizedinputtempG]% '^' -> 'OcaretO'
-    \StrDel{\ademmasanitizedinputtempG}{ }[\ademmafilenametempA]%rm spaces
-    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]%   rm newlines
-    \StrDel{\ademmafilenametempB}{\{}[\ademmafilenametempC]%     rm left curly brackets
-    \StrDel{\ademmafilenametempC}{\}}[\ademmafilenametempD]%     rm right curly brackets
+    \StrDel{\ademmasanitizedinputtempG}{ }[\ademmafilenametempA]%                           rm spaces
+    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]%                              rm newlines
+    \ExpandArgs{e}\StrDel{\ademmafilenametempB}{\string{\iffalse}\fi}[\ademmafilenametempC]%rm '{' - shoutouts to https://tex.stackexchange.com/a/748419
+    \ExpandArgs{e}\StrDel{\ademmafilenametempC}{\iffalse{\fi\string}}[\ademmafilenametempD]%rm '}' - shoutouts to https://tex.stackexchange.com/a/748419
     \ademmaimplproxy{\ademmasanitizedinputtempG}{#2}{\ademmafilenametempD.#2.tex}
 }
 
