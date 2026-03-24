@@ -3,7 +3,7 @@
 %helper macros
 
 \makeatletter
-\newcommand{\replacebackslashwithB}[2]{{\escapechar=`B 
+\newcommand{\replacebackslashwithZ}[2]{{\escapechar=`Z 
   \xdef#2{\expandafter\detokenize\expandafter{#1} \@empty}}}
 \makeatother
 
@@ -49,16 +49,19 @@
     \ademmaimpl{#1}{#2}{\ademmafullpathcachefile}{\ademmafullpatherroutfile}{\ademmafullpatherrindicatorfile}{\ademmadir}
 }
 
-% calculation-input-backslash-sanitized, setting
+% calculation-input-backslash-Z-caret-handled, setting
 \newcommand{\ademmaimplproxyproxy}[2]
 {
-    \StrSubstitute{#1}{+}{OplusO}[\ademmasanitizedinputtempA]%'+' -> 'OplusO'
-    \StrSubstitute{\ademmasanitizedinputtempA}{*}{OasteriskO}[\ademmasanitizedinputtempB]%'+' -> 'OplusO'
-    \StrDel{\ademmasanitizedinputtempB}{ }[\ademmafilenametempA]%rm spaces
+    \StrSubstitute{#1}{Z}{ObslashO}[\ademmasanitizedinputtempA]%                          'Z' -> 'ObslashO' (by now '\' -> 'Z' has occurred)
+    \StrSubstitute{\ademmasanitizedinputtempA}{+}{OplusO}[\ademmasanitizedinputtempB]%    '+' -> 'OplusO'
+    \StrSubstitute{\ademmasanitizedinputtempB}{*}{OasteriskO}[\ademmasanitizedinputtempC]%'*' -> 'OasteriskO'
+    \StrSubstitute{\ademmasanitizedinputtempC}{(}{OlparenO}[\ademmasanitizedinputtempD]%  '(' -> 'OlparenO'
+    \StrSubstitute{\ademmasanitizedinputtempD}{)}{OrparenO}[\ademmasanitizedinputtempE]%  ')' -> 'OrparenO'
+    \StrDel{\ademmasanitizedinputtempE}{ }[\ademmafilenametempA]%rm spaces
     \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]%rm newlines
     \StrDel{\ademmafilenametempB}{\{}[\ademmafilenametempC]%rm left curly brackets
     \StrDel{\ademmafilenametempC}{\}}[\ademmafilenametempD]%rm right curly brackets
-    \ademmaimplproxy{\ademmasanitizedinputtempB}{#2}{\ademmafilenametempD.tex}
+    \ademmaimplproxy{\ademmasanitizedinputtempE}{#2}{\ademmafilenametempD.tex}
 }
 
 %user-friendly macros
@@ -71,8 +74,9 @@
     {
         #2 =
     }{}
-    \replacebackslashwithB{#2}{\ademmasanitizedbackslashtemp}
-    \ademmaimplproxyproxy{\ademmasanitizedbackslashtemp}{cl}
+    \replacebackslashwithZ{#2}{\ademmasanitizedinputtempA}
+    \StrSubstitute{\ademmasanitizedinputtempA}{\string^}{OcaretO}[\ademmasanitizedinputtempB]%'^' -> 'OcaretO'
+    \ademmaimplproxyproxy{\ademmasanitizedinputtempB}{cl}
 }
 
 % #1                                                       , #2
@@ -83,7 +87,7 @@
     {
         #2 =
     }{}
-    \replacebackslashwithB{#2}{\ademmasanitizedbackslashtemp}
+    \replacebackslashwithZ{#2}{\ademmasanitizedbackslashtemp}
     \ademmaimplproxyproxy{\ademmasanitizedbackslashtemp}{rm}
 }
 
@@ -95,7 +99,7 @@
     {
         #2 =
     }{}
-    \replacebackslashwithB{#2}{\ademmasanitizedbackslashtemp}
+    \replacebackslashwithZ{#2}{\ademmasanitizedbackslashtemp}
     \ademmaimplproxyproxy{\ademmasanitizedbackslashtemp}{cm}
 }
 
