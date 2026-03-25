@@ -123,30 +123,6 @@ std::string ademma_core::ACITerm_ToString(const ACITerm& aSelf)
     return ACITerm_ToString_Recursive(aSelf);
 }
 
-#define POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, setting_ucc) \
-    { \
-        setting_ucc##AdemPolynomial poly##setting_ucc = setting_ucc##AdemPolynomial_FromString(parse_info); \
-        if (parse_info.mErrorInfo.mIsError) \
-        { \
-            goto cleanup_fail_exit_label; \
-        } \
-        ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(aci, &poly##setting_ucc, setting); \
-    } \
-
-#define POLYNOMIAL_FROMSTRING_INTOACI_ASMONOS(parse_info, setting, aci, cleanup_fail_exit_label) \
-    switch (setting) \
-    { \
-        case Setting_Type::cCLASSICAL: \
-            POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, Classical); \
-            break; \
-        case Setting_Type::cC_MOTIVIC: \
-            POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, CMotivic); \
-            break; \
-        case Setting_Type::cR_MOTIVIC: \
-            POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, RMotivic); \
-            break; \
-    } do {} while(0)
-
 ademma_core::ArbitraryCalculationInput ademma_core::ArbitraryCalculationInput_FromString(ParsingInfo& aParsingInfo, Setting_Type aSetting)
 {
     ArbitraryCalculationInput aciOut {};
@@ -556,6 +532,30 @@ std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf)
     }
     return strOut;
 }
+
+#define POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, setting_ucc) \
+    { \
+        setting_ucc##AdemPolynomial poly##setting_ucc = setting_ucc##AdemPolynomial_FromString(parse_info); \
+        if (parse_info.mErrorInfo.mIsError) \
+        { \
+            goto cleanup_fail_exit_label; \
+        } \
+        ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(aci, &poly##setting_ucc, setting); \
+    } \
+
+#define POLYNOMIAL_FROMSTRING_INTOACI_ASMONOS(parse_info, setting, aci, cleanup_fail_exit_label) \
+    switch (setting) \
+    { \
+        case Setting_Type::cCLASSICAL: \
+            POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, Classical); \
+            break; \
+        case Setting_Type::cC_MOTIVIC: \
+            POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, CMotivic); \
+            break; \
+        case Setting_Type::cR_MOTIVIC: \
+            POLYNOMIAL_FROMSTRING_INTOACIASMONOS_SETTINGIMPL(parse_info, setting, aci, cleanup_fail_exit_label, RMotivic); \
+            break; \
+    } do {} while(0)
 
 void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalculationInput& aACIOut, ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower)
 {
