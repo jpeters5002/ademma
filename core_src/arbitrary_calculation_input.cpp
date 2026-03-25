@@ -670,7 +670,7 @@ void ademma_core::ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalcul
                 if (!sub_parsing_info.MatchString_IncreaseIndexOnSuccess("}"))
                 {
                     aParsingInfo.mErrorInfo.mIsError = true;
-                    aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
+                    aParsingInfo.mErrorInfo.mErrorNearbyIndex = sub_parsing_info.mCurrentIndex;
                     aParsingInfo.mErrorInfo.mErrorString = "Left bracket '{' before exponent has no matching right bracket '}'.";
                     goto cleanup_fail_exit;
                 }
