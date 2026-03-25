@@ -17,7 +17,6 @@ std::string ACITerm_ToString_Recursive(const ACITerm& aSelf);
 void ArbitraryCalculationInput_FromString_Recursive(ArbitraryCalculationInput& aACIOut, ParsingInfo& aParsingInfo, Setting_Type aSetting, int aPower);
 std::string ArbitraryCalculationInput_ToString_Recursive(const ArbitraryCalculationInput& aACI);
 char prev_non_whitespace_char_in_string(const std::string& aStr, size_t aHighIndexExcluded, size_t* aCharAtIndex);
-char next_non_whitespace_char_in_string(const std::string& aStr, size_t aLowIndex, size_t* aCharAtIndex);
 void ArbitraryCalculationInput_AddPolynomialAsMonomialTerms(ArbitraryCalculationInput& aACI, void* aPoly, Setting_Type aSetting);
 }
 
@@ -770,27 +769,6 @@ char ademma_core::prev_non_whitespace_char_in_string(const std::string& aStr, si
         if (i == 0)
         {
             break;
-        }
-    }
-    return '\0';
-}
-
-char next_non_whitespace_char_in_string(const std::string& aStr, size_t aLowIndex, size_t* aCharAtIndex)
-{
-    for (size_t i = aLowIndex; i < aStr.size(); i++)
-    {
-        switch (aStr[i])
-        {
-            case ' ':
-            case '\n':
-            case '\t':
-                break;
-            default:
-                if (aCharAtIndex)
-                {
-                    *aCharAtIndex = i;
-                }
-                return aStr[i];
         }
     }
     return '\0';
