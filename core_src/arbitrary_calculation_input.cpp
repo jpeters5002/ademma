@@ -232,20 +232,12 @@ void ademma_core::ArbitraryCalculationInput_CoagulateInnermostToPoly_Recursive(A
 
 bool ademma_core::ArbitraryCalculationInput_IsOnlyPolynomial(const ArbitraryCalculationInput& aACI)
 {
-    if (aACI.mTerms.size() == 1 && aACI.mTerms[0].mType == ACITerm_Type::cPOLYNOMIAL)
-    {
-        return true;
-    }
-    return false;
+    return aACI.mTerms.size() == 1 && aACI.mTerms[0].mType == ACITerm_Type::cPOLYNOMIAL;
 }
 
 bool ademma_core::ArbitraryCalculationInput_IsOnlyPower1Polynomial(const ArbitraryCalculationInput& aACI)
 {
-    if (ArbitraryCalculationInput_IsOnlyPolynomial(aACI) && aACI.mPower == 1)
-    {
-        return true;
-    }
-    return false;
+    return ArbitraryCalculationInput_IsOnlyPolynomial(aACI) && aACI.mPower == 1;
 }
 
 void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(ArbitraryCalculationInput& aACI)
