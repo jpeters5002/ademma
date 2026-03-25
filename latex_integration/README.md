@@ -6,11 +6,13 @@ This LaTeX package requires that `-shell-escape` be passed to the LaTeX compiler
 
 ## Setup
 
-Ademma must be installed onto your system so that your system's shell can open Ademma with the command `ademma`. This can mean modifying your system's PATH variable or installing Ademma into a location pointed to by PATH. For Linux and MacOS/OSX this should be as simple as running the following command where your working directory has the `ademma` binary:
+Ademma must be installed onto your system so that your system's shell can open Ademma with the command `ademma`. This can mean modifying your system's PATH variable or installing Ademma into a location pointed to by PATH. For Linux and MacOS/OSX this should be as simple as running the following command in your build directory:
 
 ```
-sudo cp ./ademma /usr/local/bin/
+sudo make install
 ```
+
+which places the `ademma` binary in `/usr/local/bin`.
 
 Next, the file `ademma.sty`, which is the LaTeX package implementation, needs to go somewhere your LaTeX compiler can find it. This can be within your LaTeX project at the top level or wherever your LaTeX compiler expects packages to be, which will depend on which LaTeX compiler is being used.
 
