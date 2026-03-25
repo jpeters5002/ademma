@@ -19,9 +19,13 @@ void RMotivicAdemPolynomial_ShoveRhoLeft(RMotivicAdemPolynomial& aPolynomial);
 
 void RMotivicAdemPolynomial_CombineLikeTerms_AssumeNoSq0Factors_AssumeRhoLeft(RMotivicAdemPolynomial& aPolynomial);
 
+bool RMotivicAdemPolynomial_IsEqualInForm(const RMotivicAdemPolynomial& aLeft, const RMotivicAdemPolynomial& aRight);
+
 bool RMotivicAdemPolynomial_IsAdmissible_AssumeNoLikeTerms_AssumeNoSq0Factors(const RMotivicAdemPolynomial& aPolynomial);
 
 RMotivicAdemPolynomial RMotivicAdemPolynomial_MultiplyPolynomial(const RMotivicAdemPolynomial& aLeft, const RMotivicAdemPolynomial& aRight);
+
+void RMotivicAdemPolynomial_AddRightPolynomial(RMotivicAdemPolynomial& aLeft, const RMotivicAdemPolynomial& aRight);
 
 void RMotivicAdemPolynomial_MultiplyLeftMonomial(const RMotivicAdemMonomial& aLeft, RMotivicAdemPolynomial& aRight);
 

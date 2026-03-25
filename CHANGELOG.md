@@ -9,7 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- CMake install rule to install the `ademma` binary to your system (Windows not supported yet).
+- Allow arbitrary calculation input with sub-expressions within `(`, `)` and powered sub-expressions.
+- Allow explicit multiplication `*` between factors.
 - `--option-exists` CLI option.
+
+### Changed
+
+- Cached file filenames for LaTeX integration have special characters sanitized to allow better compatibility, especially with smaller, lesser-known operating systems like Windows. Old cache files will be ignored.
 
 ## [0.2.1] - 2026-03-09
 

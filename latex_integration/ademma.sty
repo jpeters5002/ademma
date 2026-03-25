@@ -3,8 +3,8 @@
 %helper macros
 
 \makeatletter
-\newcommand{\replacebackslashwithB}[2]{{\escapechar=`B 
-  \xdef#2{\expandafter\zap@space\detokenize\expandafter{#1} \@empty}}}
+\newcommand{\replacebackslashwithB}[2]{{\escapechar=`B
+  \xdef#2{\expandafter\detokenize\expandafter{#1} \@empty}}}
 \makeatother
 
 %main implementation macros
@@ -19,7 +19,7 @@
     }
     {
         {\immediate\write18{mkdir -p #6}}
-        {\immediate\write18{ademma --only-cli --setting #2 #1 > #3 2> #4 \detokenize{||} touch #5}}
+        {\immediate\write18{ademma --only-cli --setting #2 "#1" > #3 2> #4 \detokenize{||} touch #5}}
         \IfFileExists{#5}
         {
             {\immediate\write18{rm -f #5}}
@@ -49,6 +49,23 @@
     \ademmaimpl{#1}{#2}{\ademmafullpathcachefile}{\ademmafullpatherroutfile}{\ademmafullpatherrindicatorfile}{\ademmadir}
 }
 
+% calculation-input, setting
+\newcommand{\ademmaimplproxyproxy}[2]
+{
+    \replacebackslashwithB{#1}{\ademmasanitizedinputtempA}%                                    '\' -> 'B'
+    \StrSubstitute{\ademmasanitizedinputtempA}{B}{ObslashO}[\ademmasanitizedinputtempB]%       'B' -> 'ObslashO' - somehow this one doesn't work and idk why
+    \StrSubstitute{\ademmasanitizedinputtempB}{+}{OplusO}[\ademmasanitizedinputtempC]%         '+' -> 'OplusO'
+    \StrSubstitute{\ademmasanitizedinputtempC}{*}{OasteriskO}[\ademmasanitizedinputtempD]%     '*' -> 'OasteriskO'
+    \StrSubstitute{\ademmasanitizedinputtempD}{\string(}{OlparenO}[\ademmasanitizedinputtempE]%'(' -> 'OlparenO'
+    \StrSubstitute{\ademmasanitizedinputtempE}{\string)}{OrparenO}[\ademmasanitizedinputtempF]%')' -> 'OrparenO'
+    \StrSubstitute{\ademmasanitizedinputtempF}{\string^}{OcaretO}[\ademmasanitizedinputtempG]% '^' -> 'OcaretO'
+    \StrDel{\ademmasanitizedinputtempG}{ }[\ademmafilenametempA]%                           rm spaces
+    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]%                              rm newlines
+    \ExpandArgs{e}\StrDel{\ademmafilenametempB}{\string{\iffalse}\fi}[\ademmafilenametempC]%rm '{' - shoutouts to https://tex.stackexchange.com/a/748419
+    \ExpandArgs{e}\StrDel{\ademmafilenametempC}{\iffalse{\fi\string}}[\ademmafilenametempD]%rm '}' - shoutouts to https://tex.stackexchange.com/a/748419
+    \ademmaimplproxy{\ademmasanitizedinputtempG}{#2}{\ademmafilenametempD.#2.tex}
+}
+
 %user-friendly macros
 
 % #1                                                       , #2
@@ -59,10 +76,7 @@
     {
         #2 =
     }{}
-    \replacebackslashwithB{#2}{\ademmasanitizedbackslashtemp}
-    \StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
-    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
-    \ademmaimplproxy{\ademmasanitizedbackslashtemp}{cl}{\ademmafilenametempB.cl.tex}
+    \ademmaimplproxyproxy{#2}{cl}
 }
 
 % #1                                                       , #2
@@ -73,10 +87,7 @@
     {
         #2 =
     }{}
-    \replacebackslashwithB{#2}{\ademmasanitizedbackslashtemp}
-    \StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
-    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
-    \ademmaimplproxy{\ademmasanitizedbackslashtemp}{rm}{\ademmafilenametempB.rm.tex}
+    \ademmaimplproxyproxy{#2}{rm}
 }
 
 % #1                                                       , #2
@@ -87,9 +98,6 @@
     {
         #2 =
     }{}
-    \replacebackslashwithB{#2}{\ademmasanitizedbackslashtemp}
-    \StrDel{\ademmasanitizedbackslashtemp}{ }[\ademmafilenametempA]
-    \StrDel{\ademmafilenametempA}{\\\\}[\ademmafilenametempB]
-    \ademmaimplproxy{\ademmasanitizedbackslashtemp}{cm}{\ademmafilenametempB.cm.tex}
+    \ademmaimplproxyproxy{#2}{cm}
 }
 

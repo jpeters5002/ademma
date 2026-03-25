@@ -13,11 +13,25 @@ std::string ademma_core::ClassicalAdemMonomial_ToString(const ClassicalAdemMonom
 ademma_core::ClassicalAdemMonomial ademma_core::ClassicalAdemMonomial_FromString(ParsingInfo& aParsingInfo)
 {
     ClassicalAdemMonomial camOut {};
+    bool first = true;
+    bool most_recent_multiply = false;
     for (;;)
     {
         aParsingInfo.IncreaseIndexOverWhitespace();
+        if (!first && aParsingInfo.MatchString_IncreaseIndexOnSuccess("*"))
+        {
+            aParsingInfo.IncreaseIndexOverWhitespace();
+            most_recent_multiply = true;
+        }
         if (aParsingInfo.mCurrentIndex >= aParsingInfo.mStringToParse.size())
         {
+            if (most_recent_multiply)
+            {
+                aParsingInfo.mErrorInfo.mIsError = true;
+                aParsingInfo.mErrorInfo.mErrorString = "No factor given after '*'";
+                aParsingInfo.mErrorInfo.mErrorNearbyIndex = aParsingInfo.mCurrentIndex;
+                return {};
+            }
             break;
         }
         SteenrodSquareDegree ssd = SteenrodSquareDegree_FromString(aParsingInfo);
@@ -26,6 +40,8 @@ ademma_core::ClassicalAdemMonomial ademma_core::ClassicalAdemMonomial_FromString
             return {};
         }
         camOut.push_back(ssd);
+        most_recent_multiply = false;
+        first = false;
     }
     return camOut;
 }
