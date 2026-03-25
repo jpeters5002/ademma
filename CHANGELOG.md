@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Cached file filenames for LaTeX integration have special characters sanitized to allow better compatibility, especially with smaller, lesser-known operating systems like Windows.
+- Cached file filenames for LaTeX integration have special characters sanitized to allow better compatibility, especially with smaller, lesser-known operating systems like Windows. Old cache files will be ignored.
 
 ## [0.2.1] - 2026-03-09
 

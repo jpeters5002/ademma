@@ -153,7 +153,6 @@ void ademma_core::ClassicalAdemPolynomial_AddRightPolynomial(ClassicalAdemPolyno
     }
 }
 
-
 void ademma_core::ClassicalAdemPolynomial_MultiplyLeftMonomial(const ClassicalAdemMonomial& aLeft, ClassicalAdemPolynomial& aRight)
 {
     for (size_t i = 0; i < aRight.size(); i++)
