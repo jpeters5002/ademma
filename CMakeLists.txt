@@ -40,9 +40,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	core_include
 )
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    # untested
-    install(TARGETS ${PROJECT_NAME}
-        RUNTIME DESTINATION "C:\Program Files")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION /usr/local/bin)
