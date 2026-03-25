@@ -433,7 +433,7 @@ control_return_e handle_setting(const option_values_t& aOptionValues, const std:
         }
     }
 
-    Setting_Type setting;
+    Setting_Type setting = Setting_Type::cCLASSICAL;
     switch (aOptionValues.mSetting)
     {
         case cOPTION_VALUE_SETTING_CLASSICAL:
