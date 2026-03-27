@@ -371,6 +371,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalcul
                 switch (aACI.mSetting)
                 {
                     case Setting_Type::cCLASSICAL:
+                        std::cout << "classical expand foil right type: " << str_from_ACITerm_Type(aci_term_right_poly_or_mono_factor_ptr->mType) << std::endl;
                         POLYNOMIALORMONOMIAL_MULTIPLYINTO_SETTINGIMPL(aci_term_left_poly_or_mono_factor_ptr, aci_term_right_poly_or_mono_factor_ptr, aci_term_product_ptr, Classical);
                         break;
                     case Setting_Type::cC_MOTIVIC:
