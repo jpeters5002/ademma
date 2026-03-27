@@ -20,7 +20,7 @@ jobs:
       # 1. <Windows, Release, latest MSVC compiler toolchain on the default runner image, default generator>
       # 2. <Linux, Release, latest GCC compiler toolchain on the default runner image, default generator>
       # 3. <Linux, Release, latest Clang compiler toolchain on the default runner image, default generator>
-      # 
+      #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -70,7 +70,7 @@ jobs:
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
     - uses: actions/upload-artifact@v4
-      if: ${{ matrix.c_compiler != 'clang' && matrix.build_type == "Release" }}
+      if: ${{ matrix.c_compiler != 'clang' }}
       with:
         name: ademma-${{ runner.os }}
         path: ${{ steps.strings.outputs.build-output-dir }}/${{ runner.os == 'Windows' && format('{0}/{1}', matrix.build_type, 'ademma.exe') || 'ademma' }}
@@ -80,11 +80,8 @@ jobs:
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       shell: bash
       run: |
-        if [ "${{ runner.build_type }}" == "Release" ]; then
-        elif [ "${{ runner.os }}" == "Linux" ]; then
-          if [ "${{ runner.compiler }}" == "g++" ]; then
-            valgrind --leak-check=full ./test_ademma
-          fi
+        if [ "${{ runner.os }}" == "Linux" ]; then
+          ./test_ademma
         elif [ "${{ runner.os }}" == "Windows" ]; then
           ./${{ matrix.build_type }}/test_ademma.exe
         fi
