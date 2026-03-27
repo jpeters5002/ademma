@@ -295,6 +295,27 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
     assert(aci_term_ptr->mType == ACITerm_Type::cMONOMIAL || aci_term_ptr->mType == ACITerm_Type::cPOLYNOMIAL); \
     do {} while(0)
 
+const char* str_from_ACITerm_Type(ademma_core::ACITerm_Type aValue)
+{
+    using namespace ademma_core;
+    switch (aValue)
+    {
+        case ACITerm_Type::cADD:
+            return "add";
+        case ACITerm_Type::cMULTIPLY:
+            return "multiply";
+        case ACITerm_Type::cSUBACI:
+            return "subaci";
+        case ACITerm_Type::cPOLYNOMIAL:
+            return "poly";
+        case ACITerm_Type::cMONOMIAL:
+            return "mono";
+        case ACITerm_Type::cNONE:
+            return "none";
+    }
+    return "badvalue";
+}
+#include <iostream>
 #define POLYNOMIALORMONOMIAL_MULTIPLYINTO_SETTINGIMPL(aci_left_ptr, aci_right_ptr, aci_product_ptr, setting_ucc) \
     if (aci_left_ptr->mType == ACITerm_Type::cPOLYNOMIAL && aci_right_ptr->mType == ACITerm_Type::cPOLYNOMIAL) \
     { \
@@ -315,6 +336,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
     } \
     else \
     { \
+        std::cout << "left: " << str_from_ACITerm_Type(aci_left_ptr->mType) << "; right: " << str_from_ACITerm_Type(aci_right_ptr->mType) << std::endl; \
         assert(aci_left_ptr->mType == ACITerm_Type::cMONOMIAL && aci_right_ptr->mType == ACITerm_Type::cMONOMIAL); \
         /* multiply monomial terms, form poly with one term, then copy all in one step */ \
         *aci_product_ptr->mData.m##setting_ucc##AdemPolynomial = { setting_ucc##AdemMonomial_Multiply(*aci_left_ptr->mData.m##setting_ucc##AdemMonomial, *aci_right_ptr->mData.m##setting_ucc##AdemMonomial) }; \
