@@ -70,7 +70,7 @@ jobs:
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
     - uses: actions/upload-artifact@v4
-      if: ${{ matrix.c_compiler != 'clang' }}
+      if: ${{ matrix.c_compiler != 'clang' && matrix.build_type != 'Debug' }}
       with:
         name: ademma-${{ runner.os }}
         path: ${{ steps.strings.outputs.build-output-dir }}/${{ runner.os == 'Windows' && format('{0}/{1}', matrix.build_type, 'ademma.exe') || 'ademma' }}
