@@ -292,7 +292,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
             break; \
         } \
     } \
-    assert(aci_term_ptr->mType == ACITerm_Type::cMONOMIAL && aci_term_ptr->mType == ACITerm_Type::cPOLYNOMIAL); \
+    assert(aci_term_ptr->mType == ACITerm_Type::cMONOMIAL || aci_term_ptr->mType == ACITerm_Type::cPOLYNOMIAL); \
     do {} while(0)
 
 #define POLYNOMIALORMONOMIAL_MULTIPLYINTO_SETTINGIMPL(aci_left_ptr, aci_right_ptr, aci_product_ptr, setting_ucc) \
