@@ -278,23 +278,6 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
     }
 }
 
-#define ENSUREPOWER1POLYNOMIALORMONOMIAL_BREAKIFNOT(aci_term_ptr) \
-    if (aci_term_ptr->mType != ACITerm_Type::cPOLYNOMIAL) \
-    { \
-        if (aci_term_ptr->mType == ACITerm_Type::cMONOMIAL) \
-        {} \
-        else if (aci_term_ptr->mType == ACITerm_Type::cSUBACI && ArbitraryCalculationInput_IsOnlyPower1Polynomial(*aci_term_ptr->mData.mSubACI)) \
-        { \
-            aci_term_ptr = &aci_term_ptr->mData.mSubACI->mTerms[0]; \
-        } \
-        else \
-        { \
-            break; \
-        } \
-    } \
-    assert(aci_term_ptr->mType == ACITerm_Type::cMONOMIAL || aci_term_ptr->mType == ACITerm_Type::cPOLYNOMIAL); \
-    do {} while(0)
-
 const char* str_from_ACITerm_Type(ademma_core::ACITerm_Type aValue)
 {
     using namespace ademma_core;
@@ -316,6 +299,24 @@ const char* str_from_ACITerm_Type(ademma_core::ACITerm_Type aValue)
     return "badvalue";
 }
 #include <iostream>
+#define ENSUREPOWER1POLYNOMIALORMONOMIAL_BREAKIFNOT(aci_term_ptr) \
+    if (aci_term_ptr->mType != ACITerm_Type::cPOLYNOMIAL) \
+    { \
+        if (aci_term_ptr->mType == ACITerm_Type::cMONOMIAL) \
+        {} \
+        else if (aci_term_ptr->mType == ACITerm_Type::cSUBACI && ArbitraryCalculationInput_IsOnlyPower1Polynomial(*aci_term_ptr->mData.mSubACI)) \
+        { \
+            aci_term_ptr = &aci_term_ptr->mData.mSubACI->mTerms[0]; \
+            std::cout << "ensure... got subaci poly. Type: " << str_from_ACITerm_Type(aci_term_ptr->mType) << std::endl; \
+        } \
+        else \
+        { \
+            break; \
+        } \
+    } \
+    assert(aci_term_ptr->mType == ACITerm_Type::cMONOMIAL || aci_term_ptr->mType == ACITerm_Type::cPOLYNOMIAL); \
+    do {} while(0)
+
 #define POLYNOMIALORMONOMIAL_MULTIPLYINTO_SETTINGIMPL(aci_left_ptr, aci_right_ptr, aci_product_ptr, setting_ucc) \
     if (aci_left_ptr->mType == ACITerm_Type::cPOLYNOMIAL && aci_right_ptr->mType == ACITerm_Type::cPOLYNOMIAL) \
     { \
