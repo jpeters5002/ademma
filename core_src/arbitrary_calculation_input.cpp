@@ -366,6 +366,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalcul
                 ENSUREPOWER1POLYNOMIALORMONOMIAL_BREAKIFNOT(aci_term_left_poly_or_mono_factor_ptr);
                 aci_term_right_poly_or_mono_factor_ptr = &aACI.mTerms[i + 1];
                 ENSUREPOWER1POLYNOMIALORMONOMIAL_BREAKIFNOT(aci_term_right_poly_or_mono_factor_ptr);
+                std::cout << "expand foil after ensure ... right type: " << str_from_ACITerm_Type(aci_term_right_poly_or_mono_factor_ptr->mType) << std::endl;
                 aACI.mTerms.insert(aACI.mTerms.begin() + (i + 2), ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aACI.mSetting));
                 aci_term_product_ptr = &aACI.mTerms[i + 2];
                 switch (aACI.mSetting)
