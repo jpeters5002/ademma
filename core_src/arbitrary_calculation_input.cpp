@@ -307,13 +307,14 @@ const char* str_from_ACITerm_Type(ademma_core::ACITerm_Type aValue)
         else if (aci_term_ptr->mType == ACITerm_Type::cSUBACI && ArbitraryCalculationInput_IsOnlyPower1Polynomial(*aci_term_ptr->mData.mSubACI)) \
         { \
             aci_term_ptr = &aci_term_ptr->mData.mSubACI->mTerms[0]; \
-            std::cout << "ensure... got subaci poly. Type: " << str_from_ACITerm_Type(aci_term_ptr->mType) << std::endl; \
+            std::cout << "ensure... got subaci poly" << std::endl; \
         } \
         else \
         { \
             break; \
         } \
     } \
+    std::cout << "ensure... done (no break). Type: " << str_from_ACITerm_Type(aci_term_ptr->mType) << std::endl; \
     assert(aci_term_ptr->mType == ACITerm_Type::cMONOMIAL || aci_term_ptr->mType == ACITerm_Type::cPOLYNOMIAL); \
     do {} while(0)
 
