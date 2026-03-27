@@ -286,6 +286,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
         else if (aci_term_ptr->mType == ACITerm_Type::cSUBACI && ArbitraryCalculationInput_IsOnlyPower1Polynomial(*aci_term_ptr->mData.mSubACI)) \
         { \
             aci_term_ptr = &aci_term_ptr->mData.mSubACI->mTerms[0]; \
+            assert(aci_term_ptr->mType == ACITerm_Type::cPOLYNOMIAL); \
         } \
         else \
         { \
