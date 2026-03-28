@@ -557,6 +557,10 @@ std::string ademma_core::ACITerm_ToString_Recursive(const ACITerm& aSelf)
 #endif
             break;
         case ACITerm_Type::cNONE:
+#if DEBUG_OUTPUT
+        default:
+            strOut += "[!!!]INVALID - " + std::to_string((int)aSelf.mType) + "[!!!]";
+#endif
             break;
     }
     return strOut;
