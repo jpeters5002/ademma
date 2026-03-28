@@ -299,24 +299,25 @@ const char* str_from_ACITerm_Type(ademma_core::ACITerm_Type aValue)
     return "badvalue";
 }
 #include <iostream>
-#define ENSUREPOWER1POLYNOMIALORMONOMIAL_BREAKIFNOT(aci_term_ptr) \
-    if (aci_term_ptr->mType != ACITerm_Type::cPOLYNOMIAL) \
+#define ENSUREPOWER1POLYORMONO_CONTINUEIFNOT(aci_term_ptr) \
+    switch (aci_term_ptr->mType) \
     { \
-        if (aci_term_ptr->mType == ACITerm_Type::cMONOMIAL) \
-        {} \
-        else if (aci_term_ptr->mType == ACITerm_Type::cSUBACI && ArbitraryCalculationInput_IsOnlyPower1Polynomial(*aci_term_ptr->mData.mSubACI)) \
-        { \
-            aci_term_ptr = &aci_term_ptr->mData.mSubACI->mTerms[0]; \
-            std::cout << "ensure... got subaci poly" << std::endl; \
-        } \
-        else \
-        { \
+        case ACITerm_Type::cPOLYNOMIAL: \
+        case ACITerm_Type::cMONOMIAL: \
             break; \
-        } \
-    } \
-    std::cout << "ensure... done (no break). Type: " << str_from_ACITerm_Type(aci_term_ptr->mType) << std::endl; \
-    assert(aci_term_ptr->mType == ACITerm_Type::cMONOMIAL || aci_term_ptr->mType == ACITerm_Type::cPOLYNOMIAL); \
-    do {} while(0)
+        case ACITerm_Type::cSUBACI: \
+            if (ArbitraryCalculationInput_IsOnlyPower1Polynomial(*aci_term_ptr->mData.mSubACI)) \
+            { \
+                aci_term_ptr = &aci_term_ptr->mData.mSubACI->mTerms[0]; \
+                break; \
+            } \
+            else \
+            { \
+                continue; \
+            } \
+        default: \
+            continue; \
+    } do {} while (0)
 
 #define POLYNOMIALORMONOMIAL_MULTIPLYINTO_SETTINGIMPL(aci_left_ptr, aci_right_ptr, aci_product_ptr, setting_ucc) \
     if (aci_left_ptr->mType == ACITerm_Type::cPOLYNOMIAL && aci_right_ptr->mType == ACITerm_Type::cPOLYNOMIAL) \
@@ -349,6 +350,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalcul
     ACITerm* aci_term_left_poly_or_mono_factor_ptr;
     ACITerm* aci_term_right_poly_or_mono_factor_ptr;
     ACITerm* aci_term_product_ptr;
+    ACITerm aci_term_product_to_insert;
     ACITerm* aci_term_ptr;
     for (size_t i = 0; i < aACI.mTerms.size(); i++)
     {
@@ -363,13 +365,13 @@ void ademma_core::ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalcul
                 assert(i > 0);
                 assert(i < aACI.mTerms.size() - 1);
                 aci_term_left_poly_or_mono_factor_ptr = &aACI.mTerms[i - 1];
-                ENSUREPOWER1POLYNOMIALORMONOMIAL_BREAKIFNOT(aci_term_left_poly_or_mono_factor_ptr);
+                ENSUREPOWER1POLYORMONO_CONTINUEIFNOT(aci_term_left_poly_or_mono_factor_ptr);
                 aci_term_right_poly_or_mono_factor_ptr = &aACI.mTerms[i + 1];
-                ENSUREPOWER1POLYNOMIALORMONOMIAL_BREAKIFNOT(aci_term_right_poly_or_mono_factor_ptr);
+                ENSUREPOWER1POLYORMONO_CONTINUEIFNOT(aci_term_right_poly_or_mono_factor_ptr);
                 std::cout << "expand foil after ensure ... right type: " << str_from_ACITerm_Type(aci_term_right_poly_or_mono_factor_ptr->mType) << std::endl;
-                aACI.mTerms.insert(aACI.mTerms.begin() + (i + 2), ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aACI.mSetting));
+                aci_term_product_to_insert = ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aACI.mSetting);
+                aci_term_product_ptr = &aci_term_product_to_insert;
                 std::cout << "expand foil after ensure ...2 right type: " << str_from_ACITerm_Type(aci_term_right_poly_or_mono_factor_ptr->mType) << std::endl;
-                aci_term_product_ptr = &aACI.mTerms[i + 2];
                 switch (aACI.mSetting)
                 {
                     case Setting_Type::cCLASSICAL:
@@ -383,6 +385,7 @@ void ademma_core::ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalcul
                         POLYNOMIALORMONOMIAL_MULTIPLYINTO_SETTINGIMPL(aci_term_left_poly_or_mono_factor_ptr, aci_term_right_poly_or_mono_factor_ptr, aci_term_product_ptr, RMotivic);
                         break;
                 }
+                aACI.mTerms.insert(aACI.mTerms.begin() + (i + 2), aci_term_product_to_insert);
                 ACITerm_Destruct(aACI.mTerms[i + 1]);
                 ACITerm_Destruct(aACI.mTerms[i]);
                 ACITerm_Destruct(aACI.mTerms[i - 1]);
