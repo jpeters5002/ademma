@@ -278,27 +278,6 @@ void ademma_core::ArbitraryCalculationInput_ExpandPolyExponent_Recursive(Arbitra
     }
 }
 
-const char* str_from_ACITerm_Type(ademma_core::ACITerm_Type aValue)
-{
-    using namespace ademma_core;
-    switch (aValue)
-    {
-        case ACITerm_Type::cADD:
-            return "add";
-        case ACITerm_Type::cMULTIPLY:
-            return "multiply";
-        case ACITerm_Type::cSUBACI:
-            return "subaci";
-        case ACITerm_Type::cPOLYNOMIAL:
-            return "poly";
-        case ACITerm_Type::cMONOMIAL:
-            return "mono";
-        case ACITerm_Type::cNONE:
-            return "none";
-    }
-    return "badvalue";
-}
-#include <iostream>
 #define ENSUREPOWER1POLYORMONO_CONTINUEIFNOT(aci_term_ptr) \
     switch (aci_term_ptr->mType) \
     { \
@@ -339,7 +318,6 @@ const char* str_from_ACITerm_Type(ademma_core::ACITerm_Type aValue)
     } \
     else \
     { \
-        std::cout << "left: " << str_from_ACITerm_Type(aci_left_ptr->mType) << "; right: " << str_from_ACITerm_Type(aci_right_ptr->mType) << std::endl; \
         assert(aci_left_ptr->mType == ACITerm_Type::cMONOMIAL && aci_right_ptr->mType == ACITerm_Type::cMONOMIAL); \
         /* multiply monomial terms, form poly with one term, then copy all in one step */ \
         *aci_product_ptr->mData.m##setting_ucc##AdemPolynomial = { setting_ucc##AdemMonomial_Multiply(*aci_left_ptr->mData.m##setting_ucc##AdemMonomial, *aci_right_ptr->mData.m##setting_ucc##AdemMonomial) }; \
@@ -368,14 +346,11 @@ void ademma_core::ArbitraryCalculationInput_ExpandFoil_Recursive(ArbitraryCalcul
                 ENSUREPOWER1POLYORMONO_CONTINUEIFNOT(aci_term_left_poly_or_mono_factor_ptr);
                 aci_term_right_poly_or_mono_factor_ptr = &aACI.mTerms[i + 1];
                 ENSUREPOWER1POLYORMONO_CONTINUEIFNOT(aci_term_right_poly_or_mono_factor_ptr);
-                std::cout << "expand foil after ensure ... right type: " << str_from_ACITerm_Type(aci_term_right_poly_or_mono_factor_ptr->mType) << std::endl;
                 aci_term_product_to_insert = ACITerm_Construct(ACITerm_Type::cPOLYNOMIAL, aACI.mSetting);
                 aci_term_product_ptr = &aci_term_product_to_insert;
-                std::cout << "expand foil after ensure ...2 right type: " << str_from_ACITerm_Type(aci_term_right_poly_or_mono_factor_ptr->mType) << std::endl;
                 switch (aACI.mSetting)
                 {
                     case Setting_Type::cCLASSICAL:
-                        std::cout << "classical expand foil right type: " << str_from_ACITerm_Type(aci_term_right_poly_or_mono_factor_ptr->mType) << std::endl;
                         POLYNOMIALORMONOMIAL_MULTIPLYINTO_SETTINGIMPL(aci_term_left_poly_or_mono_factor_ptr, aci_term_right_poly_or_mono_factor_ptr, aci_term_product_ptr, Classical);
                         break;
                     case Setting_Type::cC_MOTIVIC:
