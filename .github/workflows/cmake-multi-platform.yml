@@ -81,13 +81,7 @@ jobs:
       shell: bash
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
-          echo "${{ runner.c_compiler }}"
-          echo "${{ runner.build_type }}"
-          if [[ "${{ runner.c_compiler }}" == "gcc" && "${{ runner.build_type }}" == "Debug" ]]; then
-            valgrind --leak-check=full ./test_ademma
-          else
-            ./test_ademma
-          fi
+          valgrind --leak-check=full ./test_ademma
         elif [ "${{ runner.os }}" == "Windows" ]; then
           ./${{ matrix.build_type }}/test_ademma.exe
         fi
