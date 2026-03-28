@@ -24,7 +24,7 @@ jobs:
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
         os: [ubuntu-latest, windows-latest]
-        build_type: [Release]
+        build_type: [Release, Debug]
         c_compiler: [gcc, clang, cl]
         include:
           - os: windows-latest
@@ -54,6 +54,10 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
+    - name: Install Valgrind
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.build_type == 'Debug' }}
+      run: sudo apt-get update && sudo apt-get install valgrind -y
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
@@ -70,7 +74,7 @@ jobs:
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
     - uses: actions/upload-artifact@v4
-      if: ${{ matrix.c_compiler != 'clang' }}
+      if: ${{ matrix.c_compiler != 'clang' && matrix.build_type != 'Debug' }}
       with:
         name: ademma-${{ runner.os }}
         path: ${{ steps.strings.outputs.build-output-dir }}/${{ runner.os == 'Windows' && format('{0}/{1}', matrix.build_type, 'ademma.exe') || 'ademma' }}
@@ -81,7 +85,11 @@ jobs:
       shell: bash
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
-          ./test_ademma
+          if command -v valgrind &>/dev/null; then
+            valgrind --leak-check=full --error-exitcode=42 --errors-for-leak-kinds=all ./test_ademma
+          else
+            ./test_ademma
+          fi
         elif [ "${{ runner.os }}" == "Windows" ]; then
           ./${{ matrix.build_type }}/test_ademma.exe
         fi
