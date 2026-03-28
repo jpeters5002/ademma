@@ -56,7 +56,6 @@ int main()
         std::cout << std::endl << "TESTS PASSED" << std::endl;
 #endif
     }
-    out_val = 1;
     return out_val;
 }
 
