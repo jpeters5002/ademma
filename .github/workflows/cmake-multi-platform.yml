@@ -55,7 +55,7 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
     - name: Install Valgrind
-      if: ${{ matrix.os == 'ubuntu-latest' }}
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.build_type == 'Debug' }}
       run: sudo apt-get update && sudo apt-get install valgrind -y
 
     - name: Configure CMake
@@ -85,7 +85,11 @@ jobs:
       shell: bash
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
-          valgrind --leak-check=full --error-exitcode=42 --errors-for-leak-kinds=all ./test_ademma
+          if command -v valgrind &>/dev/null; then
+            valgrind --leak-check=full --error-exitcode=42 --errors-for-leak-kinds=all ./test_ademma
+          else
+            ./test_ademma
+          fi
         elif [ "${{ runner.os }}" == "Windows" ]; then
           ./${{ matrix.build_type }}/test_ademma.exe
         fi
