@@ -85,7 +85,7 @@ jobs:
       shell: bash
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
-          valgrind --leak-check=full ./test_ademma
+          valgrind --leak-check=full --error-exitcode=42 --errors-for-leak-kinds=all ./test_ademma
         elif [ "${{ runner.os }}" == "Windows" ]; then
           ./${{ matrix.build_type }}/test_ademma.exe
         fi
