@@ -6,7 +6,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-project(ademma VERSION 0.2.1 LANGUAGES CXX)
+project(ademma VERSION 0.3.0 LANGUAGES CXX)
 
 if (MSVC)
     add_compile_options(/W4)
