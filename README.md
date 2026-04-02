@@ -90,5 +90,5 @@ Lead Designer and Programmer
   * Brian Billman
 
 Math Wizard
-  * Joshua A. Peterson
+  * Joshua A. Peterson, PhD
 
